@@ -4,8 +4,51 @@ package pb;
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb";
 
+import "google/protobuf/timestamp.proto";
+
 message HealthzRequest {}
 
 message HealthzResponse {
 	string status = 1;
 }
+
+message VideoInfo {
+	string id = 1;
+	uint32 width = 2;
+	uint32 height = 3;
+	uint64 size = 4;
+	double duration = 5;
+	string url = 6;
+	string status = 7;
+	map<string, string> variants = 8;
+	google.protobuf.Timestamp created_at = 9;
+	google.protobuf.Timestamp updated_at = 10;
+}
+
+message GetVideoRequest {
+	string id = 1;
+}
+
+message GetVideoResponse {
+	VideoInfo video = 1;
+}
+
+message ListVideoRequest {}
+
+message ListVideoResponse {
+	repeated VideoInfo videos = 1;
+}
+
+message UploadVideoRequest {
+	bytes chunk_data = 1;
+}
+
+message UploadVideoResponse {
+	string id = 1;
+}
+
+message DeleteVideoRequest {
+	string id = 1;
+}
+
+message DeleteVideoResponse {}
