@@ -10,7 +10,7 @@ DOCKER_COMPOSE := docker compose
 -include */makefile.mk
 
 ####################################################################################################
-### rule for the generate command
+### Rule for the `generate` command
 ###
 
 define make-generate-rules
@@ -49,5 +49,5 @@ bin/protoc-gen-go-grpc: go.mod
 	go build -o $@ google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
 ####################################################################################################
-### rule for the test command
+### Rule for the `test` command
 ###
