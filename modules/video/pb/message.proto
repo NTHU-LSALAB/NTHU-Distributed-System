@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb";
+
+message HealthzRequest {}
+
+message HealthzResponse {
+	string status = 1;
+}

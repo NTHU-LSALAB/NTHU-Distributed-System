@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  proto:
+    image: justin0u0/golang-protoc:protoc-3.19.3-golang-1.17
+    working_dir: /src
+    environment:
+      GOPATH: /go
+    volumes:
+    - .:/src
+    - ~/go/pkg/mod/cache:/go/pkg/mod/cache
+    command:
+    - make
+    - proto

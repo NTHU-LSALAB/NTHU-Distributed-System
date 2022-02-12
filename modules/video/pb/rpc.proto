@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "modules/video/pb/message.proto";
+
+option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb";
+
+service Video {
+	rpc Healthz(HealthzRequest) returns (HealthzResponse) {}
+
+	// rpc GetVideo(GetVideoRequest) returns (GetVideoResponse) {}
+	// rpc ListVideo(ListVideoRequest) returns (ListVideoResponse) {}
+	// rpc CreateVideo(CreateVideoRequest) returns (CreateVideoResponse) {}
+	// rpc UpdateVideo(UpdateVideoRequest) returns (UpdateVideoResponse) {}
+	// rpc DeleteVideo(DeleleVideoRequest) returns (DeleteVideoResponse) {}
+}
