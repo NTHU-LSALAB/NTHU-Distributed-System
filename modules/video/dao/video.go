@@ -32,3 +32,26 @@ type VideoDAO interface {
 var (
 	ErrVideoNotFound = errors.New("video not found")
 )
+
+// newFakeVideo returns a fake video instance with random
+// id that is useful for testing
+func newFakeVideo() *Video {
+	id := primitive.NewObjectID()
+
+	// Note that timestamp is hard to test equally,
+	// so ignore the `createdAt` and `updatedAt` field
+
+	return &Video{
+		ID:       id,
+		Width:    800,
+		Height:   600,
+		Size:     144000,
+		Duration: 10.234,
+		URL:      "https://storage.example.com/videos/" + id.Hex() + ".mp4",
+		Status:   "SUCCESS",
+		Variants: map[string]string{
+			"1080p": "https://storage.example.com/videos/" + id.Hex() + "-1080p.mp4",
+			"720p":  "https://storage.example.com/videos/" + id.Hex() + "-720p.mp4",
+		},
+	}
+}

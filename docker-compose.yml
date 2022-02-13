@@ -1,14 +1,37 @@
 version: '3.9'
 
+x-common-env: &common-env
+  MONGO_URL: mongodb://mongo:27017/
+  # POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+  # REDIS_ADDR: redis:6379
+  # KAFKA_ADDR:
+
+x-common-build: &common-build
+  image: justin0u0/golang-protoc:protoc-3.19.3-golang-1.17
+  working_dir: /src
+  environment:
+    <<: *common-env
+    GOPATH: /go
+  volumes:
+  - .:/src
+  - ~/go/pkg/mod/cache:/go/pkg/mod/cache
+
 services:
+  mongo:
+    image: mongo:5
+    ports:
+      - 27017:27017
+
   proto:
-    image: justin0u0/golang-protoc:protoc-3.19.3-golang-1.17
-    working_dir: /src
-    environment:
-      GOPATH: /go
-    volumes:
-    - .:/src
-    - ~/go/pkg/mod/cache:/go/pkg/mod/cache
+    <<: *common-build
     command:
     - make
     - proto
+
+  test:
+    <<: *common-build
+    command:
+    - make
+    - proto
+    depends_on:
+    - mongo

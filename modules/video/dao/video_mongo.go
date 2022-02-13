@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,6 +25,9 @@ func NewVideoMongoDAO(collection *mongo.Collection) *videoMongoDAO {
 func (dao *videoMongoDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
 	var video Video
 	if err := dao.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&video); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, ErrVideoNotFound
+		}
 		return nil, err
 	}
 

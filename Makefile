@@ -13,24 +13,24 @@ DOCKER_COMPOSE := docker compose
 ### Rule for the `generate` command
 ###
 
-define make-generate-rules
+define make-dc-generate-rules
 
-.PHONY: $1.generate
+.PHONY: dc.$1.generate
 
-# to generate individual service, override the command defined in the docker-compose.yml file
-$1.generate::
+# to generate individual module, override the command defined in the docker-compose.yml file
+dc.$1.generate:
 	$(DOCKER_COMPOSE) run --rm proto make $1.proto
 
 endef
-$(foreach module,$(MODULES),$(eval $(call make-generate-rules,$(module))))
+$(foreach module,$(MODULES),$(eval $(call make-dc-generate-rules,$(module))))
 
-.PHONY: generate
-generate:
+.PHONY: dc.generate
+dc.generate:
 	$(DOCKER_COMPOSE) run --rm proto
 
 define make-proto-rules
 
-$1.proto:: bin/protoc-gen-go bin/protoc-gen-go-grpc
+$1.proto: bin/protoc-gen-go bin/protoc-gen-go-grpc
 	protoc \
 		-I . \
 		--go_out=paths=source_relative:. \
@@ -51,3 +51,29 @@ bin/protoc-gen-go-grpc: go.mod
 ####################################################################################################
 ### Rule for the `test` command
 ###
+
+define make-dc-test-rules
+
+.PHONY: dc.$1.test
+
+# to test individual module, override the command defined in the docker-compose.yml file
+dc.$1.test:
+	$(DOCKER_COMPOSE) run --rm test make $1.test
+
+endef
+$(foreach module,$(MODULES),$(eval $(call make-dc-test-rules,$(module))))
+
+.PHONY: dc.test
+dc.test:
+	$(DOCKER_COMPOSE) run --rm test
+
+define make-test-rules
+
+$1.test:
+	go test -v -race ./modules/$1/...
+	
+endef
+$(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
+
+test:
+	go test -v -race ./...
