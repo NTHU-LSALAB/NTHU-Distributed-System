@@ -24,7 +24,7 @@ type Video struct {
 type VideoDAO interface {
 	Get(ctx context.Context, id primitive.ObjectID) (*Video, error)
 	List(ctx context.Context, limit, skip int64) ([]*Video, error)
-	Create(ctx context.Context, video *Video) (primitive.ObjectID, error)
+	Create(ctx context.Context, video *Video) error
 	Update(ctx context.Context, video *Video) error
 	Delete(ctx context.Context, id primitive.ObjectID) error
 }

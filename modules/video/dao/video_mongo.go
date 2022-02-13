@@ -56,13 +56,15 @@ func (dao *videoMongoDAO) List(ctx context.Context, limit, skip int64) ([]*Video
 	return videos, nil
 }
 
-func (dao *videoMongoDAO) Create(ctx context.Context, video *Video) (primitive.ObjectID, error) {
+func (dao *videoMongoDAO) Create(ctx context.Context, video *Video) error {
 	result, err := dao.collection.InsertOne(ctx, video)
 	if err != nil {
-		return primitive.NilObjectID, err
+		return err
 	}
 
-	return result.InsertedID.(primitive.ObjectID), nil
+	video.ID = result.InsertedID.(primitive.ObjectID)
+
+	return nil
 }
 
 func (dao *videoMongoDAO) Update(ctx context.Context, video *Video) error {
