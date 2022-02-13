@@ -5,7 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Video struct {
@@ -19,6 +21,21 @@ type Video struct {
 	Variants  map[string]string  `bson:"variants,omitempty"`
 	CreatedAt time.Time          `bson:"created_at,omitempty"`
 	UpdatedAt time.Time          `bson:"updated_at,omitempty"`
+}
+
+func (v *Video) ToProto() *pb.VideoInfo {
+	return &pb.VideoInfo{
+		Id:        v.ID.Hex(),
+		Width:     v.Width,
+		Height:    v.Height,
+		Size:      v.Size,
+		Duration:  v.Duration,
+		Url:       v.URL,
+		Status:    v.Status,
+		Variants:  v.Variants,
+		CreatedAt: timestamppb.New(v.CreatedAt),
+		UpdatedAt: timestamppb.New(v.UpdatedAt),
+	}
 }
 
 type VideoDAO interface {

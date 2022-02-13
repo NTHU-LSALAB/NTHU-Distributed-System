@@ -33,7 +33,10 @@ message GetVideoResponse {
 	VideoInfo video = 1;
 }
 
-message ListVideoRequest {}
+message ListVideoRequest {
+	int64 limit = 1;
+	int64 skip = 2;
+}
 
 message ListVideoResponse {
 	repeated VideoInfo videos = 1;
