@@ -19,34 +19,39 @@ define make-dc-generate-rules
 
 # to generate individual module, override the command defined in the docker-compose.yml file
 dc.$1.generate:
-	$(DOCKER_COMPOSE) run --rm proto make $1.proto
+	$(DOCKER_COMPOSE) run --rm proto make $1.generate
 
 endef
 $(foreach module,$(MODULES),$(eval $(call make-dc-generate-rules,$(module))))
 
 .PHONY: dc.generate
 dc.generate:
-	$(DOCKER_COMPOSE) run --rm proto
+	$(DOCKER_COMPOSE) run --rm generate
 
-define make-proto-rules
+define make-generate-rules
 
-$1.proto: bin/protoc-gen-go bin/protoc-gen-go-grpc
+$1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/mockgen
 	protoc \
 		-I . \
 		--go_out=paths=source_relative:. \
 		--go-grpc_out=paths=source_relative:. \
 		./modules/$1/pb/*.proto
 
-endef
-$(foreach module,$(MODULES),$(eval $(call make-proto-rules,$(module))))
+	go generate ./modules/$1/...
 
-proto: bin/protoc-gen-go bin/protoc-gen-go-grpc $(addsuffix .proto,$(MODULES))
+endef
+$(foreach module,$(MODULES),$(eval $(call make-generate-rules,$(module))))
+
+generate: $(addsuffix .generate,$(MODULES))
 
 bin/protoc-gen-go: go.mod
 	go build -o $@ google.golang.org/protobuf/cmd/protoc-gen-go
 
 bin/protoc-gen-go-grpc: go.mod
 	go build -o $@ google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+bin/mockgen: go.mod
+	go build -o $@ github.com/golang/mock/mockgen
 
 ####################################################################################################
 ### Rule for the `test` command
@@ -75,5 +80,4 @@ $1.test:
 endef
 $(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
 
-test:
-	go test -v -race ./...
+test: $(addsuffix .test,$(MODULES))

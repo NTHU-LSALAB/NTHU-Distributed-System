@@ -23,16 +23,16 @@ services:
     ports:
       - 27017:27017
 
-  proto:
+  generate:
     <<: *common-build
     command:
     - make
-    - proto
+    - generate
 
   test:
     <<: *common-build
     command:
     - make
-    - proto
+    - test
     depends_on:
     - mongo

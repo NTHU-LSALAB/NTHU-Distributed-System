@@ -6,7 +6,6 @@ import (
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
-	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,7 +15,12 @@ type service struct {
 	pb.UnimplementedVideoServer
 
 	videoDAO dao.VideoDAO
-	logger   *logkit.Logger
+}
+
+func NewService(videoDAO dao.VideoDAO) *service {
+	return &service{
+		videoDAO: videoDAO,
+	}
 }
 
 func (s *service) Healthz(ctx context.Context, req *pb.HealthzRequest) (*pb.HealthzResponse, error) {
