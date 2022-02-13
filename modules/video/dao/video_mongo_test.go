@@ -12,14 +12,15 @@ import (
 
 var _ = Describe("VideoMongoDAO", func() {
 	var videoDAO *videoMongoDAO
+	var ctx context.Context
 
 	BeforeEach(func() {
 		videoDAO = NewVideoMongoDAO(mongoClient.Database().Collection("video"))
+		ctx = context.Background()
 	})
 
-	Describe("GetVideo", func() {
+	Describe("Get", func() {
 		var (
-			ctx   context.Context
 			video *Video
 			id    primitive.ObjectID
 
@@ -28,16 +29,13 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			ctx = context.Background()
 			video = newFakeVideo()
 
-			Expect(videoDAO.collection.InsertOne(ctx, video)).
-				To(Equal(&mongo.InsertOneResult{InsertedID: video.ID}))
+			insertVideo(ctx, videoDAO, video)
 		})
 
 		AfterEach(func() {
-			Expect(videoDAO.collection.DeleteOne(ctx, bson.M{"_id": video.ID})).
-				To(Equal(&mongo.DeleteResult{DeletedCount: 1}))
+			deleteVideo(ctx, videoDAO, video.ID)
 		})
 
 		JustBeforeEach(func() {
@@ -63,9 +61,8 @@ var _ = Describe("VideoMongoDAO", func() {
 		})
 	})
 
-	Describe("ListVideo", func() {
+	Describe("List", func() {
 		var (
-			ctx    context.Context
 			videos []*Video
 			limit  int64
 			skip   int64
@@ -75,20 +72,16 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			ctx = context.Background()
-
 			videos = []*Video{newFakeVideo(), newFakeVideo(), newFakeVideo()}
 
 			for _, video := range videos {
-				Expect(videoDAO.collection.InsertOne(ctx, video)).
-					To(Equal(&mongo.InsertOneResult{InsertedID: video.ID}))
+				insertVideo(ctx, videoDAO, video)
 			}
 		})
 
 		AfterEach(func() {
 			for _, video := range videos {
-				Expect(videoDAO.collection.DeleteOne(ctx, bson.M{"_id": video.ID})).
-					To(Equal(&mongo.DeleteResult{DeletedCount: 1}))
+				deleteVideo(ctx, videoDAO, video.ID)
 			}
 		})
 
@@ -124,34 +117,24 @@ var _ = Describe("VideoMongoDAO", func() {
 		})
 	})
 
-	Describe("CreateVideo", func() {
+	Describe("Create", func() {
 		var (
-			ctx   context.Context
 			video *Video
 
 			err error
-
-			getVideo Video
 		)
 
 		BeforeEach(func() {
-			ctx = context.Background()
-
 			video = newFakeVideo()
 			video.ID = primitive.NilObjectID
 		})
 
 		AfterEach(func() {
-			Expect(videoDAO.collection.DeleteOne(ctx, bson.M{"_id": video.ID})).
-				To(Equal(&mongo.DeleteResult{DeletedCount: 1}))
+			deleteVideo(ctx, videoDAO, video.ID)
 		})
 
 		JustBeforeEach(func() {
 			err = videoDAO.Create(ctx, video)
-
-			Expect(
-				videoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
-			).NotTo(HaveOccurred())
 		})
 
 		When("success", func() {
@@ -160,10 +143,130 @@ var _ = Describe("VideoMongoDAO", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			It("inserts the document successfully", func() {
+			It("inserts the document", func() {
+				var getVideo Video
+
+				Expect(
+					videoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
+				).NotTo(HaveOccurred())
+
 				Expect(&getVideo).To(Equal(video))
 			})
 		})
 	})
 
+	Describe("Update", func() {
+		var (
+			video *Video
+			id    primitive.ObjectID
+
+			err error
+		)
+
+		BeforeEach(func() {
+			video = newFakeVideo()
+			id = video.ID
+
+			insertVideo(ctx, videoDAO, video)
+		})
+
+		AfterEach(func() {
+			deleteVideo(ctx, videoDAO, id)
+		})
+
+		JustBeforeEach(func() {
+			err = videoDAO.Update(ctx, video)
+		})
+
+		When("video not found", func() {
+			BeforeEach(func() { video.ID = primitive.NewObjectID() })
+
+			It("returns video not found error", func() {
+				Expect(err).To(MatchError(ErrVideoNotFound))
+			})
+		})
+
+		When("success", func() {
+			var size uint64
+
+			BeforeEach(func() {
+				size = 1234
+				video.Size = size
+			})
+
+			It("returns no error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("updates the document", func() {
+				var getVideo Video
+
+				Expect(
+					videoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
+				).NotTo(HaveOccurred())
+
+				Expect(getVideo.Size).To(Equal(size))
+				Expect(&getVideo).To(Equal(video))
+			})
+		})
+	})
+
+	Describe("Delete", func() {
+		var (
+			video *Video
+			id    primitive.ObjectID
+
+			err error
+		)
+
+		BeforeEach(func() {
+			video = newFakeVideo()
+			id = video.ID
+
+			insertVideo(ctx, videoDAO, video)
+		})
+
+		JustBeforeEach(func() {
+			err = videoDAO.Delete(ctx, video.ID)
+		})
+
+		When("video not found", func() {
+			BeforeEach(func() { video.ID = primitive.NewObjectID() })
+
+			AfterEach(func() {
+				deleteVideo(ctx, videoDAO, id)
+			})
+
+			It("returns video not found error", func() {
+
+				Expect(err).To(MatchError(ErrVideoNotFound))
+			})
+		})
+
+		When("success", func() {
+			It("returns no error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("deletes the document", func() {
+				var getVideo Video
+
+				Expect(
+					videoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
+				).To(Equal(mongo.ErrNoDocuments))
+			})
+		})
+	})
 })
+
+// useful methods for testing
+
+func insertVideo(ctx context.Context, videoDAO *videoMongoDAO, video *Video) {
+	Expect(videoDAO.collection.InsertOne(ctx, video)).
+		To(Equal(&mongo.InsertOneResult{InsertedID: video.ID}))
+}
+
+func deleteVideo(ctx context.Context, videoDAO *videoMongoDAO, id primitive.ObjectID) {
+	Expect(videoDAO.collection.DeleteOne(ctx, bson.M{"_id": id})).
+		To(Equal(&mongo.DeleteResult{DeletedCount: 1}))
+}
