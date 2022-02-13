@@ -12,6 +12,7 @@ x-common-build: &common-build
   environment:
     <<: *common-env
     GOPATH: /go
+    GOCACHE: /src/.cache/gocache
   volumes:
   - .:/src
   - ~/go/pkg/mod/cache:/go/pkg/mod/cache
