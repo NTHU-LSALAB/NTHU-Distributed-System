@@ -2,7 +2,7 @@ PATH := $(CURDIR)/bin:$(PATH)
 
 MODULES := video comment
 
-DOCKER_COMPOSE := docker compose
+DOCKER_COMPOSE := $(or $(DOCKER_COMPOSE),$(DOCKER_COMPOSE),docker compose)
 
 ####################################################################################################
 ### Automatically include components' extensions and ad-hoc rules (makefile.mk)
