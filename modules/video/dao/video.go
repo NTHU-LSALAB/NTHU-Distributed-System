@@ -50,9 +50,9 @@ var (
 	ErrVideoNotFound = errors.New("video not found")
 )
 
-// newFakeVideo returns a fake video instance with random
+// NewFakeVideo returns a fake video instance with random
 // id that is useful for testing
-func newFakeVideo() *Video {
+func NewFakeVideo() *Video {
 	id := primitive.NewObjectID()
 
 	// Note that timestamp is hard to test equally,

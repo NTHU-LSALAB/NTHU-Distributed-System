@@ -51,7 +51,7 @@ func (s *service) ListVideo(ctx context.Context, req *pb.ListVideoRequest) (*pb.
 		return nil, err
 	}
 
-	pbVideos := make([]*pb.VideoInfo, len(videos))
+	pbVideos := make([]*pb.VideoInfo, 0, len(videos))
 	for _, video := range videos {
 		pbVideos = append(pbVideos, video.ToProto())
 	}

@@ -29,7 +29,7 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			video = newFakeVideo()
+			video = NewFakeVideo()
 
 			insertVideo(ctx, videoDAO, video)
 		})
@@ -72,7 +72,7 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			videos = []*Video{newFakeVideo(), newFakeVideo(), newFakeVideo()}
+			videos = []*Video{NewFakeVideo(), NewFakeVideo(), NewFakeVideo()}
 
 			for _, video := range videos {
 				insertVideo(ctx, videoDAO, video)
@@ -125,7 +125,7 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			video = newFakeVideo()
+			video = NewFakeVideo()
 			video.ID = primitive.NilObjectID
 		})
 
@@ -164,7 +164,7 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			video = newFakeVideo()
+			video = NewFakeVideo()
 			id = video.ID
 
 			insertVideo(ctx, videoDAO, video)
@@ -220,7 +220,7 @@ var _ = Describe("VideoMongoDAO", func() {
 		)
 
 		BeforeEach(func() {
-			video = newFakeVideo()
+			video = NewFakeVideo()
 			id = video.ID
 
 			insertVideo(ctx, videoDAO, video)
