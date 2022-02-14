@@ -54,7 +54,3 @@ func NewLogger(conf *LoggerConfig) *Logger {
 func (l *Logger) WithContext(ctx context.Context) context.Context {
 	return WithContext(ctx, l)
 }
-
-func (l *Logger) FromContext(ctx context.Context) {
-	l = FromContext(ctx)
-}

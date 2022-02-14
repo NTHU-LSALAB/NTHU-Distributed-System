@@ -54,6 +54,33 @@ bin/mockgen: go.mod
 	go build -o $@ github.com/golang/mock/mockgen
 
 ####################################################################################################
+### Rule for the `lint` command
+###
+
+define make-dc-lint-rules
+
+.PHONY: dc.$1.lint
+dc.$1.lint:
+	$(DOCKER_COMPOSE) run --rm lint make $1.lint
+endef
+$(foreach module,$(MODULES),$(eval $(call make-dc-lint-rules,$(module))))
+
+.PHONY: dc.lint
+dc.lint:
+	$(DOCKER_COMPOSE) run --rm lint
+
+define make-lint-rules
+
+$1.lint:
+	golangci-lint run ./modules/$1/...
+
+endef
+$(foreach module,$(MODULES),$(eval $(call make-lint-rules,$(module))))
+
+lint: $(addsuffix .lint,$(MODULES))
+	golangci-lint run ./pkg/...
+
+####################################################################################################
 ### Rule for the `test` command
 ###
 
@@ -81,3 +108,4 @@ endef
 $(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
 
 test: $(addsuffix .test,$(MODULES))
+	go test -v -race ./pkg/...

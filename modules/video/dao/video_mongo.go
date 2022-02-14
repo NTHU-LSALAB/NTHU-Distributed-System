@@ -46,7 +46,7 @@ func (dao *videoMongoDAO) List(ctx context.Context, limit, skip int64) ([]*Video
 	videos := make([]*Video, 0)
 	for cursor.Next(ctx) {
 		var video Video
-		if err = cursor.Decode(&video); err != nil {
+		if err := cursor.Decode(&video); err != nil {
 			return nil, err
 		}
 
