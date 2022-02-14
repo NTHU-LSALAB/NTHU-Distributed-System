@@ -103,7 +103,7 @@ define make-test-rules
 
 $1.test:
 	go test -v -race ./modules/$1/...
-	
+
 endef
 $(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
 
