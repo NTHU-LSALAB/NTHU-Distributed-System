@@ -33,3 +33,19 @@ jobs:
 
     - name: test
       run: make dc.test
+
+    - name: image
+      run: make dc.image
+
+    - name: login
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: push
+      run: |
+        docker tag nthu-distributed-system:latest nthu-distributed-system:${{ env.GITHUB_SHA }}
+        docker push nthu-distributed-system:latest
+        docker push nthu-distributed-system:${{ env.GITHUB_SHA }}
