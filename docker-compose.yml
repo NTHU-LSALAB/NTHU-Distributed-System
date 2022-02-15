@@ -1,6 +1,8 @@
 version: '3.9'
 
 x-common-env: &common-env
+  GOPATH: /go
+  GOCACHE: /src/.cache/gocache
   MONGO_URL: mongodb://mongo:27017/
   # POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
   # REDIS_ADDR: redis:6379
@@ -11,8 +13,6 @@ x-common-build: &common-build
   working_dir: /src
   environment:
     <<: *common-env
-    GOPATH: /go
-    GOCACHE: /src/.cache/gocache
   volumes:
   - .:/src
   - ~/go/pkg/mod/cache:/go/pkg/mod/cache
@@ -45,3 +45,16 @@ services:
     - test
     depends_on:
     - mongo
+
+  build:
+    <<: *common-build
+    command:
+    - make
+    - build
+
+  image:
+    image: nthu-distributed-system:latest
+    build:
+      context: .
+    environment:
+      <<: *common-env

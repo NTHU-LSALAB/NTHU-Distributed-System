@@ -109,3 +109,19 @@ $(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
 
 test: $(addsuffix .test,$(MODULES))
 	go test -v -race ./pkg/...
+
+####################################################################################################
+### Rule for the `build` command
+###
+
+.PHONY: dc.image
+dc.image: dc.build
+	$(DOCKER_COMPOSE) build --force-rm image
+
+.PHONY: dc.build
+dc.build:
+	$(DOCKER_COMPOSE) run --rm build
+
+build:
+	mkdir -p ./bin/app
+	go build -o ./bin/app/cmd ./cmd/main.go
