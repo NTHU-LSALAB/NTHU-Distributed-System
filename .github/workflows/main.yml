@@ -23,20 +23,15 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: prepare
-      run: |
-        mkdir -p ~/go/pkg/mod/cache
-        mkdir -p ~/.cache/go-build
-
     - name: cache
       uses: actions/cache@v2
       with:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: gocache-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-gocache-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          gocache-
+          ${{ runner.os }}-gocache-
 
     - name: test
       run: make dc.test

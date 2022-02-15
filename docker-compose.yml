@@ -3,6 +3,7 @@ version: '3.9'
 x-common-env: &common-env
   GOPATH: /go
   GOCACHE: /src/.cache/gocache
+  GOFLAGS: -modcacherw
   MONGO_URL: mongodb://mongo:27017/
   MONGO_DATABASE: nthu_distributes_system
   # POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
