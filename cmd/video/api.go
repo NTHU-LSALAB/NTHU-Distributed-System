@@ -59,12 +59,8 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	videoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
 	svc := service.NewService(videoDAO)
 
-	return runkit.GracefulRun(serveGRPC(args.GRPCAddr, svc, logger), &args.GracefulConfig)
-}
-
-func serveGRPC(addr string, svc pb.VideoServer, logger *logkit.Logger) runkit.GracefulRunFunc {
-	logger.Info("listen to gRPC addr", zap.String("grpc_addr", addr))
-	lis, err := net.Listen("tcp", addr)
+	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
+	lis, err := net.Listen("tcp", args.GRPCAddr)
 	if err != nil {
 		logger.Fatal("fail to listen gRPC addr", zap.Error(err))
 	}
@@ -74,6 +70,10 @@ func serveGRPC(addr string, svc pb.VideoServer, logger *logkit.Logger) runkit.Gr
 		}
 	}()
 
+	return runkit.GracefulRun(serveGRPC(lis, svc, logger), &args.GracefulConfig)
+}
+
+func serveGRPC(lis net.Listener, svc pb.VideoServer, logger *logkit.Logger) runkit.GracefulRunFunc {
 	grpcServer := grpc.NewServer()
 	pb.RegisterVideoServer(grpcServer, svc)
 

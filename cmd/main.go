@@ -13,9 +13,9 @@ func main() {
 		Short: "NTHU Distributed System module entrypoints",
 	}
 
+	cmd.AddCommand(video.NewVideoCommand())
+
 	if err := cmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
-
-	cmd.AddCommand(video.NewVideoCommand())
 }
