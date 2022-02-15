@@ -19,26 +19,24 @@ jobs:
       DOCKER_COMPOSE: docker-compose
       REGISTRY: ghcr.io
       OWNER: nthu-lsalab
-      GOFLAGS: -modcacherw
     steps:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: setup
-      uses: actions/setup-go@v2
-      with:
-        go-version: '1.17'
-        check-latest: true
+    - name: prepare
+      run: |
+        mkdir -p ~/go/pkg/mod/cache
+        mkdir -p ~/.cache/go-build
 
     - name: cache
-      uses: actions/cache@v2.1.7
+      uses: actions/cache@v2
       with:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: go-cache-${{ hashFiles('**/go.sum') }}
+        key: gocache-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          go-cache
+          gocache-
 
     - name: test
       run: make dc.test
