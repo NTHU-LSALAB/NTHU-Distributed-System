@@ -19,6 +19,7 @@ jobs:
       DOCKER_COMPOSE: docker-compose
       REGISTRY: ghcr.io
       OWNER: nthu-lsalab
+      GOFLAGS: -modcacherw
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -35,9 +36,9 @@ jobs:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        key: go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-go-
+          go-
 
     - name: test
       run: make dc.test
