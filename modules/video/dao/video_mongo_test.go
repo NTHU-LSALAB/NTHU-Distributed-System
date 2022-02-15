@@ -15,7 +15,7 @@ var _ = Describe("VideoMongoDAO", func() {
 	var ctx context.Context
 
 	BeforeEach(func() {
-		videoDAO = NewVideoMongoDAO(mongoClient.Database().Collection("video"))
+		videoDAO = NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
 		ctx = context.Background()
 	})
 
