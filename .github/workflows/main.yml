@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_COMPOSE: docker-compose
+      REGISTRY: ghcr.io
+      OWNER: nthu-lsalab
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -46,6 +48,7 @@ jobs:
 
     - name: push
       run: |
-        docker tag nthu-distributed-system:latest nthu-distributed-system:${{ github.sha }}
-        docker push ghcr.io/nthu-lsalab/nthu-distributed-system:latest
-        docker push ghcr.io/nthu-lsalab/nthu-distributed-system:${{ github.sha }}
+        docker tag nthu-distributed-system:latest ${{ env.REGISTRY }}/${{ env.OWNER }}/nthu-distributed-system:latest
+        docker tag nthu-distributed-system:latest ${{ env.REGISTRY }}/${{ env.OWNER }}/nthu-distributed-system:${{ github.sha }}
+        docker push ${{ env.REGISTRY }}/${{ env.OWNER }}/nthu-distributed-system:latest
+        docker push ${{ env.REGISTRY }}/${{ env.OWNER }}/nthu-distributed-system:${{ github.sha }}
