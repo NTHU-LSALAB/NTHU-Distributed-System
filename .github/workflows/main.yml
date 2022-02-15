@@ -47,5 +47,5 @@ jobs:
     - name: push
       run: |
         docker tag nthu-distributed-system:latest nthu-distributed-system:${{ github.sha }}
-        docker push nthu-distributed-system:latest
-        docker push nthu-distributed-system:${{ github.sha }}
+        docker push ghcr.io/NTHU-LSALAB/nthu-distributed-system:latest
+        docker push ghcr.io/NTHU-LSALAB/nthu-distributed-system:${{ github.sha }}
