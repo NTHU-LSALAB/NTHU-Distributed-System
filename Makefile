@@ -23,7 +23,7 @@ define make-dc-generate-rules
 
 # to generate individual module, override the command defined in the docker-compose.yml file
 dc.$1.generate:
-	$(DOCKER_COMPOSE) run --rm proto make $1.generate
+	$(DOCKER_COMPOSE) run --rm generate make $1.generate
 
 endef
 $(foreach module,$(MODULES),$(eval $(call make-dc-generate-rules,$(module))))

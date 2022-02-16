@@ -18,86 +18,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// VideoClient is the client API for Video service.
+// CommentClient is the client API for Comment service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type VideoClient interface {
+type CommentClient interface {
 	Healthz(ctx context.Context, in *HealthzRequest, opts ...grpc.CallOption) (*HealthzResponse, error)
 }
 
-type videoClient struct {
+type commentClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewVideoClient(cc grpc.ClientConnInterface) VideoClient {
-	return &videoClient{cc}
+func NewCommentClient(cc grpc.ClientConnInterface) CommentClient {
+	return &commentClient{cc}
 }
 
-func (c *videoClient) Healthz(ctx context.Context, in *HealthzRequest, opts ...grpc.CallOption) (*HealthzResponse, error) {
+func (c *commentClient) Healthz(ctx context.Context, in *HealthzRequest, opts ...grpc.CallOption) (*HealthzResponse, error) {
 	out := new(HealthzResponse)
-	err := c.cc.Invoke(ctx, "/pb.Video/Healthz", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.Comment/Healthz", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// VideoServer is the server API for Video service.
-// All implementations must embed UnimplementedVideoServer
+// CommentServer is the server API for Comment service.
+// All implementations must embed UnimplementedCommentServer
 // for forward compatibility
-type VideoServer interface {
+type CommentServer interface {
 	Healthz(context.Context, *HealthzRequest) (*HealthzResponse, error)
-	mustEmbedUnimplementedVideoServer()
+	mustEmbedUnimplementedCommentServer()
 }
 
-// UnimplementedVideoServer must be embedded to have forward compatible implementations.
-type UnimplementedVideoServer struct {
+// UnimplementedCommentServer must be embedded to have forward compatible implementations.
+type UnimplementedCommentServer struct {
 }
 
-func (UnimplementedVideoServer) Healthz(context.Context, *HealthzRequest) (*HealthzResponse, error) {
+func (UnimplementedCommentServer) Healthz(context.Context, *HealthzRequest) (*HealthzResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Healthz not implemented")
 }
-func (UnimplementedVideoServer) mustEmbedUnimplementedVideoServer() {}
+func (UnimplementedCommentServer) mustEmbedUnimplementedCommentServer() {}
 
-// UnsafeVideoServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to VideoServer will
+// UnsafeCommentServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CommentServer will
 // result in compilation errors.
-type UnsafeVideoServer interface {
-	mustEmbedUnimplementedVideoServer()
+type UnsafeCommentServer interface {
+	mustEmbedUnimplementedCommentServer()
 }
 
-func RegisterVideoServer(s grpc.ServiceRegistrar, srv VideoServer) {
-	s.RegisterService(&Video_ServiceDesc, srv)
+func RegisterCommentServer(s grpc.ServiceRegistrar, srv CommentServer) {
+	s.RegisterService(&Comment_ServiceDesc, srv)
 }
 
-func _Video_Healthz_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Comment_Healthz_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HealthzRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(VideoServer).Healthz(ctx, in)
+		return srv.(CommentServer).Healthz(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Video/Healthz",
+		FullMethod: "/pb.Comment/Healthz",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VideoServer).Healthz(ctx, req.(*HealthzRequest))
+		return srv.(CommentServer).Healthz(ctx, req.(*HealthzRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Video_ServiceDesc is the grpc.ServiceDesc for Video service.
+// Comment_ServiceDesc is the grpc.ServiceDesc for Comment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Video_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.Video",
-	HandlerType: (*VideoServer)(nil),
+var Comment_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "pb.Comment",
+	HandlerType: (*CommentServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Healthz",
-			Handler:    _Video_Healthz_Handler,
+			Handler:    _Comment_Healthz_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
