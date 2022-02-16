@@ -9,6 +9,10 @@ DOCKER_COMPOSE := $(or $(DOCKER_COMPOSE),$(DOCKER_COMPOSE),docker compose)
 ###
 -include */makefile.mk
 
+.PHONY: clean
+clean:
+	rm -rf bin/*
+
 ####################################################################################################
 ### Rule for the `generate` command
 ###
@@ -30,11 +34,13 @@ dc.generate:
 
 define make-generate-rules
 
-$1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/mockgen
+$1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/mockgen
 	protoc \
 		-I . \
+		-I ./pkg/pb \
 		--go_out=paths=source_relative:. \
 		--go-grpc_out=paths=source_relative:. \
+		--grpc-gateway_out=paths=source_relative:. \
 		./modules/$1/pb/*.proto
 
 	go generate ./modules/$1/...
@@ -49,6 +55,9 @@ bin/protoc-gen-go: go.mod
 
 bin/protoc-gen-go-grpc: go.mod
 	go build -o $@ google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+bin/protoc-gen-grpc-gateway: go.mod
+	go build -o $@ github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
 
 bin/mockgen: go.mod
 	go build -o $@ github.com/golang/mock/mockgen

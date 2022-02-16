@@ -2,12 +2,17 @@ syntax = "proto3";
 
 package pb;
 
+import "google/api/annotations.proto";
 import "modules/video/pb/message.proto";
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb";
 
 service Video {
-	rpc Healthz(HealthzRequest) returns (HealthzResponse) {}
+	rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+		option (google.api.http) = {
+			get: "/"
+		};
+	}
 
 	rpc GetVideo(GetVideoRequest) returns (GetVideoResponse) {}
 	rpc ListVideo(ListVideoRequest) returns (ListVideoResponse) {}
