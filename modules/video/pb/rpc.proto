@@ -14,8 +14,26 @@ service Video {
 		};
 	}
 
-	rpc GetVideo(GetVideoRequest) returns (GetVideoResponse) {}
-	rpc ListVideo(ListVideoRequest) returns (ListVideoResponse) {}
+	rpc GetVideo(GetVideoRequest) returns (GetVideoResponse) {
+		option (google.api.http) = {
+			get: "/v1/videos/{id}"
+			response_body: "video"
+		};
+	}
+
+	rpc ListVideo(ListVideoRequest) returns (ListVideoResponse) {
+		option (google.api.http) = {
+			get: "/v1/videos"
+			response_body: "*"
+		};
+	}
+
 	rpc UploadVideo(stream UploadVideoRequest) returns (UploadVideoResponse) {}
-	rpc DeleteVideo(DeleteVideoRequest) returns (DeleteVideoResponse) {}
+
+	rpc DeleteVideo(DeleteVideoRequest) returns (DeleteVideoResponse) {
+		option (google.api.http) = {
+			delete: "/v1/videos/{id}"
+			response_body: "*"
+		};
+	}
 }
