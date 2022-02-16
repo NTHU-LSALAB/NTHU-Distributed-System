@@ -45,7 +45,7 @@ func NewLogger(conf *LoggerConfig) *Logger {
 
 	logger, err := config.Build()
 	if err != nil {
-		log.Fatal("fail to build logger")
+		log.Fatal("failed to build logger")
 	}
 
 	return &Logger{Logger: logger}

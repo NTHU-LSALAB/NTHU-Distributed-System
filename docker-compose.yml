@@ -59,3 +59,26 @@ services:
       context: .
     environment:
       <<: *common-env
+  
+  video-api:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+    command:
+    - /cmd
+    - video
+    - api
+    depends_on:
+    - mongo
+
+  video-gateway:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+      GRPC_ADDR: video-api:8081
+    command:
+    - /cmd
+    - video
+    - gateway
+    ports:
+    - 10080:8080

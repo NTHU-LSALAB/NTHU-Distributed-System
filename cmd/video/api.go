@@ -37,13 +37,13 @@ func runAPI(_ *cobra.Command, _ []string) error {
 
 	var args APIArgs
 	if _, err := flags.NewParser(&args, flags.Default).Parse(); err != nil {
-		log.Fatal("fail to parse flag", err.Error())
+		log.Fatal("failed to parse flag", err.Error())
 	}
 
 	logger := logkit.NewLogger(&args.LoggerConfig)
 	defer func() {
 		if err := logger.Sync(); err != nil {
-			log.Fatal("fail to sync logger", err.Error())
+			log.Fatal("failed to sync logger", err.Error())
 		}
 	}()
 
@@ -52,7 +52,7 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	mongoClient := mongokit.NewMongoClient(ctx, &args.MongoConfig)
 	defer func() {
 		if err := mongoClient.Close(); err != nil {
-			logger.Fatal("fail to close mongo client", zap.Error(err))
+			logger.Fatal("failed to close mongo client", zap.Error(err))
 		}
 	}()
 
@@ -62,11 +62,11 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
 	lis, err := net.Listen("tcp", args.GRPCAddr)
 	if err != nil {
-		logger.Fatal("fail to listen gRPC addr", zap.Error(err))
+		logger.Fatal("failed to listen gRPC addr", zap.Error(err))
 	}
 	defer func() {
 		if err := lis.Close(); err != nil {
-			logger.Fatal("fail to close gRPC listener", zap.Error(err))
+			logger.Fatal("failed to close gRPC listener", zap.Error(err))
 		}
 	}()
 
@@ -80,7 +80,7 @@ func serveGRPC(lis net.Listener, svc pb.VideoServer, logger *logkit.Logger) runk
 	return func(ctx context.Context) error {
 		go func() {
 			if err := grpcServer.Serve(lis); err != nil {
-				logger.Error("fail to run gRPC server", zap.Error(err))
+				logger.Error("failed to run gRPC server", zap.Error(err))
 			}
 		}()
 
