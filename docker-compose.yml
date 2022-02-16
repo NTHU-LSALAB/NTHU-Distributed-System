@@ -59,7 +59,7 @@ services:
       context: .
     environment:
       <<: *common-env
-  
+
   video-api:
     image: nthu-distributed-system:latest
     environment:
