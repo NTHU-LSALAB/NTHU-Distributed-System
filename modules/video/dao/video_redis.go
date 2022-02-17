@@ -2,13 +2,11 @@ package dao
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	"github.com/go-redis/cache/v8"
-	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -17,9 +15,7 @@ type videoRedisDAO struct {
 	baseDAO VideoDAO
 }
 
-// var _ VideoDAO = (*videoRedisDAO)(nil)
-// var ErrCacheMiss = errors.New("cache miss")
-// var ErrSingleFlight = errors.New("singleflight error")
+var _ VideoDAO = (*videoRedisDAO)(nil)
 
 func NewVideoRedisDAO(client *rediskit.RedisClient, baseDAO VideoDAO) *videoRedisDAO {
 	size := 1000
@@ -35,24 +31,17 @@ func NewVideoRedisDAO(client *rediskit.RedisClient, baseDAO VideoDAO) *videoRedi
 
 func (dao *videoRedisDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
 	var video Video
-	err := dao.cache.Get(ctx, id.Hex(), &video)
-	if errors.Is(err, redis.Nil) { // cache miss
-		onceErr := dao.cache.Once(&cache.Item{
-			Key:   id.Hex(),
-			Value: &video,
-			Do: func(*cache.Item) (interface{}, error) {
-				dbVideo, dberr := dao.baseDAO.Get(ctx, id)
-				return dbVideo, dberr
-			},
-		})
-		if onceErr != nil {
-			return nil, onceErr
-		} else {
-			return &video, nil
-		}
-	} else if err != nil {
+	err := dao.cache.Once(&cache.Item{
+		Key:   id.Hex(),
+		Value: &video,
+		Do: func(*cache.Item) (interface{}, error) {
+			dbVideo, dberr := dao.baseDAO.Get(ctx, id)
+			return dbVideo, dberr
+		},
+	})
+	if err != nil {
 		return nil, err
-	} else { // cache hit
+	} else {
 		return &video, nil
 	}
 }
@@ -60,24 +49,17 @@ func (dao *videoRedisDAO) Get(ctx context.Context, id primitive.ObjectID) (*Vide
 func (dao *videoRedisDAO) List(ctx context.Context, limit, skip int64) ([]*Video, error) {
 	var video []*Video
 	id := fmt.Sprintf("%d_%d", limit, skip)
-	err := dao.cache.Get(ctx, id, &video)
-	if errors.Is(err, redis.Nil) { // cache miss
-		onceErr := dao.cache.Once(&cache.Item{
-			Key:   id,
-			Value: &video,
-			Do: func(*cache.Item) (interface{}, error) {
-				dbVideo, dberr := dao.baseDAO.List(ctx, limit, skip)
-				return dbVideo, dberr
-			},
-		})
-		if onceErr != nil {
-			return nil, onceErr
-		} else {
-			return video, nil
-		}
-	} else if err != nil {
+	err := dao.cache.Once(&cache.Item{
+		Key:   id,
+		Value: &video,
+		Do: func(*cache.Item) (interface{}, error) {
+			dbVideo, dberr := dao.baseDAO.List(ctx, limit, skip)
+			return dbVideo, dberr
+		},
+	})
+	if err != nil {
 		return nil, err
-	} else { // cache hit
+	} else {
 		return video, nil
 	}
 }
