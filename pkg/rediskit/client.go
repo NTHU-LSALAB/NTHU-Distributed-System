@@ -10,7 +10,7 @@ import (
 )
 
 type RedisConfig struct {
-	URL      string `long:"url" env:"URL" description:"the URL of MongoDB" required:"true"`
+	URL      string `long:"url" env:"URL" description:"the URL of Redis" required:"true"`
 	Addr     string `long:"addr" env:"ADDR" description:"the Address of Redis" required:"true"`
 	Password string `long:"password" env:"PASSWORD" description:"the Password of Redis"`
 	DB       int    `long:"db" env:"DB" description:"default db"`
@@ -46,8 +46,7 @@ func NewRedisClient(ctx context.Context, conf *RedisConfig) *RedisClient {
 		DB:       conf.DB,
 	})
 
-	_, err := client.Ping(ctx).Result()
-	if err != nil {
+	if _, err := client.Ping(ctx).Result(); err != nil {
 		logger.Fatal("failed to ping to Redis", zap.Error(err))
 	}
 

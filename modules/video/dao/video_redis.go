@@ -31,37 +31,35 @@ func NewVideoRedisDAO(client *rediskit.RedisClient, baseDAO VideoDAO) *videoRedi
 
 func (dao *videoRedisDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
 	var video Video
-	err := dao.cache.Once(&cache.Item{
+	if err := dao.cache.Once(&cache.Item{
 		Key:   id.Hex(),
 		Value: &video,
 		Do: func(*cache.Item) (interface{}, error) {
 			dbVideo, dberr := dao.baseDAO.Get(ctx, id)
 			return dbVideo, dberr
 		},
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, err
-	} else {
-		return &video, nil
 	}
+
+	return &video, nil
 }
 
 func (dao *videoRedisDAO) List(ctx context.Context, limit, skip int64) ([]*Video, error) {
 	var video []*Video
 	id := fmt.Sprintf("%d_%d", limit, skip)
-	err := dao.cache.Once(&cache.Item{
+	if err := dao.cache.Once(&cache.Item{
 		Key:   id,
 		Value: &video,
 		Do: func(*cache.Item) (interface{}, error) {
 			dbVideo, dberr := dao.baseDAO.List(ctx, limit, skip)
 			return dbVideo, dberr
 		},
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, err
-	} else {
-		return video, nil
 	}
+
+	return video, nil
 }
 
 func (dao *videoRedisDAO) Create(ctx context.Context, video *Video) error {
