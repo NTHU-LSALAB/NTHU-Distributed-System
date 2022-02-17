@@ -22,6 +22,18 @@ services:
   mongo:
     image: mongo:5
 
+  minio:
+    image: minio/minio
+    volumes:
+    - ./.data/:/data
+    command:
+    - server
+    - /data
+    - --console-address
+    - ":9001"
+    ports:
+    - 9001:9001
+
   generate:
     <<: *common-build
     command:
