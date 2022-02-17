@@ -39,7 +39,7 @@ func NewRedisClient(ctx context.Context, conf *RedisConfig) *RedisClient {
 		DB:       conf.Database,
 	})
 
-	if _, err := client.Ping(ctx).Result(); err != nil {
+	if err := client.Ping(ctx).Err(); err != nil {
 		logger.Fatal("failed to ping to Redis", zap.Error(err))
 	}
 
