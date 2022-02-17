@@ -25,6 +25,11 @@ message VideoInfo {
 	google.protobuf.Timestamp updated_at = 10;
 }
 
+message VideoHeader {
+	string filename = 1;
+	uint64 size = 2;
+}
+
 message GetVideoRequest {
 	string id = 1;
 }
@@ -43,7 +48,10 @@ message ListVideoResponse {
 }
 
 message UploadVideoRequest {
-	bytes chunk_data = 1;
+	oneof data {
+		VideoHeader header = 1;
+		bytes chunk_data = 2;
+	};
 }
 
 message UploadVideoResponse {

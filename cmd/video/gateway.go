@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/gateway"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
@@ -81,6 +82,12 @@ func runGateway(_ *cobra.Command, _ []string) error {
 
 func serveHTTP(lis net.Listener, conn *grpc.ClientConn, logger *logkit.Logger) runkit.GracefulRunFunc {
 	mux := runtime.NewServeMux()
+
+	// register additional routes
+	handler := gateway.NewHandler(pb.NewVideoClient(conn), logger)
+	if err := mux.HandlePath("POST", "/v1/videos/", handler.HandleUploadVideo); err != nil {
+		logger.Fatal("failed to register additional routes")
+	}
 
 	httpServer := &http.Server{
 		Handler: mux,
