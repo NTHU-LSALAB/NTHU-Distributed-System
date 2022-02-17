@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
@@ -17,26 +16,31 @@ type videoRedisDAO struct {
 
 var _ VideoDAO = (*videoRedisDAO)(nil)
 
+const (
+	videoDAOLocalCacheSize     = 1024
+	videoDAOLocalCacheDuration = 1 * time.Minute
+	videoDAORedisCacheDuration = 3 * time.Minute
+)
+
 func NewVideoRedisDAO(client *rediskit.RedisClient, baseDAO VideoDAO) *videoRedisDAO {
-	size := 1000
-	redisCache := cache.New(&cache.Options{
-		Redis:      client.Client,
-		LocalCache: cache.NewTinyLFU(size, time.Minute),
-	})
 	return &videoRedisDAO{
-		cache:   redisCache,
+		cache: cache.New(&cache.Options{
+			Redis:      client,
+			LocalCache: cache.NewTinyLFU(videoDAOLocalCacheSize, videoDAOLocalCacheDuration),
+		}),
 		baseDAO: baseDAO,
 	}
 }
 
 func (dao *videoRedisDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
 	var video Video
+
 	if err := dao.cache.Once(&cache.Item{
-		Key:   id.Hex(),
+		Key:   getVideoKey(id),
 		Value: &video,
+		TTL:   videoDAORedisCacheDuration,
 		Do: func(*cache.Item) (interface{}, error) {
-			dbVideo, dberr := dao.baseDAO.Get(ctx, id)
-			return dbVideo, dberr
+			return dao.baseDAO.Get(ctx, id)
 		},
 	}); err != nil {
 		return nil, err
@@ -47,13 +51,13 @@ func (dao *videoRedisDAO) Get(ctx context.Context, id primitive.ObjectID) (*Vide
 
 func (dao *videoRedisDAO) List(ctx context.Context, limit, skip int64) ([]*Video, error) {
 	var video []*Video
-	id := fmt.Sprintf("%d_%d", limit, skip)
+
 	if err := dao.cache.Once(&cache.Item{
-		Key:   id,
+		Key:   listVideoKey(limit, skip),
 		Value: &video,
+		TTL:   videoDAORedisCacheDuration,
 		Do: func(*cache.Item) (interface{}, error) {
-			dbVideo, dberr := dao.baseDAO.List(ctx, limit, skip)
-			return dbVideo, dberr
+			return dao.baseDAO.List(ctx, limit, skip)
 		},
 	}); err != nil {
 		return nil, err
@@ -61,6 +65,8 @@ func (dao *videoRedisDAO) List(ctx context.Context, limit, skip int64) ([]*Video
 
 	return video, nil
 }
+
+// The following operations are not cachable, just pass down to baseDAO.
 
 func (dao *videoRedisDAO) Create(ctx context.Context, video *Video) error {
 	return dao.baseDAO.Create(ctx, video)

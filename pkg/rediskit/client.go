@@ -2,7 +2,6 @@ package rediskit
 
 import (
 	"context"
-	"os"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/go-redis/redis/v8"
@@ -10,10 +9,9 @@ import (
 )
 
 type RedisConfig struct {
-	URL      string `long:"url" env:"URL" description:"the URL of Redis" required:"true"`
-	Addr     string `long:"addr" env:"ADDR" description:"the Address of Redis" required:"true"`
-	Password string `long:"password" env:"PASSWORD" description:"the Password of Redis"`
-	DB       int    `long:"db" env:"DB" description:"default db"`
+	Addr     string `long:"addr" env:"ADDR" description:"the address of Redis" required:"true"`
+	Password string `long:"password" env:"PASSWORD" description:"the password of Redis"`
+	Database int    `long:"database" env:"DATABASE" description:"the database of Redis"`
 }
 
 type RedisClient struct {
@@ -30,20 +28,15 @@ func (c *RedisClient) Close() error {
 }
 
 func NewRedisClient(ctx context.Context, conf *RedisConfig) *RedisClient {
-	if url := os.ExpandEnv(conf.URL); url != "" {
-		conf.URL = url
-	}
-
 	logger := logkit.FromContext(ctx).
-		With(zap.String("url", conf.URL)).
 		With(zap.String("addr", conf.Addr)).
 		With(zap.String("password", conf.Password)).
-		With(zap.Int("db", conf.DB))
+		With(zap.Int("database", conf.Database))
 
 	client := redis.NewClient(&redis.Options{
 		Addr:     conf.Addr,
 		Password: conf.Password,
-		DB:       conf.DB,
+		DB:       conf.Database,
 	})
 
 	if _, err := client.Ping(ctx).Result(); err != nil {

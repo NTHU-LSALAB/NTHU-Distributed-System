@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
@@ -49,6 +50,14 @@ type VideoDAO interface {
 var (
 	ErrVideoNotFound = errors.New("video not found")
 )
+
+func getVideoKey(id primitive.ObjectID) string {
+	return "getVideo:" + id.Hex()
+}
+
+func listVideoKey(limit, skip int64) string {
+	return fmt.Sprintf("listVideo:%d:%d", limit, skip)
+}
 
 // NewFakeVideo returns a fake video instance with random
 // id that is useful for testing
