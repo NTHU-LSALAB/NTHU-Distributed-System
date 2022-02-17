@@ -18,16 +18,17 @@ type videoRedisDAO struct {
 }
 
 // var _ VideoDAO = (*videoRedisDAO)(nil)
-var ErrCacheMiss = errors.New("cache miss")
-var ErrSingleFlight = errors.New("singleflight error")
+// var ErrCacheMiss = errors.New("cache miss")
+// var ErrSingleFlight = errors.New("singleflight error")
 
 func NewVideoRedisDAO(client *rediskit.RedisClient, baseDAO VideoDAO) *videoRedisDAO {
-	cache := cache.New(&cache.Options{
+	size := 1000
+	redisCache := cache.New(&cache.Options{
 		Redis:      client.Client,
-		LocalCache: cache.NewTinyLFU(1000, time.Minute),
+		LocalCache: cache.NewTinyLFU(size, time.Minute),
 	})
 	return &videoRedisDAO{
-		cache:   cache,
+		cache:   redisCache,
 		baseDAO: baseDAO,
 	}
 }
@@ -35,17 +36,17 @@ func NewVideoRedisDAO(client *rediskit.RedisClient, baseDAO VideoDAO) *videoRedi
 func (dao *videoRedisDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
 	var video Video
 	err := dao.cache.Get(ctx, id.Hex(), &video)
-	if err == redis.Nil { // cache miss
-		err = dao.cache.Once(&cache.Item{
+	if errors.Is(err, redis.Nil) { // cache miss
+		onceErr := dao.cache.Once(&cache.Item{
 			Key:   id.Hex(),
 			Value: &video,
 			Do: func(*cache.Item) (interface{}, error) {
-				dbVideo, err := dao.baseDAO.Get(ctx, id)
-				return dbVideo, err
+				dbVideo, dberr := dao.baseDAO.Get(ctx, id)
+				return dbVideo, dberr
 			},
 		})
-		if err != nil {
-			return nil, err
+		if onceErr != nil {
+			return nil, onceErr
 		} else {
 			return &video, nil
 		}
@@ -60,17 +61,17 @@ func (dao *videoRedisDAO) List(ctx context.Context, limit, skip int64) ([]*Video
 	var video []*Video
 	id := fmt.Sprintf("%d_%d", limit, skip)
 	err := dao.cache.Get(ctx, id, &video)
-	if err == redis.Nil { // cache miss
-		err = dao.cache.Once(&cache.Item{
+	if errors.Is(err, redis.Nil) { // cache miss
+		onceErr := dao.cache.Once(&cache.Item{
 			Key:   id,
 			Value: &video,
 			Do: func(*cache.Item) (interface{}, error) {
-				dbVideo, err := dao.baseDAO.List(ctx, limit, skip)
-				return dbVideo, err
+				dbVideo, dberr := dao.baseDAO.List(ctx, limit, skip)
+				return dbVideo, dberr
 			},
 		})
-		if err != nil {
-			return nil, err
+		if onceErr != nil {
+			return nil, onceErr
 		} else {
 			return video, nil
 		}
