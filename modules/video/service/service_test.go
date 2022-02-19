@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
@@ -161,7 +161,7 @@ var _ = Describe("Service", func() {
 
 		When("success", func() {
 			BeforeEach(func() {
-				file, rerr := ioutil.ReadFile("./fixtures/big_buck_bunny_240p_1mb.mp4")
+				file, rerr := os.ReadFile("./fixtures/big_buck_bunny_240p_1mb.mp4")
 				Expect(rerr).NotTo(HaveOccurred())
 
 				requests := []*pb.UploadVideoRequest{
