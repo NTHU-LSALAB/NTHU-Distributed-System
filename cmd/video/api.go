@@ -11,6 +11,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/mongokit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -26,10 +27,11 @@ func newAPICommand() *cobra.Command {
 }
 
 type APIArgs struct {
-	GRPCAddr              string `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
-	runkit.GracefulConfig `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
-	logkit.LoggerConfig   `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
-	mongokit.MongoConfig  `group:"mongo" namespace:"mongo" env-namespace:"MONGO"`
+	GRPCAddr               string `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
+	runkit.GracefulConfig  `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
+	logkit.LoggerConfig    `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
+	mongokit.MongoConfig   `group:"mongo" namespace:"mongo" env-namespace:"MONGO"`
+	storagekit.MinIOConfig `group:"minio" namespace:"minio" env-namespace:"MINIO"`
 }
 
 func runAPI(_ *cobra.Command, _ []string) error {
@@ -57,7 +59,8 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	}()
 
 	videoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
-	svc := service.NewService(videoDAO)
+	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
+	svc := service.NewService(videoDAO, storage)
 
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
 	lis, err := net.Listen("tcp", args.GRPCAddr)

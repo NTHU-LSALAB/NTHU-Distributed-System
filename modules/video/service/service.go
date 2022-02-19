@@ -1,25 +1,30 @@
 package service
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"errors"
+	"io"
+	"path"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type service struct {
 	pb.UnimplementedVideoServer
 
 	videoDAO dao.VideoDAO
+	storage  storagekit.Storage
 }
 
-func NewService(videoDAO dao.VideoDAO) *service {
+func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage) *service {
 	return &service{
 		videoDAO: videoDAO,
+		storage:  storage,
 	}
 }
 
@@ -60,7 +65,58 @@ func (s *service) ListVideo(ctx context.Context, req *pb.ListVideoRequest) (*pb.
 }
 
 func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
-	return status.Errorf(codes.Unimplemented, "method UploadVideo not implemented")
+	req, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	filename := req.GetHeader().GetFilename()
+	size := req.GetHeader().GetSize()
+
+	var buf bytes.Buffer
+
+	for {
+		req, err := stream.Recv()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+
+			return err
+		}
+
+		chunk := req.GetChunkData()
+		if _, err := buf.Write(chunk); err != nil {
+			return err
+		}
+	}
+
+	id := primitive.NewObjectID()
+	objectName := filename + "-" + id.Hex()
+
+	if err := s.storage.PutObject(stream.Context(), objectName, bufio.NewReader(&buf), int64(size), storagekit.PutObjectOptions{
+		ContentType: "application/octet-stream",
+	}); err != nil {
+		return err
+	}
+
+	video := &dao.Video{
+		ID:   id,
+		Size: size,
+		URL:  path.Join(s.storage.Endpoint(), s.storage.Bucket(), objectName),
+	}
+
+	if err := s.videoDAO.Create(stream.Context(), video); err != nil {
+		return err
+	}
+
+	if err := stream.SendAndClose(&pb.UploadVideoResponse{
+		Id: id.Hex(),
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error) {

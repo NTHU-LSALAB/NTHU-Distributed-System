@@ -3,6 +3,7 @@ package gateway
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
@@ -24,6 +25,7 @@ type handler struct {
 
 func NewHandler(client pb.VideoClient, logger *logkit.Logger) *handler {
 	return &handler{
+		client: client,
 		logger: logger,
 	}
 }
@@ -65,11 +67,11 @@ func (h *handler) HandleUploadVideo(w http.ResponseWriter, req *http.Request, pa
 
 	for {
 		n, rerr := reader.Read(buffer)
-		if rerr == io.EOF {
-			break
-		}
-
 		if rerr != nil {
+			if errors.Is(rerr, io.EOF) {
+				break
+			}
+
 			h.encodeJSONResponse(w, NewResponseError(http.StatusInternalServerError, "failed to read file into buffer", rerr))
 			return
 		}

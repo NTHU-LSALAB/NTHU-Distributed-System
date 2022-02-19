@@ -34,7 +34,7 @@ var _ = Describe("Service", func() {
 	BeforeEach(func() {
 		controller = gomock.NewController(GinkgoT())
 		videoDAO = daomock.NewMockVideoDAO(controller)
-		svc = NewService(videoDAO)
+		svc = NewService(videoDAO, nil)
 		ctx = context.Background()
 	})
 

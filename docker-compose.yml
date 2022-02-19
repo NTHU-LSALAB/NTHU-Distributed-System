@@ -8,6 +8,9 @@ x-common-env: &common-env
   # POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
   # REDIS_ADDR: redis:6379
   # KAFKA_ADDR:
+  MINIO_ENDPOINT: play.min.io
+  MINIO_USERNAME: Q3AM3UQ867SPQQA43P2F
+  MINIO_PASSWORD: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
 
 x-common-build: &common-build
   image: justin0u0/golang-protoc:protoc-3.19.3-golang-1.17
@@ -21,18 +24,6 @@ x-common-build: &common-build
 services:
   mongo:
     image: mongo:5
-
-  minio:
-    image: minio/minio
-    volumes:
-    - ./.data/:/data
-    command:
-    - server
-    - /data
-    - --console-address
-    - ":9001"
-    ports:
-    - 9001:9001
 
   generate:
     <<: *common-build
