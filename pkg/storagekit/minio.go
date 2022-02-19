@@ -2,6 +2,7 @@ package storagekit
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
@@ -16,6 +17,7 @@ type MinIOConfig struct {
 	Username string `long:"username" env:"USERNAME" description:"the access key id (username) to the MinIO server" required:"true"`
 	Password string `long:"password" env:"PASSWORD" description:"the secret access key (password) to the MinIO server" required:"true"`
 	Insecure bool   `long:"insecure" env:"INSECURE" description:"disable HTTPS or not"`
+	Policy   string `long:"policy" env:"POLICY" description:"the bucket policy" default:"public"`
 }
 
 type MinIOClient struct {
@@ -48,6 +50,12 @@ func NewMinIOClient(ctx context.Context, conf *MinIOConfig) *MinIOClient {
 			if err := client.MakeBucket(ctx, conf.Bucket, minio.MakeBucketOptions{}); err != nil {
 				logger.Fatal("failed to create bucket", zap.Error(err))
 			}
+
+			if policy := generatePolicy(conf.Bucket, conf.Policy); policy != "" {
+				if err := client.SetBucketPolicy(ctx, conf.Bucket, policy); err != nil {
+					logger.Fatal("failed to set bucket policy")
+				}
+			}
 		}
 	}
 
@@ -75,4 +83,38 @@ func (c *MinIOClient) PutObject(ctx context.Context, objectName string, reader i
 	}
 
 	return nil
+}
+
+func generatePolicy(bucketName string, policy string) string {
+	switch policy {
+	case "public":
+		return fmt.Sprintf(`
+			{
+				"Version":"2012-10-17",
+				"Statement": [
+					{
+						"Effect": "Allow",
+						"Principal": {"AWS": ["*"]},
+						"Action": ["s3:GetBucketLocation", "s3:ListBucket", "s3:ListBucketMultipartUploads"],
+						"Resource": ["arn:aws:s3:::%s"]
+					},
+					{
+						"Effect": "Allow",
+						"Principal": {"AWS": ["*"]},
+						"Action": ["s3:AbortMultipartUpload", "s3:DeleteObject", "s3:GetObject", "s3:ListMultipartUploadParts", "s3:PutObject"],
+						"Resource":["arn:aws:s3:::%s/*"]
+					}
+				]
+			}
+		`, bucketName, bucketName)
+	case "private":
+		return `
+			{
+				"Version": "2012-10-17",
+				"Statement": []
+			}
+		`
+	}
+
+	return ""
 }
