@@ -28,6 +28,10 @@ dc.$1.generate:
 endef
 $(foreach module,$(MODULES),$(eval $(call make-dc-generate-rules,$(module))))
 
+.PHONY: dc.pkg.generate
+dc.pkg.generate:
+	$(DOCKER_COMPOSE) run --rm generate make pkg.generate
+
 .PHONY: dc.generate
 dc.generate:
 	$(DOCKER_COMPOSE) run --rm generate
@@ -48,7 +52,10 @@ $1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gatewa
 endef
 $(foreach module,$(MODULES),$(eval $(call make-generate-rules,$(module))))
 
-generate: $(addsuffix .generate,$(MODULES))
+pkg.generate:
+	go generate ./pkg/...
+
+generate: pkg.generate $(addsuffix .generate,$(MODULES))
 
 bin/protoc-gen-go: go.mod
 	go build -o $@ google.golang.org/protobuf/cmd/protoc-gen-go
@@ -74,6 +81,10 @@ dc.$1.lint:
 endef
 $(foreach module,$(MODULES),$(eval $(call make-dc-lint-rules,$(module))))
 
+.PHONY: dc.pkg.lint
+dc.pkg.lint:
+	$(DOCKER_COMPOSE) run --rm lint make pkg.lint
+
 .PHONY: dc.lint
 dc.lint:
 	$(DOCKER_COMPOSE) run --rm lint
@@ -86,8 +97,10 @@ $1.lint:
 endef
 $(foreach module,$(MODULES),$(eval $(call make-lint-rules,$(module))))
 
-lint: $(addsuffix .lint,$(MODULES))
+pkg.lint:
 	golangci-lint run ./pkg/...
+
+lint: pkg.lint $(addsuffix .lint,$(MODULES))
 
 ####################################################################################################
 ### Rule for the `test` command
@@ -104,6 +117,10 @@ dc.$1.test:
 endef
 $(foreach module,$(MODULES),$(eval $(call make-dc-test-rules,$(module))))
 
+.PHONY: dc.pkg.test
+dc.pkg.test:
+	$(DOCKER_COMPOSE) run --rm test make pkg.test
+
 .PHONY: dc.test
 dc.test:
 	$(DOCKER_COMPOSE) run --rm test
@@ -116,8 +133,10 @@ $1.test:
 endef
 $(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
 
-test: $(addsuffix .test,$(MODULES))
+pkg.test:
 	go test -v -race ./pkg/...
+
+test: pkg.test $(addsuffix .test,$(MODULES))
 
 ####################################################################################################
 ### Rule for the `build` command
