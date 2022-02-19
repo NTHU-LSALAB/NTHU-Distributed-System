@@ -3,11 +3,15 @@ package service
 import (
 	"context"
 	"errors"
+	"io"
+	"io/ioutil"
 	"testing"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/daomock"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/pbmock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit/mock/storagemock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,6 +31,7 @@ var _ = Describe("Service", func() {
 	var (
 		controller *gomock.Controller
 		videoDAO   *daomock.MockVideoDAO
+		storage    *storagemock.MockStorage
 		svc        *service
 		ctx        context.Context
 	)
@@ -34,7 +39,8 @@ var _ = Describe("Service", func() {
 	BeforeEach(func() {
 		controller = gomock.NewController(GinkgoT())
 		videoDAO = daomock.NewMockVideoDAO(controller)
-		svc = NewService(videoDAO, nil)
+		storage = storagemock.NewMockStorage(controller)
+		svc = NewService(videoDAO, storage)
 		ctx = context.Background()
 	})
 
@@ -135,6 +141,66 @@ var _ = Describe("Service", func() {
 						videos[1].ToProto(),
 					},
 				}))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("UploadVideo", func() {
+		var stream *pbmock.MockVideo_UploadVideoServer
+		var err error
+
+		BeforeEach(func() {
+			stream = pbmock.NewMockVideo_UploadVideoServer(controller)
+			stream.EXPECT().Context().Return(ctx)
+		})
+
+		JustBeforeEach(func() {
+			err = svc.UploadVideo(stream)
+		})
+
+		When("success", func() {
+			BeforeEach(func() {
+				file, rerr := ioutil.ReadFile("./fixtures/big_buck_bunny_240p_1mb.mp4")
+				Expect(rerr).NotTo(HaveOccurred())
+
+				requests := []*pb.UploadVideoRequest{
+					{
+						Data: &pb.UploadVideoRequest_Header{
+							Header: &pb.VideoHeader{
+								Filename: "big_buck_bunny_240p_1mb.mp4",
+								Size:     1053651,
+							},
+						},
+					},
+					{
+						Data: &pb.UploadVideoRequest_ChunkData{
+							ChunkData: file,
+						},
+					},
+				}
+
+				for _, req := range requests {
+					stream.EXPECT().Recv().Return(req, nil)
+				}
+				stream.EXPECT().Recv().Return(nil, io.EOF)
+
+				storage.EXPECT().PutObject(
+					ctx,
+					gomock.Any(),
+					gomock.Any(),
+					int64(requests[0].GetHeader().GetSize()),
+					gomock.Any(),
+				).Return(nil)
+
+				storage.EXPECT().Endpoint().Return("https://play.min.io")
+				storage.EXPECT().Bucket().Return("videos")
+				videoDAO.EXPECT().Create(ctx, gomock.Any()).Return(nil)
+
+				stream.EXPECT().SendAndClose(gomock.Any()).Return(nil)
+			})
+
+			It("returns no error", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})

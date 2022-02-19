@@ -65,6 +65,8 @@ func (s *service) ListVideo(ctx context.Context, req *pb.ListVideoRequest) (*pb.
 }
 
 func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
+	ctx := stream.Context()
+
 	req, err := stream.Recv()
 	if err != nil {
 		return err
@@ -94,19 +96,20 @@ func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
 	id := primitive.NewObjectID()
 	objectName := filename + "-" + id.Hex()
 
-	if err := s.storage.PutObject(stream.Context(), objectName, bufio.NewReader(&buf), int64(size), storagekit.PutObjectOptions{
+	if err := s.storage.PutObject(ctx, objectName, bufio.NewReader(&buf), int64(size), storagekit.PutObjectOptions{
 		ContentType: "application/octet-stream",
 	}); err != nil {
 		return err
 	}
 
 	video := &dao.Video{
-		ID:   id,
-		Size: size,
-		URL:  path.Join(s.storage.Endpoint(), s.storage.Bucket(), objectName),
+		ID:     id,
+		Size:   size,
+		URL:    path.Join(s.storage.Endpoint(), s.storage.Bucket(), objectName),
+		Status: dao.VideoStatusUploaded,
 	}
 
-	if err := s.videoDAO.Create(stream.Context(), video); err != nil {
+	if err := s.videoDAO.Create(ctx, video); err != nil {
 		return err
 	}
 

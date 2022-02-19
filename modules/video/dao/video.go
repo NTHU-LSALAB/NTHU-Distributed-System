@@ -11,6 +11,19 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type VideoStatus string
+
+const (
+	VideoStatusUploaded VideoStatus = "uploaded"
+	VideoStatusEncoding VideoStatus = "encoding"
+	VideoStatusFailed   VideoStatus = "failed"
+	VideoStatusSuccess  VideoStatus = "success"
+)
+
+func (s VideoStatus) String() string {
+	return string(s)
+}
+
 type Video struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	Width     uint32             `bson:"width,omitempty"`
@@ -18,7 +31,7 @@ type Video struct {
 	Size      uint64             `bson:"size,omitempty"`
 	Duration  float64            `bson:"duration,omitempty"`
 	URL       string             `bson:"url,omitempty"`
-	Status    string             `bson:"status,omitempty"`
+	Status    VideoStatus        `bson:"status,omitempty"`
 	Variants  map[string]string  `bson:"variants,omitempty"`
 	CreatedAt time.Time          `bson:"created_at,omitempty"`
 	UpdatedAt time.Time          `bson:"updated_at,omitempty"`
@@ -32,7 +45,7 @@ func (v *Video) ToProto() *pb.VideoInfo {
 		Size:      v.Size,
 		Duration:  v.Duration,
 		Url:       v.URL,
-		Status:    v.Status,
+		Status:    v.Status.String(),
 		Variants:  v.Variants,
 		CreatedAt: timestamppb.New(v.CreatedAt),
 		UpdatedAt: timestamppb.New(v.UpdatedAt),
