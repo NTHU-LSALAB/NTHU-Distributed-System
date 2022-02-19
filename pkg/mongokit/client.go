@@ -59,6 +59,8 @@ func NewMongoClient(ctx context.Context, conf *MongoConfig) *MongoClient {
 		logger.Fatal("failed to ping to MongoDB", zap.Error(err))
 	}
 
+	logger.Info("create MongoDB client successfully")
+
 	return &MongoClient{
 		Client:   client,
 		database: client.Database(conf.Database),

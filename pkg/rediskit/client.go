@@ -43,6 +43,8 @@ func NewRedisClient(ctx context.Context, conf *RedisConfig) *RedisClient {
 		logger.Fatal("failed to ping to Redis", zap.Error(err))
 	}
 
+	logger.Info("connect to Redis client successfully")
+
 	return &RedisClient{
 		Client: client,
 	}
