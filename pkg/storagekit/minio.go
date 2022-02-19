@@ -15,7 +15,7 @@ type MinIOConfig struct {
 	Bucket   string `long:"bucket" env:"BUCKET" description:"the bucket name" required:"true"`
 	Username string `long:"username" env:"USERNAME" description:"the access key id (username) to the MinIO server" required:"true"`
 	Password string `long:"password" env:"PASSWORD" description:"the secret access key (password) to the MinIO server" required:"true"`
-	SSL      bool   `long:"ssl" env:"SSL" description:"enable HTTPS or not" default:"true"`
+	Insecure bool   `long:"insecure" env:"INSECURE" description:"disable HTTPS or not"`
 }
 
 type MinIOClient struct {
@@ -32,7 +32,7 @@ func NewMinIOClient(ctx context.Context, conf *MinIOConfig) *MinIOClient {
 
 	client, err := minio.New(conf.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(conf.Username, conf.Password, ""),
-		Secure: conf.SSL,
+		Secure: !conf.Insecure,
 	})
 	if err != nil {
 		logger.Fatal("failed to create MinIO client", zap.Error(err))

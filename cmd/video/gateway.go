@@ -85,8 +85,8 @@ func serveHTTP(lis net.Listener, conn *grpc.ClientConn, logger *logkit.Logger) r
 
 	// register additional routes
 	handler := gateway.NewHandler(pb.NewVideoClient(conn), logger)
-	if err := mux.HandlePath("POST", "/v1/videos/", handler.HandleUploadVideo); err != nil {
-		logger.Fatal("failed to register additional routes")
+	if err := mux.HandlePath("POST", "/v1/videos", handler.HandleUploadVideo); err != nil {
+		logger.Fatal("failed to register additional routes", zap.Error(err))
 	}
 
 	httpServer := &http.Server{

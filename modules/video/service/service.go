@@ -94,7 +94,7 @@ func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
 	}
 
 	id := primitive.NewObjectID()
-	objectName := filename + "-" + id.Hex()
+	objectName := id.Hex() + "-" + filename
 
 	if err := s.storage.PutObject(ctx, objectName, bufio.NewReader(&buf), int64(size), storagekit.PutObjectOptions{
 		ContentType: "application/octet-stream",
