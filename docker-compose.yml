@@ -5,7 +5,7 @@ x-common-env: &common-env
   GOCACHE: /src/.cache/gocache
   MONGO_URL: mongodb://mongo:27017/
   MONGO_DATABASE: nthu_distributes_system
-  # POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+  POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
   # REDIS_ADDR: redis:6379
   # KAFKA_ADDR:
   MINIO_ENDPOINT: play.min.io
@@ -25,6 +25,9 @@ x-common-build: &common-build
 services:
   mongo:
     image: mongo:5
+  
+  postgres:
+    image: postgres:14-alpine
 
   generate:
     <<: *common-build
