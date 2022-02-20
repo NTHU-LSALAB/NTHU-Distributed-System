@@ -4,6 +4,8 @@ package pb;
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb";
 
+import "google/protobuf/timestamp.proto";
+
 message HealthzRequest {}
 
 message HealthzResponse {
