@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var _ = Describe("VideoRedisDAO", func() {
@@ -223,108 +222,6 @@ var _ = Describe("VideoRedisDAO", func() {
 				).NotTo(HaveOccurred())
 
 				Expect(&getVideo).To(Equal(video))
-			})
-		})
-	})
-
-	Describe("Update", func() {
-		var (
-			video *Video
-			id    primitive.ObjectID
-
-			err error
-		)
-
-		BeforeEach(func() {
-			video = NewFakeVideo()
-			id = video.ID
-
-			insertVideo(ctx, videoMongoDAO, video)
-		})
-
-		AfterEach(func() {
-			deleteVideo(ctx, videoMongoDAO, id)
-		})
-
-		JustBeforeEach(func() {
-			err = videoMongoDAO.Update(ctx, video)
-		})
-
-		When("video not found", func() {
-			BeforeEach(func() { video.ID = primitive.NewObjectID() })
-
-			It("returns video not found error", func() {
-				Expect(err).To(MatchError(ErrVideoNotFound))
-			})
-		})
-
-		When("success", func() {
-			var size uint64
-
-			BeforeEach(func() {
-				size = 1234
-				video.Size = size
-			})
-
-			It("returns no error", func() {
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("updates the document", func() {
-				var getVideo Video
-
-				Expect(videoMongoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo)).NotTo(HaveOccurred())
-
-				Expect(getVideo.Size).To(Equal(size))
-				Expect(&getVideo).To(Equal(video))
-			})
-		})
-	})
-
-	Describe("Delete", func() {
-		var (
-			video *Video
-			id    primitive.ObjectID
-
-			err error
-		)
-
-		BeforeEach(func() {
-			video = NewFakeVideo()
-			id = video.ID
-
-			insertVideo(ctx, videoMongoDAO, video)
-		})
-
-		JustBeforeEach(func() {
-			err = videoMongoDAO.Delete(ctx, video.ID)
-		})
-
-		When("video not found", func() {
-			BeforeEach(func() {
-				video.ID = primitive.NewObjectID()
-			})
-
-			AfterEach(func() {
-				deleteVideo(ctx, videoMongoDAO, id)
-			})
-
-			It("returns video not found error", func() {
-				Expect(err).To(MatchError(ErrVideoNotFound))
-			})
-		})
-
-		When("success", func() {
-			It("returns no error", func() {
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("deletes the document", func() {
-				var getVideo Video
-
-				Expect(
-					videoMongoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
-				).To(Equal(mongo.ErrNoDocuments))
 			})
 		})
 	})
