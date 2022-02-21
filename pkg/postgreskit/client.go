@@ -6,64 +6,55 @@ import (
 	"os"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"github.com/go-pg/pg/v9"
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 )
 
-type MongoConfig struct {
-	URL      string `long:"url" env:"URL" description:"the URL of MongoDB" required:"true"`
-	Database string `long:"database" env:"DATABASE" description:"the database of MongoDB" required:"true"`
+type PGConfig struct {
+	URL string `long:"url" env:"URL" description:"the URL of PostgreSQL" required:"true"`
 }
 
-type MongoClient struct {
-	*mongo.Client
-	database  *mongo.Database
-	closeFunc func()
+type PGClient struct {
+	*pg.DB
+	Closed atomic.Bool
 }
 
-func (c *MongoClient) Database() *mongo.Database {
-	return c.database
+func (c *PGClient) Close() error {
+	c.Closed.Store(true)
+	return c.DB.Close()
 }
 
-func (c *MongoClient) Close() error {
-	if c.closeFunc != nil {
-		c.closeFunc()
-	}
-
-	return c.Client.Disconnect(context.Background())
-}
-
-func NewMongoClient(ctx context.Context, conf *MongoConfig) *MongoClient {
+func NewPGClient(ctx context.Context, conf *PGConfig) *PGClient {
 	if url := os.ExpandEnv(conf.URL); url != "" {
 		conf.URL = url
 	}
 
-	logger := logkit.FromContext(ctx).
-		With(zap.String("url", conf.URL)).
-		With(zap.String("database", conf.Database))
-
-	o := options.Client()
-	o.ApplyURI(conf.URL)
-
-	client, err := mongo.NewClient(o)
+	logger := logkit.FromContext(ctx).With(zap.String("url", conf.URL))
+	opts, err := pg.ParseURL(conf.URL)
 	if err != nil {
-		logger.Fatal("failed to create MongoDB client", zap.Error(err))
+		logger.Fatal("Failed to parse PostgreSQL url", zap.Error(err))
 	}
 
-	if err := client.Connect(ctx); err != nil {
-		logger.Fatal("failed to connect to MongoDB", zap.Error(err))
-	}
+	db := pg.Connect(opts).WithContext(ctx)
 
-	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		logger.Fatal("failed to ping to MongoDB", zap.Error(err))
-	}
+	// client, err := mongo.NewClient(o)
+	// if err != nil {
+	// 	logger.Fatal("failed to create MongoDB client", zap.Error(err))
+	// }
 
-	logger.Info("create MongoDB client successfully")
+	// if err := client.Connect(ctx); err != nil {
+	// 	logger.Fatal("failed to connect to MongoDB", zap.Error(err))
+	// }
 
-	return &MongoClient{
-		Client:   client,
-		database: client.Database(conf.Database),
-	}
+	// if err := client.Ping(ctx, readpref.Primary()); err != nil {
+	// 	logger.Fatal("failed to ping to MongoDB", zap.Error(err))
+	// }
+
+	// logger.Info("create MongoDB client successfully")
+
+	// return &MongoClient{
+	// 	Client:   client,
+	// 	database: client.Database(conf.Database),
+	// }
 }
