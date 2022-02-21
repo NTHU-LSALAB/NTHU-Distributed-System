@@ -1,6 +1,5 @@
 package postgreskit
 
-// just copy from mongokit, not implemented yet!
 import (
 	"context"
 	"os"
@@ -37,24 +36,13 @@ func NewPGClient(ctx context.Context, conf *PGConfig) *PGClient {
 	}
 
 	db := pg.Connect(opts).WithContext(ctx)
+	if _, err := db.Exec("SELECT 1"); err != nil {
+		logger.Fatal("failed to pin PostgreSQL", zap.Error(err))
+	}
 
-	// client, err := mongo.NewClient(o)
-	// if err != nil {
-	// 	logger.Fatal("failed to create MongoDB client", zap.Error(err))
-	// }
+	logger.Info("create PostgreSQL client successfully")
 
-	// if err := client.Connect(ctx); err != nil {
-	// 	logger.Fatal("failed to connect to MongoDB", zap.Error(err))
-	// }
-
-	// if err := client.Ping(ctx, readpref.Primary()); err != nil {
-	// 	logger.Fatal("failed to ping to MongoDB", zap.Error(err))
-	// }
-
-	// logger.Info("create MongoDB client successfully")
-
-	// return &MongoClient{
-	// 	Client:   client,
-	// 	database: client.Database(conf.Database),
-	// }
+	return &PGClient{
+		DB: db,
+	}
 }
