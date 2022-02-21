@@ -13,7 +13,7 @@ message HealthzResponse {
 }
 
 message CommentInfo {
-	string id = 1;
+	uint32 id = 1;
 	string video_id = 2;
 	string content = 3;
 	google.protobuf.Timestamp created_at = 4;
