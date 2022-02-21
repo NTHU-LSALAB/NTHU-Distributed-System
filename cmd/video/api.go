@@ -10,6 +10,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/service"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/mongokit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
 	flags "github.com/jessevdk/go-flags"
@@ -32,6 +33,7 @@ type APIArgs struct {
 	logkit.LoggerConfig    `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
 	mongokit.MongoConfig   `group:"mongo" namespace:"mongo" env-namespace:"MONGO"`
 	storagekit.MinIOConfig `group:"minio" namespace:"minio" env-namespace:"MINIO"`
+	rediskit.RedisConfig   `group:"redis" namespace:"redis" env-namespace:"REDIS"`
 }
 
 func runAPI(_ *cobra.Command, _ []string) error {
@@ -58,8 +60,18 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	videoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
 	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
+	videoMongoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
+
+	redisClient := rediskit.NewRedisClient(ctx, &args.RedisConfig)
+	defer func() {
+		if err := redisClient.Close(); err != nil {
+			logger.Fatal("failed to close redis client", zap.Error(err))
+		}
+	}()
+
+	videoDAO := dao.NewVideoRedisDAO(redisClient, videoMongoDAO)
+
 	svc := service.NewService(videoDAO, storage)
 
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))

@@ -7,6 +7,7 @@ import (
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/mongokit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,28 +19,37 @@ func TestDAO(t *testing.T) {
 
 var (
 	mongoClient *mongokit.MongoClient
+	redisClient *rediskit.RedisClient
 )
 
 var _ = BeforeSuite(func() {
-	var conf mongokit.MongoConfig
+	var mongoConf mongokit.MongoConfig
+	var redisConf rediskit.RedisConfig
 
-	conf.URL = "mongodb://localhost:27017"
+	mongoConf.URL = "mongodb://localhost:27017"
 	if url := os.Getenv("MONGO_URL"); url != "" {
-		conf.URL = url
+		mongoConf.URL = url
 	}
 
-	conf.Database = "video"
+	mongoConf.Database = "video"
 	if database := os.Getenv("MONGO_DATABASE"); database != "" {
-		conf.Database = database
+		mongoConf.Database = database
+	}
+
+	redisConf.Addr = "localhost:6379"
+	if addr := os.Getenv("REDIS_ADDR"); addr != "" {
+		redisConf.Addr = addr
 	}
 
 	ctx := logkit.NewLogger(&logkit.LoggerConfig{
 		Development: true,
 	}).WithContext(context.Background())
 
-	mongoClient = mongokit.NewMongoClient(ctx, &conf)
+	redisClient = rediskit.NewRedisClient(ctx, &redisConf)
+	mongoClient = mongokit.NewMongoClient(ctx, &mongoConf)
 })
 
 var _ = AfterSuite(func() {
 	Expect(mongoClient.Close()).NotTo(HaveOccurred())
+	Expect(redisClient.Close()).NotTo(HaveOccurred())
 })
