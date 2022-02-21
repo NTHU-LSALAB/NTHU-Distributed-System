@@ -27,6 +27,8 @@ services:
     image: mongo:5
   redis:
     image: redis:6.2
+    ports:
+      - "6379:6379"
   generate:
     <<: *common-build
     command:
