@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -26,10 +25,10 @@ var _ = Describe("VideoRedisDAO", func() {
 	Describe("Get", func() {
 		var (
 			video *Video
-			resp  *Video
 			id    primitive.ObjectID
 
-			err error
+			resp *Video
+			err  error
 		)
 
 		BeforeEach(func() {
@@ -111,11 +110,11 @@ var _ = Describe("VideoRedisDAO", func() {
 	Describe("List", func() {
 		var (
 			videos []*Video
-			resp   []*Video
 			limit  int64
 			skip   int64
 
-			err error
+			resp []*Video
+			err  error
 		)
 
 		BeforeEach(func() {
@@ -184,44 +183,6 @@ var _ = Describe("VideoRedisDAO", func() {
 						Expect(getVideos[i]).To(matchVideo(videos[i]))
 					}
 				})
-			})
-		})
-	})
-
-	Describe("Create", func() {
-		var (
-			video *Video
-
-			err error
-		)
-
-		BeforeEach(func() {
-			video = NewFakeVideo()
-			video.ID = primitive.NilObjectID
-		})
-
-		AfterEach(func() {
-			deleteVideo(ctx, videoMongoDAO, video.ID)
-		})
-
-		JustBeforeEach(func() {
-			err = videoRedisDAO.baseDAO.Create(ctx, video)
-		})
-
-		When("success", func() {
-			It("returns the new video ID with no error", func() {
-				Expect(video.ID).NotTo(Equal(primitive.NilObjectID))
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("inserts the document", func() {
-				var getVideo Video
-
-				Expect(
-					videoMongoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
-				).NotTo(HaveOccurred())
-
-				Expect(&getVideo).To(Equal(video))
 			})
 		})
 	})
