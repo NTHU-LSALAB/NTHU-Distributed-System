@@ -16,7 +16,7 @@ service Comment {
 	
 	rpc ListComment(ListCommentRequest) returns (ListCommentResponse) {
 		option (google.api.http) = {
-			get: "/v1/comments/{id}"
+			get: "/v1/comments/{video_id}"
 			response_body: "*"
 		};
 	}
