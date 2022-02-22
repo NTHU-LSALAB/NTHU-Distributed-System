@@ -2,16 +2,43 @@ syntax = "proto3";
 
 package pb;
 
+import "google/api/annotations.proto";
 import "modules/comment/pb/message.proto";
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb";
 
 service Comment {
-	rpc Healthz(HealthzRequest) returns (HealthzResponse) {}
+	rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+		option (google.api.http) = {
+			get: "/"
+		};
+	}
+	
+	rpc ListComment(ListCommentRequest) returns (ListCommentResponse) {
+		option (google.api.http) = {
+			get: "/v1/comments/{id}"
+			response_body: "*"
+		};
+	}
 
-	// rpc GetComment(GetCommentRequest) returns (GetCommentResponse) {}
-	// rpc ListComment(ListCommentRequest) returns (ListCommentResponse) {}
-	// rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
-	// rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {}
-	// rpc DeleteComment(DeleleCommentRequest) returns (DeleteCommentResponse) {}
+	rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
+		option (google.api.http) = {
+			post: "/v1/comments"
+			response_body: "*"
+		};
+	}
+
+	rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {
+		option (google.api.http) = {
+			put: "/v1/comments/{id}"
+			response_body: "*"
+		};
+	}
+
+	rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
+		option (google.api.http) = {
+			delete: "/v1/comments/{id}"
+			response_body: "*"
+		};
+	}
 }

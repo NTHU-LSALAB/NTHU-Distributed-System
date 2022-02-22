@@ -4,8 +4,50 @@ package pb;
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb";
 
+import "google/protobuf/timestamp.proto";
+
 message HealthzRequest {}
 
 message HealthzResponse {
 	string status = 1;
 }
+
+message CommentInfo {
+	int32 id = 1;
+	string video_id = 2;
+	string content = 3;
+	google.protobuf.Timestamp created_at = 4;
+	google.protobuf.Timestamp updated_at = 5;
+}
+
+message CreateCommentRequest {
+	string video_id = 1;
+	string content = 2;
+}
+
+message CreateCommentResponse {
+	string id = 1;
+}
+
+message ListCommentRequest {
+	int64 limit = 1;
+	int64 skip = 2;
+}
+
+message ListCommentResponse {
+	repeated CommentInfo comments = 1;
+}
+
+message UpdateCommentRequest {
+	string id = 1;
+	string video_id = 2;
+	string content = 3;
+}
+
+message UpdateCommentResponse {}
+
+message DeleteCommentRequest {
+	string id = 1;
+}
+
+message DeleteCommentResponse {}
