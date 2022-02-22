@@ -5,8 +5,7 @@ import (
 	"os"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
-	"github.com/go-pg/pg/v9"
-	"go.uber.org/atomic"
+	"github.com/go-pg/pg/v10"
 	"go.uber.org/zap"
 )
 
@@ -16,11 +15,13 @@ type PGConfig struct {
 
 type PGClient struct {
 	*pg.DB
-	Closed atomic.Bool
+	closeFunc func()
 }
 
 func (c *PGClient) Close() error {
-	c.Closed.Store(true)
+	if c.closeFunc != nil {
+		c.closeFunc()
+	}
 	return c.DB.Close()
 }
 
@@ -36,7 +37,7 @@ func NewPGClient(ctx context.Context, conf *PGConfig) *PGClient {
 	}
 
 	db := pg.Connect(opts).WithContext(ctx)
-	if _, err := db.Exec("SELECT 1"); err != nil {
+	if err := db.Ping(ctx); err != nil {
 		logger.Fatal("failed to pin PostgreSQL", zap.Error(err))
 	}
 
