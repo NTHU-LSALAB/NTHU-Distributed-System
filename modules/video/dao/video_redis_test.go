@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+	"github.com/onsi/gomega/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -62,7 +63,7 @@ var _ = Describe("VideoRedisDAO", func() {
 				BeforeEach(func() { id = video.ID })
 
 				It("returns the video with no error", func() {
-					matchVideo(resp, video)
+					Expect(resp).To(matchVideo(video))
 					Expect(err).NotTo(HaveOccurred())
 				})
 			})
@@ -91,14 +92,17 @@ var _ = Describe("VideoRedisDAO", func() {
 				BeforeEach(func() { id = video.ID })
 
 				It("returns the video with no error", func() {
-					matchVideo(resp, video)
+					Expect(resp).To(matchVideo(video))
 					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("insert the video to cache", func() {
 					var getVideo Video
-					Expect(videoRedisDAO.cache.Get(ctx, getVideoKey(id), &getVideo)).NotTo(HaveOccurred())
-					matchVideo(&getVideo, video)
+
+					Expect(
+						videoRedisDAO.cache.Get(ctx, getVideoKey(id), &getVideo),
+					).NotTo(HaveOccurred())
+					Expect(resp).To(matchVideo(video))
 				})
 			})
 		})
@@ -135,7 +139,7 @@ var _ = Describe("VideoRedisDAO", func() {
 			When("videos not found", func() {
 				BeforeEach(func() { limit = 1 })
 
-				It("returns empty video with no error", func() {
+				It("returns empty list with no error", func() {
 					Expect(resp).To(HaveLen(0))
 					Expect(err).NotTo(HaveOccurred())
 				})
@@ -144,7 +148,7 @@ var _ = Describe("VideoRedisDAO", func() {
 			When("success", func() {
 				It("returns the videos with no error", func() {
 					for i := range resp {
-						matchVideo(resp[i], videos[i])
+						Expect(resp[i]).To(matchVideo(videos[i]))
 					}
 					Expect(err).NotTo(HaveOccurred())
 				})
@@ -168,7 +172,7 @@ var _ = Describe("VideoRedisDAO", func() {
 			When("success", func() {
 				It("returns the videos with no error", func() {
 					for i := range resp {
-						matchVideo(resp[i], videos[i])
+						Expect(resp[i]).To(matchVideo(videos[i]))
 					}
 					Expect(err).NotTo(HaveOccurred())
 				})
@@ -177,7 +181,7 @@ var _ = Describe("VideoRedisDAO", func() {
 					var getVideos []*Video
 					Expect(videoRedisDAO.cache.Get(ctx, listVideoKey(limit, skip), &getVideos)).NotTo(HaveOccurred())
 					for i := range getVideos {
-						matchVideo(getVideos[i], videos[i])
+						Expect(getVideos[i]).To(matchVideo(videos[i]))
 					}
 				})
 			})
@@ -249,15 +253,15 @@ func deleteVideosInRedis(ctx context.Context, videoDAO *videoRedisDAO, limit int
 	Expect(videoDAO.cache.Delete(ctx, listVideoKey(limit, skip))).NotTo(HaveOccurred())
 }
 
-func matchVideo(actual *Video, expect *Video) {
-	Expect(*actual).To(MatchFields(IgnoreExtras, Fields{
-		"ID":       Equal(expect.ID),
-		"Width":    Equal(expect.Width),
-		"Height":   Equal(expect.Height),
-		"Size":     Equal(expect.Size),
-		"Duration": Equal(expect.Duration),
-		"URL":      Equal(expect.URL),
-		"Status":   Equal(expect.Status),
-		"Variants": Equal(expect.Variants),
-	}))
+func matchVideo(video *Video) types.GomegaMatcher {
+	return MatchFields(IgnoreExtras, Fields{
+		"ID":       Equal(video.ID),
+		"Width":    Equal(video.Width),
+		"Height":   Equal(video.Height),
+		"Size":     Equal(video.Size),
+		"Duration": Equal(video.Duration),
+		"URL":      Equal(video.URL),
+		"Status":   Equal(video.Status),
+		"Variants": Equal(video.Variants),
+	})
 }

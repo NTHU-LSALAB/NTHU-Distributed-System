@@ -60,9 +60,6 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
-	videoMongoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
-
 	redisClient := rediskit.NewRedisClient(ctx, &args.RedisConfig)
 	defer func() {
 		if err := redisClient.Close(); err != nil {
@@ -70,7 +67,9 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
+	videoMongoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
 	videoDAO := dao.NewVideoRedisDAO(redisClient, videoMongoDAO)
+	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
 
 	svc := service.NewService(videoDAO, storage)
 
