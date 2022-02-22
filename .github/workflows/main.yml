@@ -23,7 +23,7 @@ jobs:
       mongo:
         image: mongo:5
       redis:
-        image: redis:6.2
+        image: redis:6.2-alpine
     env:
       MONGO_URL: mongodb://mongo:27017/
       MONGO_DATABASE: nthu_distributes_system

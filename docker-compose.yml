@@ -26,7 +26,7 @@ services:
   mongo:
     image: mongo:5
   redis:
-    image: redis:6.2
+    image: redis:6.2-alpine
   generate:
     <<: *common-build
     command:
