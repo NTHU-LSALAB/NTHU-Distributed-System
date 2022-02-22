@@ -38,7 +38,7 @@ func NewPGClient(ctx context.Context, conf *PGConfig) *PGClient {
 
 	db := pg.Connect(opts).WithContext(ctx)
 	if err := db.Ping(ctx); err != nil {
-		logger.Fatal("failed to pin PostgreSQL", zap.Error(err))
+		logger.Fatal("failed to ping PostgreSQL", zap.Error(err))
 	}
 
 	logger.Info("create PostgreSQL client successfully")
