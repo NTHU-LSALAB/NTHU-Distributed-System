@@ -39,9 +39,10 @@ func NewMongoClient(ctx context.Context, conf *MongoConfig) *MongoClient {
 		conf.URL = url
 	}
 
-	logger := logkit.FromContext(ctx).
-		With(zap.String("url", conf.URL)).
-		With(zap.String("database", conf.Database))
+	logger := logkit.FromContext(ctx).With(
+		zap.String("url", conf.URL),
+		zap.String("database", conf.Database),
+	)
 
 	o := options.Client()
 	o.ApplyURI(conf.URL)
