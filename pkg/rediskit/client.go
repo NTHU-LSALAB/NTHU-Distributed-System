@@ -28,10 +28,10 @@ func (c *RedisClient) Close() error {
 }
 
 func NewRedisClient(ctx context.Context, conf *RedisConfig) *RedisClient {
-	logger := logkit.FromContext(ctx).
-		With(zap.String("addr", conf.Addr)).
-		With(zap.String("password", conf.Password)).
-		With(zap.Int("database", conf.Database))
+	logger := logkit.FromContext(ctx).With(
+		zap.String("addr", conf.Addr),
+		zap.Int("database", conf.Database),
+	)
 
 	client := redis.NewClient(&redis.Options{
 		Addr:     conf.Addr,
@@ -42,8 +42,6 @@ func NewRedisClient(ctx context.Context, conf *RedisConfig) *RedisClient {
 	if err := client.Ping(ctx).Err(); err != nil {
 		logger.Fatal("failed to ping to Redis", zap.Error(err))
 	}
-
-	logger.Info("connect to Redis client successfully")
 
 	return &RedisClient{
 		Client: client,

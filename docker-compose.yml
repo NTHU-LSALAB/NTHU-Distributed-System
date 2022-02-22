@@ -6,7 +6,7 @@ x-common-env: &common-env
   MONGO_URL: mongodb://mongo:27017/
   MONGO_DATABASE: nthu_distributes_system
   # POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
-  # REDIS_ADDR: redis:6379
+  REDIS_ADDR: redis:6379
   # KAFKA_ADDR:
   MINIO_ENDPOINT: play.min.io
   MINIO_BUCKET: videos
@@ -25,7 +25,8 @@ x-common-build: &common-build
 services:
   mongo:
     image: mongo:5
-
+  redis:
+    image: redis:6.2-alpine
   generate:
     <<: *common-build
     command:
@@ -50,6 +51,7 @@ services:
     - test
     depends_on:
     - mongo
+    - redis
 
   build:
     <<: *common-build
@@ -74,6 +76,7 @@ services:
     - api
     depends_on:
     - mongo
+    - redis
 
   video-gateway:
     image: nthu-distributed-system:latest
