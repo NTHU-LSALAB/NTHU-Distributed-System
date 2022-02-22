@@ -45,8 +45,8 @@ var _ = BeforeSuite(func() {
 		Development: true,
 	}).WithContext(context.Background())
 
-	redisClient = rediskit.NewRedisClient(ctx, &redisConf)
 	mongoClient = mongokit.NewMongoClient(ctx, &mongoConf)
+	redisClient = rediskit.NewRedisClient(ctx, &redisConf)
 })
 
 var _ = AfterSuite(func() {

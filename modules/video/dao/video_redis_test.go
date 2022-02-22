@@ -3,7 +3,6 @@ package dao
 import (
 	"context"
 
-	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	"github.com/go-redis/cache/v8"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,9 +12,6 @@ import (
 )
 
 var _ = Describe("VideoRedisDAO", func() {
-	var conf = rediskit.RedisConfig{
-		Addr: "redis:6379",
-	}
 	var videoRedisDAO *videoRedisDAO
 	var videoMongoDAO *videoMongoDAO
 	var ctx context.Context
@@ -23,7 +19,7 @@ var _ = Describe("VideoRedisDAO", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		videoMongoDAO = NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
-		videoRedisDAO = NewVideoRedisDAO(rediskit.NewRedisClient(ctx, &conf), videoMongoDAO)
+		videoRedisDAO = NewVideoRedisDAO(redisClient, videoMongoDAO)
 	})
 
 	Describe("Get", func() {
