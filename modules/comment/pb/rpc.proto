@@ -23,14 +23,14 @@ service Comment {
 
 	rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
 		option (google.api.http) = {
-			post: "/v1/comments/create"
+			post: "/v1/comments"
 			response_body: "*"
 		};
 	}
 
 	rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {
 		option (google.api.http) = {
-			put: "/v1/comments/update/{id}"
+			put: "/v1/comments/{id}"
 			response_body: "*"
 		};
 	}
