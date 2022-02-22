@@ -254,7 +254,7 @@ func deleteVideosInRedis(ctx context.Context, videoDAO *videoRedisDAO, limit int
 }
 
 func matchVideo(video *Video) types.GomegaMatcher {
-	return MatchFields(IgnoreExtras, Fields{
+	return PointTo(MatchFields(IgnoreExtras, Fields{
 		"ID":       Equal(video.ID),
 		"Width":    Equal(video.Width),
 		"Height":   Equal(video.Height),
@@ -263,5 +263,5 @@ func matchVideo(video *Video) types.GomegaMatcher {
 		"URL":      Equal(video.URL),
 		"Status":   Equal(video.Status),
 		"Variants": Equal(video.Variants),
-	})
+	}))
 }
