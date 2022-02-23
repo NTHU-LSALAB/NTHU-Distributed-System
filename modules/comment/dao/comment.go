@@ -12,16 +12,16 @@ import (
 )
 
 type Comment struct {
-	ID        string    `pg:"_id,omitempty"`
-	VideoID   string    `pg:"video_id,omitempty"`
-	Content   string    `pg:"content,omitempty"`
-	CreatedAt time.Time `pg:"created_at,omitempty"`
-	UpdatedAt time.Time `pg:"updated_at,omitempty"`
+	ID        uuid.UUID `pg:"type:uuid,default:gen_random_uuid()"`
+	VideoID   string
+	Content   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (c *Comment) ToProto() *pb.CommentInfo {
 	return &pb.CommentInfo{
-		Id:        c.ID,
+		Id:        c.ID.String(),
 		VideoId:   c.VideoID,
 		Content:   c.Content,
 		CreatedAt: timestamppb.New(c.CreatedAt),
@@ -30,19 +30,19 @@ func (c *Comment) ToProto() *pb.CommentInfo {
 }
 
 type CommentDAO interface {
-	List(ctx context.Context, videoID string, limit, skip int) ([]*Comment, error)
+	List(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error)
 	Create(ctx context.Context, comment *Comment) error
 	Update(ctx context.Context, comment *Comment) error
-	Delete(ctx context.Context, id string) error
-	DeleteComments(ctx context.Context, videoID string) error
+	Delete(ctx context.Context, id uuid.UUID) error
+	DeleteByVideoID(ctx context.Context, videoID string) error
 }
 
 var (
-	ErrCommentNotFound = errors.New("Comment not found")
+	ErrCommentNotFound = errors.New("comment not found")
 )
 
 func NewFakeComment() *Comment {
-	id := uuid.New().String()
+	id := uuid.New()
 	videoID := primitive.NewObjectID()
 
 	return &Comment{

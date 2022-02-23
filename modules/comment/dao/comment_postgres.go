@@ -3,27 +3,28 @@ package dao
 import (
 	"context"
 
-	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/postgreskit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
+	"github.com/google/uuid"
 )
 
 type commentPGDAO struct {
-	pgClient *postgreskit.PGClient
+	client *pgkit.PGClient
 }
 
 var _ CommentDAO = (*commentPGDAO)(nil)
 
-func NewCommentPGDAO(pgClient *postgreskit.PGClient) *commentPGDAO {
+func NewCommentPGDAO(pgClient *pgkit.PGClient) *commentPGDAO {
 	return &commentPGDAO{
-		pgClient: pgClient,
+		client: pgClient,
 	}
 }
 
-func (dao *commentPGDAO) List(ctx context.Context, videoID string, limit, skip int) ([]*Comment, error) {
+func (dao *commentPGDAO) List(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error) {
 	var comments []*Comment
-	query := dao.pgClient.ModelContext(ctx, &comments).
-		Where("video_id=?", videoID).
+	query := dao.client.ModelContext(ctx, &comments).
+		Where("video_id = ?", videoID).
 		Limit(limit).
-		Offset(skip).
+		Offset(offset).
 		Order("updated_at DESC")
 	if err := query.Select(); err != nil {
 		return nil, err
@@ -33,7 +34,7 @@ func (dao *commentPGDAO) List(ctx context.Context, videoID string, limit, skip i
 }
 
 func (dao *commentPGDAO) Create(ctx context.Context, comment *Comment) error {
-	if _, err := dao.pgClient.ModelContext(ctx, comment).Insert(); err != nil {
+	if _, err := dao.client.ModelContext(ctx, comment).Insert(); err != nil {
 		return err
 	}
 
@@ -41,7 +42,7 @@ func (dao *commentPGDAO) Create(ctx context.Context, comment *Comment) error {
 }
 
 func (dao *commentPGDAO) Update(ctx context.Context, comment *Comment) error {
-	if res, err := dao.pgClient.ModelContext(ctx, comment).WherePK().Update(); err != nil {
+	if res, err := dao.client.ModelContext(ctx, comment).WherePK().Update(); err != nil {
 		return err
 	} else if res.RowsAffected() == 0 {
 		return ErrCommentNotFound
@@ -50,9 +51,8 @@ func (dao *commentPGDAO) Update(ctx context.Context, comment *Comment) error {
 	return nil
 }
 
-func (dao *commentPGDAO) Delete(ctx context.Context, id string) error {
-	var comment *Comment
-	if _, err := dao.pgClient.ModelContext(ctx, comment).Where("_id = ?", id).Delete(); err != nil {
+func (dao *commentPGDAO) Delete(ctx context.Context, id uuid.UUID) error {
+	if _, err := dao.client.ModelContext(ctx, &Comment{ID: id}).WherePK().Delete(); err != nil {
 		return err
 	}
 
@@ -60,9 +60,9 @@ func (dao *commentPGDAO) Delete(ctx context.Context, id string) error {
 }
 
 // delete all comments when the video deleted
-func (dao *commentPGDAO) DeleteComments(ctx context.Context, videoID string) error {
+func (dao *commentPGDAO) DeleteByVideoID(ctx context.Context, videoID string) error {
 	var comment *Comment
-	if _, err := dao.pgClient.ModelContext(ctx, comment).Where("video_id=?", videoID).Delete(); err != nil {
+	if _, err := dao.client.ModelContext(ctx, comment).Where("video_id = ?", videoID).Delete(); err != nil {
 		return err
 	}
 

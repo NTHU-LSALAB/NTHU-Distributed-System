@@ -7,7 +7,7 @@ require (
 	github.com/go-redis/cache/v8 v8.4.3
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/golang/mock v1.6.0
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.3
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/minio/minio-go/v7 v7.0.22
