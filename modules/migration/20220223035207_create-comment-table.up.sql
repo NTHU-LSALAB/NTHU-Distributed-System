@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS comments(
-    id serial PRIMARY KEY,
-    video_id text NOT NULL,
-    comment text NOT NULl
+    id SERIAL PRIMARY KEY,
+    video_id TEXT NOT NULL,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL
 );
