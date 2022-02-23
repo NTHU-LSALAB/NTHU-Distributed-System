@@ -30,11 +30,11 @@ func (c *Comment) ToProto() *pb.CommentInfo {
 }
 
 type CommentDAO interface {
-	Get(ctx context.Context, id int32) (*Comment, error)
-	List(ctx context.Context, limit, skip int64) ([]*Comment, error)
+	List(ctx context.Context, video_id string, limit, skip int) ([]*Comment, error)
 	Create(ctx context.Context, comment *Comment) error
 	Update(ctx context.Context, comment *Comment) error
 	Delete(ctx context.Context, id int32) error
+	DeleteComments(ctx context.Context, video_id string) error
 }
 
 var (
