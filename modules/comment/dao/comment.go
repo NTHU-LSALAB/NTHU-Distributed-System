@@ -12,7 +12,7 @@ import (
 )
 
 type Comment struct {
-	ID        uuid.UUID `pg:"type:uuid,default:gen_random_uuid()"`
+	ID        uuid.UUID
 	VideoID   string
 	Content   string
 	CreatedAt time.Time
