@@ -1,4 +1,4 @@
-package postgreskit
+package pgkit
 
 import (
 	"context"
