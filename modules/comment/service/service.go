@@ -44,22 +44,22 @@ func (s *service) CreateComment(ctx context.Context, req *pb.CreateCommentReques
 		VideoID: req.GetVideoId(),
 		Content: req.GetContent(),
 	}
-	commentId, err := s.commentDAO.Create(ctx, comment)
+	commentID, err := s.commentDAO.Create(ctx, comment)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.CreateCommentResponse{Id: commentId.String()}, nil
+	return &pb.CreateCommentResponse{Id: commentID.String()}, nil
 }
 
 func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentRequest) (*pb.UpdateCommentResponse, error) {
-	commentId, err := uuid.Parse(req.GetId())
+	commentID, err := uuid.Parse(req.GetId())
 	if err != nil {
 		return nil, ErrInvalidObjectID
 	}
 
 	var comment = &dao.Comment{
-		ID:      commentId,
+		ID:      commentID,
 		Content: req.GetContent(),
 	}
 	err = s.commentDAO.Update(ctx, comment)
@@ -71,12 +71,12 @@ func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentReques
 }
 
 func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.DeleteCommentResponse, error) {
-	commentId, err := uuid.Parse(req.GetId())
+	commentID, err := uuid.Parse(req.GetId())
 	if err != nil {
 		return nil, ErrInvalidObjectID
 	}
 
-	if err := s.commentDAO.Delete(ctx, commentId); err != nil {
+	if err := s.commentDAO.Delete(ctx, commentID); err != nil {
 		if errors.Is(err, dao.ErrCommentNotFound) {
 			return nil, ErrCommentNotFound
 		}
