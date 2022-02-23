@@ -18,10 +18,10 @@ func NewCommentPGDAO(pgClient *postgreskit.PGClient) *commentPGDAO {
 	}
 }
 
-func (dao *commentPGDAO) List(ctx context.Context, video_id string, limit, skip int) ([]*Comment, error) {
+func (dao *commentPGDAO) List(ctx context.Context, videoID string, limit, skip int) ([]*Comment, error) {
 	var comments []*Comment
 	query := dao.pgClient.ModelContext(ctx, &comments).
-		Where("video_id=?", video_id).
+		Where("video_id=?", videoID).
 		Limit(limit).
 		Offset(skip).
 		Order("updated_at DESC")
@@ -50,7 +50,7 @@ func (dao *commentPGDAO) Update(ctx context.Context, comment *Comment) error {
 	return nil
 }
 
-func (dao *commentPGDAO) Delete(ctx context.Context, id int32) error {
+func (dao *commentPGDAO) Delete(ctx context.Context, id string) error {
 	var comment *Comment
 	if _, err := dao.pgClient.ModelContext(ctx, comment).Where("_id = ?", id).Delete(); err != nil {
 		return err
@@ -60,9 +60,9 @@ func (dao *commentPGDAO) Delete(ctx context.Context, id int32) error {
 }
 
 // delete all comments when the video deleted
-func (dao *commentPGDAO) DeleteComments(ctx context.Context, video_id string) error {
+func (dao *commentPGDAO) DeleteComments(ctx context.Context, videoID string) error {
 	var comment *Comment
-	if _, err := dao.pgClient.ModelContext(ctx, comment).Where("video_id=?", video_id).Delete(); err != nil {
+	if _, err := dao.pgClient.ModelContext(ctx, comment).Where("video_id=?", videoID).Delete(); err != nil {
 		return err
 	}
 

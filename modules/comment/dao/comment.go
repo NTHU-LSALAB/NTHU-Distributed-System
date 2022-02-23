@@ -3,16 +3,16 @@ package dao
 import (
 	"context"
 	"errors"
-	"math/rand"
 	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Comment struct {
-	ID        int32     `pg:"_id,omitempty"`
+	ID        string    `pg:"_id,omitempty"`
 	VideoID   string    `pg:"video_id,omitempty"`
 	Content   string    `pg:"content,omitempty"`
 	CreatedAt time.Time `pg:"created_at,omitempty"`
@@ -30,11 +30,11 @@ func (c *Comment) ToProto() *pb.CommentInfo {
 }
 
 type CommentDAO interface {
-	List(ctx context.Context, video_id string, limit, skip int) ([]*Comment, error)
+	List(ctx context.Context, videoID string, limit, skip int) ([]*Comment, error)
 	Create(ctx context.Context, comment *Comment) error
 	Update(ctx context.Context, comment *Comment) error
-	Delete(ctx context.Context, id int32) error
-	DeleteComments(ctx context.Context, video_id string) error
+	Delete(ctx context.Context, id string) error
+	DeleteComments(ctx context.Context, videoID string) error
 }
 
 var (
@@ -42,12 +42,12 @@ var (
 )
 
 func NewFakeComment() *Comment {
-	var id int32 = int32(rand.Int())
-	video_id := primitive.NewObjectID()
+	id := uuid.New().String()
+	videoID := primitive.NewObjectID()
 
 	return &Comment{
 		ID:      id,
-		VideoID: video_id.Hex(),
+		VideoID: videoID.Hex(),
 		Content: "comment test",
 	}
 }
