@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     video_id TEXT NOT NULL,
-    comment TEXT NOT NULL,
+    content TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
