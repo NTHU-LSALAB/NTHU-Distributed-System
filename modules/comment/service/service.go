@@ -40,7 +40,7 @@ func (s *service) ListComment(ctx context.Context, req *pb.ListCommentRequest) (
 }
 
 func (s *service) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
-	var comment = &dao.Comment{
+	comment := &dao.Comment{
 		VideoID: req.GetVideoId(),
 		Content: req.GetContent(),
 	}
@@ -58,12 +58,15 @@ func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentReques
 		return nil, ErrInvalidObjectID
 	}
 
-	var comment = &dao.Comment{
+	comment := &dao.Comment{
 		ID:      commentID,
 		Content: req.GetContent(),
 	}
-	err = s.commentDAO.Update(ctx, comment)
-	if err != nil {
+	if err := s.commentDAO.Update(ctx, comment); err != nil {
+		if errors.Is(err, dao.ErrCommentNotFound) {
+			return nil, ErrCommentNotFound
+		}
+
 		return nil, err
 	}
 

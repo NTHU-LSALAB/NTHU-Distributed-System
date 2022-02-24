@@ -6,6 +6,6 @@ import (
 )
 
 var (
-	ErrInvalidObjectID = status.Errorf(codes.InvalidArgument, "invalid objectID")
+	ErrInvalidObjectID = status.Errorf(codes.InvalidArgument, "invalid UUID")
 	ErrCommentNotFound = status.Errorf(codes.NotFound, "comment not found")
 )
