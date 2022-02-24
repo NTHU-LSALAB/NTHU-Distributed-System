@@ -33,16 +33,16 @@ func (dao *commentPGDAO) List(ctx context.Context, videoID string, limit, offset
 	return comments, nil
 }
 
-func (dao *commentPGDAO) Create(ctx context.Context, comment *Comment) error {
+func (dao *commentPGDAO) Create(ctx context.Context, comment *Comment) (uuid.UUID, error) {
 	if _, err := dao.client.ModelContext(ctx, comment).Insert(); err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
-	return nil
+	return comment.ID, nil
 }
 
 func (dao *commentPGDAO) Update(ctx context.Context, comment *Comment) error {
-	if res, err := dao.client.ModelContext(ctx, comment).WherePK().Update(); err != nil {
+	if res, err := dao.client.ModelContext(ctx, comment).Column("content").WherePK().Update(); err != nil {
 		return err
 	} else if res.RowsAffected() == 0 {
 		return ErrCommentNotFound
@@ -52,8 +52,10 @@ func (dao *commentPGDAO) Update(ctx context.Context, comment *Comment) error {
 }
 
 func (dao *commentPGDAO) Delete(ctx context.Context, id uuid.UUID) error {
-	if _, err := dao.client.ModelContext(ctx, &Comment{ID: id}).WherePK().Delete(); err != nil {
+	if res, err := dao.client.ModelContext(ctx, &Comment{ID: id}).WherePK().Delete(); err != nil {
 		return err
+	} else if res.RowsAffected() == 0 {
+		return ErrCommentNotFound
 	}
 
 	return nil
