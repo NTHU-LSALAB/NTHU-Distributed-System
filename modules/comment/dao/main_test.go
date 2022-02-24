@@ -38,3 +38,8 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	Expect(pgClient.Close()).NotTo(HaveOccurred())
 })
+
+var pgExec = func(query string, params ...interface{}) {
+	_, err := pgClient.Exec(query, params...)
+	Expect(err).NotTo(HaveOccurred())
+}
