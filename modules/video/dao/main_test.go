@@ -23,30 +23,29 @@ var (
 )
 
 var _ = BeforeSuite(func() {
-	var mongoConf mongokit.MongoConfig
-	var redisConf rediskit.RedisConfig
+	mongoConf := &mongokit.MongoConfig{
+		URL:      "mongodb://mongo:27017",
+		Database: "video",
+	}
 
-	mongoConf.URL = "mongodb://localhost:27017"
 	if url := os.Getenv("MONGO_URL"); url != "" {
 		mongoConf.URL = url
 	}
 
-	mongoConf.Database = "video"
 	if database := os.Getenv("MONGO_DATABASE"); database != "" {
 		mongoConf.Database = database
 	}
 
-	redisConf.Addr = "localhost:6379"
-	if addr := os.Getenv("REDIS_ADDR"); addr != "" {
-		redisConf.Addr = addr
+	redisConf := &rediskit.RedisConfig{
+		Addr: "redis:6379",
 	}
 
 	ctx := logkit.NewLogger(&logkit.LoggerConfig{
 		Development: true,
 	}).WithContext(context.Background())
 
-	mongoClient = mongokit.NewMongoClient(ctx, &mongoConf)
-	redisClient = rediskit.NewRedisClient(ctx, &redisConf)
+	mongoClient = mongokit.NewMongoClient(ctx, mongoConf)
+	redisClient = rediskit.NewRedisClient(ctx, redisConf)
 })
 
 var _ = AfterSuite(func() {
