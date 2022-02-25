@@ -27,7 +27,7 @@ func (dao *commentPGDAO) List(ctx context.Context, videoID string, limit, offset
 		Offset(offset).
 		Order("updated_at DESC")
 	if err := query.Select(); err != nil {
-		return nil, err
+		return nil, ErrVideoNotFound
 	}
 
 	return comments, nil
@@ -65,7 +65,7 @@ func (dao *commentPGDAO) Delete(ctx context.Context, id uuid.UUID) error {
 func (dao *commentPGDAO) DeleteByVideoID(ctx context.Context, videoID string) error {
 	var comment *Comment
 	if _, err := dao.client.ModelContext(ctx, comment).Where("video_id = ?", videoID).Delete(); err != nil {
-		return err
+		return ErrVideoNotFound
 	}
 
 	return nil

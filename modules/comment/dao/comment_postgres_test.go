@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var _ = Describe("CommentPostgresDAO", func() {
@@ -30,32 +31,34 @@ var _ = Describe("CommentPostgresDAO", func() {
 
 		BeforeEach(func() {
 			comments = []*Comment{NewFakeComment(), NewFakeComment(), NewFakeComment()}
+			fake_video_id := primitive.NewObjectID().Hex()
 
 			for _, comment := range comments {
+				comment.VideoID = fake_video_id
 				insertComment(comment)
 			}
 		})
 
 		AfterEach(func() {
-			for _, comment := range comments {
-				deleteComment(comment.ID)
-			}
+			deletCommentByVideoID(comments[0].VideoID)
 		})
 
 		JustBeforeEach(func() {
 			resp, err = commentDAO.List(ctx, video_id, limit, skip)
 		})
 
-		When("comment not found", func() {
-			BeforeEach(func() { video_id = uuid.NewString() })
+		When("video not found", func() {
+			BeforeEach(func() { video_id = primitive.NewObjectID().Hex() })
 
 			It("returns comment not found error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(ErrCommentNotFound))
+				Expect(err).To(MatchError(ErrVideoNotFound))
 			})
 		})
 
 		Context("success", func() {
+			BeforeEach(func() { video_id = comments[0].VideoID })
+
 			When("no limit and offset", func() {
 				It("return comments with no offer", func() {
 					Expect(resp).To(Equal(comments))
@@ -87,6 +90,7 @@ var _ = Describe("CommentPostgresDAO", func() {
 		var (
 			comment *Comment
 
+			res uuid.UUID
 			err error
 		)
 
@@ -100,18 +104,20 @@ var _ = Describe("CommentPostgresDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			err = commentDAO.Create(ctx, comment)
+			res, err = commentDAO.Create(ctx, comment)
 		})
 
 		When("success", func() {
 			It("returns the new comment ID with no error", func() {
-				Expect(comment.ID).NotTo(Equal(uuid.Nil))
+				Expect(res).NotTo(Equal(uuid.Nil))
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("inserts the comment", func() {
+				var getComment Comment
 				query := "SELECT * FROM comments WHERE id = ?"
-				getComment, err := pgClient.Exec(query, comment.ID)
+				_, err := pgClient.DB.QueryOne(&getComment, query, comment.ID)
+
 				Expect(err).NotTo(HaveOccurred())
 				Expect(getComment).To(Equal(comment))
 			})
@@ -162,10 +168,92 @@ var _ = Describe("CommentPostgresDAO", func() {
 			})
 
 			It("updates the comment", func() {
+				var getComment Comment
 				query := "SELECT * FROM comments WHERE id = ?"
-				res, err := pgClient.Exec(query, comment.ID)
-				Expect(res.Model).To(Equal(content))
+				_, err := pgClient.DB.QueryOne(&getComment, query, comment.ID)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(getComment.Content).To(Equal(content))
 				Expect(getComment).To(Equal(comment))
+			})
+		})
+	})
+
+	Describe("Delete", func() {
+		var (
+			comment *Comment
+			id      uuid.UUID
+
+			err error
+		)
+
+		BeforeEach(func() {
+			comment = NewFakeComment()
+			id = comment.ID
+
+			insertComment(comment)
+		})
+
+		JustBeforeEach(func() {
+			err = commentDAO.Delete(ctx, id)
+		})
+
+		When("comment not found", func() {
+			BeforeEach(func() { comment.ID = uuid.New() })
+
+			AfterEach(func() {
+				deleteComment(id)
+			})
+
+			It("returns comment not found error", func() {
+				Expect(err).To(MatchError(ErrCommentNotFound))
+			})
+		})
+
+		When("success", func() {
+			It("returns no error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("DeleteByVideoID", func() {
+		var (
+			comments []*Comment
+			video_id string
+
+			err error
+		)
+
+		BeforeEach(func() {
+			comments = []*Comment{NewFakeComment(), NewFakeComment(), NewFakeComment()}
+			fake_video_id := primitive.NewObjectID().Hex()
+
+			for _, comment := range comments {
+				comment.VideoID = fake_video_id
+				insertComment(comment)
+			}
+		})
+
+		JustBeforeEach(func() {
+			err = commentDAO.DeleteByVideoID(ctx, video_id)
+		})
+
+		When("video not found", func() {
+			BeforeEach(func() { video_id = primitive.NewObjectID().Hex() })
+
+			AfterEach(func() {
+				deletCommentByVideoID(comments[0].VideoID)
+			})
+
+			It("returns comment not found error", func() {
+				Expect(err).To(MatchError(ErrVideoNotFound))
+			})
+		})
+
+		When("success", func() {
+			It("returns no error", func() {
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	})
@@ -181,4 +269,10 @@ func deleteComment(id uuid.UUID) {
 	query := "DELETE FROM comments WHERE id = ?"
 
 	pgExec(query, id)
+}
+
+func deletCommentByVideoID(video_id string) {
+	query := "DELETE FROM comments WHERE video_id = ?"
+
+	pgExec(query, video_id)
 }

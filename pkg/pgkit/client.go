@@ -6,6 +6,9 @@ import (
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/go-pg/pg/v10"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/github"
 	"go.uber.org/zap"
 )
 
@@ -26,11 +29,23 @@ func (c *PGClient) Close() error {
 }
 
 func NewPGClient(ctx context.Context, conf *PGConfig) *PGClient {
+	logger := logkit.FromContext(ctx).With(zap.String("url", conf.URL))
 	if url := os.ExpandEnv(conf.URL); url != "" {
 		conf.URL = url
+		m, err := migrate.New(
+			"file://src/modules/migrations",
+			url,
+		)
+
+		if err != nil {
+			logger.Fatal("Failed to create database table", zap.Error(err))
+		}
+
+		if err := m.Down(); err != nil {
+			logger.Fatal("Failed to create database table", zap.Error(err))
+		}
 	}
 
-	logger := logkit.FromContext(ctx).With(zap.String("url", conf.URL))
 	opts, err := pg.ParseURL(conf.URL)
 	if err != nil {
 		logger.Fatal("Failed to parse PostgreSQL url", zap.Error(err))
