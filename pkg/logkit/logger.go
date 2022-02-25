@@ -54,3 +54,9 @@ func NewLogger(conf *LoggerConfig) *Logger {
 func (l *Logger) WithContext(ctx context.Context) context.Context {
 	return WithContext(ctx, l)
 }
+
+func (l *Logger) With(fields ...zapcore.Field) *Logger {
+	l.Logger = l.Logger.With(fields...)
+
+	return l
+}
