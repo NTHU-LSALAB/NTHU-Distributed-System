@@ -67,8 +67,8 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	videoMongoDAO := dao.NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
-	videoDAO := dao.NewVideoRedisDAO(redisClient, videoMongoDAO)
+	mongoVideoDAO := dao.NewMongoVideoDAO(mongoClient.Database().Collection("videos"))
+	videoDAO := dao.NewRedisVideoDAO(redisClient, mongoVideoDAO)
 	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
 
 	svc := service.NewService(videoDAO, storage)

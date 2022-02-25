@@ -56,9 +56,9 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	commentPGDAO := dao.NewCommentPGDAO(pgClient)
+	pgCommentDAO := dao.NewPGCommentDAO(pgClient)
 
-	svc := service.NewService(commentPGDAO)
+	svc := service.NewService(pgCommentDAO)
 
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
 	lis, err := net.Listen("tcp", args.GRPCAddr)
