@@ -85,7 +85,6 @@ services:
     depends_on:
     - mongo
     - redis
-    - postgres
 
   video-gateway:
     image: nthu-distributed-system:latest
@@ -98,3 +97,27 @@ services:
     - gateway
     ports:
     - 10080:8080
+
+  comment-api:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+    command:
+    - /cmd
+    - comment
+    - api
+    depends_on:
+    - postgres
+    - redis
+
+  comment-gateway:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+      GRPC_ADDR: comment-api:8081
+    command:
+    - /cmd
+    - comment
+    - gateway
+    ports:
+    - 10081:8080
