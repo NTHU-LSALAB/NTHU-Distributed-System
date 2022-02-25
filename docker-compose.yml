@@ -28,6 +28,8 @@ services:
 
   postgres:
     image: postgres:14-alpine
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
 
   redis:
     image: redis:6.2-alpine
@@ -57,6 +59,7 @@ services:
     depends_on:
     - mongo
     - redis
+    - postgres
 
   build:
     <<: *common-build
@@ -82,6 +85,7 @@ services:
     depends_on:
     - mongo
     - redis
+    - postgres
 
   video-gateway:
     image: nthu-distributed-system:latest
