@@ -39,7 +39,6 @@ type CommentDAO interface {
 
 var (
 	ErrCommentNotFound = errors.New("comment not found")
-	ErrVideoNotFound   = errors.New("video not found")
 )
 
 func NewFakeComment() *Comment {

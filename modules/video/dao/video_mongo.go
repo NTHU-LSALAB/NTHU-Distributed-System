@@ -10,19 +10,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type videoMongoDAO struct {
+type mongoVideoDAO struct {
 	collection *mongo.Collection
 }
 
-var _ VideoDAO = (*videoMongoDAO)(nil)
+var _ VideoDAO = (*mongoVideoDAO)(nil)
 
-func NewVideoMongoDAO(collection *mongo.Collection) *videoMongoDAO {
-	return &videoMongoDAO{
+func NewMongoVideoDAO(collection *mongo.Collection) *mongoVideoDAO {
+	return &mongoVideoDAO{
 		collection: collection,
 	}
 }
 
-func (dao *videoMongoDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
+func (dao *mongoVideoDAO) Get(ctx context.Context, id primitive.ObjectID) (*Video, error) {
 	var video Video
 	if err := dao.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&video); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -34,7 +34,7 @@ func (dao *videoMongoDAO) Get(ctx context.Context, id primitive.ObjectID) (*Vide
 	return &video, nil
 }
 
-func (dao *videoMongoDAO) List(ctx context.Context, limit, skip int64) ([]*Video, error) {
+func (dao *mongoVideoDAO) List(ctx context.Context, limit, skip int64) ([]*Video, error) {
 	o := options.Find().SetLimit(limit).SetSkip(skip)
 
 	cursor, err := dao.collection.Find(ctx, bson.M{}, o)
@@ -56,7 +56,7 @@ func (dao *videoMongoDAO) List(ctx context.Context, limit, skip int64) ([]*Video
 	return videos, nil
 }
 
-func (dao *videoMongoDAO) Create(ctx context.Context, video *Video) error {
+func (dao *mongoVideoDAO) Create(ctx context.Context, video *Video) error {
 	result, err := dao.collection.InsertOne(ctx, video)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (dao *videoMongoDAO) Create(ctx context.Context, video *Video) error {
 	return nil
 }
 
-func (dao *videoMongoDAO) Update(ctx context.Context, video *Video) error {
+func (dao *mongoVideoDAO) Update(ctx context.Context, video *Video) error {
 	if result, err := dao.collection.ReplaceOne(
 		ctx,
 		bson.M{"_id": video.ID},
@@ -81,7 +81,7 @@ func (dao *videoMongoDAO) Update(ctx context.Context, video *Video) error {
 	return nil
 }
 
-func (dao *videoMongoDAO) Delete(ctx context.Context, id primitive.ObjectID) error {
+func (dao *mongoVideoDAO) Delete(ctx context.Context, id primitive.ObjectID) error {
 	if result, err := dao.collection.DeleteOne(ctx, bson.M{"_id": id}); err != nil {
 		return err
 	} else if result.DeletedCount == 0 {

@@ -10,12 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var _ = Describe("VideoMongoDAO", func() {
-	var videoDAO *videoMongoDAO
+var _ = Describe("mongoVideoDAO", func() {
+	var videoDAO *mongoVideoDAO
 	var ctx context.Context
 
 	BeforeEach(func() {
-		videoDAO = NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
+		videoDAO = NewMongoVideoDAO(mongoClient.Database().Collection("videos"))
 		ctx = context.Background()
 	})
 
@@ -261,12 +261,12 @@ var _ = Describe("VideoMongoDAO", func() {
 
 // useful methods for testing
 
-func insertVideo(ctx context.Context, videoDAO *videoMongoDAO, video *Video) {
+func insertVideo(ctx context.Context, videoDAO *mongoVideoDAO, video *Video) {
 	Expect(videoDAO.collection.InsertOne(ctx, video)).
 		To(Equal(&mongo.InsertOneResult{InsertedID: video.ID}))
 }
 
-func deleteVideo(ctx context.Context, videoDAO *videoMongoDAO, id primitive.ObjectID) {
+func deleteVideo(ctx context.Context, videoDAO *mongoVideoDAO, id primitive.ObjectID) {
 	Expect(videoDAO.collection.DeleteOne(ctx, bson.M{"_id": id})).
 		To(Equal(&mongo.DeleteResult{DeletedCount: 1}))
 }

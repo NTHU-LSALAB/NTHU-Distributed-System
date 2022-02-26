@@ -12,14 +12,14 @@ import (
 )
 
 var _ = Describe("VideoRedisDAO", func() {
-	var videoRedisDAO *videoRedisDAO
-	var videoMongoDAO *videoMongoDAO
+	var redisVideoDAO *redisVideoDAO
+	var mongoVideoDAO *mongoVideoDAO
 	var ctx context.Context
 
 	BeforeEach(func() {
 		ctx = context.Background()
-		videoMongoDAO = NewVideoMongoDAO(mongoClient.Database().Collection("videos"))
-		videoRedisDAO = NewVideoRedisDAO(redisClient, videoMongoDAO)
+		mongoVideoDAO = NewMongoVideoDAO(mongoClient.Database().Collection("videos"))
+		redisVideoDAO = NewRedisVideoDAO(redisClient, mongoVideoDAO)
 	})
 
 	Describe("Get", func() {
@@ -37,16 +37,16 @@ var _ = Describe("VideoRedisDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			resp, err = videoRedisDAO.Get(ctx, id)
+			resp, err = redisVideoDAO.Get(ctx, id)
 		})
 
 		Context("cache hit", func() {
 			BeforeEach(func() {
-				insertVideoInRedis(ctx, videoRedisDAO, video)
+				insertVideoInRedis(ctx, redisVideoDAO, video)
 			})
 
 			AfterEach(func() {
-				deleteVideoInRedis(ctx, videoRedisDAO, getVideoKey(video.ID))
+				deleteVideoInRedis(ctx, redisVideoDAO, getVideoKey(video.ID))
 			})
 
 			When("video not found", func() {
@@ -70,12 +70,12 @@ var _ = Describe("VideoRedisDAO", func() {
 
 		Context("cache miss", func() {
 			BeforeEach(func() {
-				insertVideo(ctx, videoMongoDAO, video)
+				insertVideo(ctx, mongoVideoDAO, video)
 			})
 
 			AfterEach(func() {
-				deleteVideo(ctx, videoMongoDAO, video.ID)
-				deleteVideoInRedis(ctx, videoRedisDAO, getVideoKey(video.ID))
+				deleteVideo(ctx, mongoVideoDAO, video.ID)
+				deleteVideoInRedis(ctx, redisVideoDAO, getVideoKey(video.ID))
 			})
 
 			When("video not found", func() {
@@ -99,7 +99,7 @@ var _ = Describe("VideoRedisDAO", func() {
 					var getVideo Video
 
 					Expect(
-						videoRedisDAO.cache.Get(ctx, getVideoKey(id), &getVideo),
+						redisVideoDAO.cache.Get(ctx, getVideoKey(id), &getVideo),
 					).NotTo(HaveOccurred())
 					Expect(resp).To(matchVideo(video))
 				})
@@ -122,17 +122,17 @@ var _ = Describe("VideoRedisDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			resp, err = videoRedisDAO.List(ctx, limit, skip)
+			resp, err = redisVideoDAO.List(ctx, limit, skip)
 		})
 
 		Context("cache hit", func() {
 			BeforeEach(func() {
 				limit, skip = 3, 0
-				insertVideosInRedis(ctx, videoRedisDAO, videos, limit, skip)
+				insertVideosInRedis(ctx, redisVideoDAO, videos, limit, skip)
 			})
 
 			AfterEach(func() {
-				deleteVideosInRedis(ctx, videoRedisDAO, limit, skip)
+				deleteVideosInRedis(ctx, redisVideoDAO, limit, skip)
 			})
 
 			When("videos not found", func() {
@@ -157,15 +157,15 @@ var _ = Describe("VideoRedisDAO", func() {
 		Context("cache miss", func() {
 			BeforeEach(func() {
 				for _, video := range videos {
-					insertVideo(ctx, videoMongoDAO, video)
+					insertVideo(ctx, mongoVideoDAO, video)
 				}
 			})
 
 			AfterEach(func() {
 				for _, video := range videos {
-					deleteVideo(ctx, videoMongoDAO, video.ID)
+					deleteVideo(ctx, mongoVideoDAO, video.ID)
 				}
-				deleteVideoInRedis(ctx, videoRedisDAO, listVideoKey(limit, skip))
+				deleteVideoInRedis(ctx, redisVideoDAO, listVideoKey(limit, skip))
 			})
 
 			When("success", func() {
@@ -178,7 +178,7 @@ var _ = Describe("VideoRedisDAO", func() {
 
 				It("insert the videos to cache", func() {
 					var getVideos []*Video
-					Expect(videoRedisDAO.cache.Get(ctx, listVideoKey(limit, skip), &getVideos)).NotTo(HaveOccurred())
+					Expect(redisVideoDAO.cache.Get(ctx, listVideoKey(limit, skip), &getVideos)).NotTo(HaveOccurred())
 					for i := range getVideos {
 						Expect(getVideos[i]).To(matchVideo(videos[i]))
 					}
@@ -188,7 +188,7 @@ var _ = Describe("VideoRedisDAO", func() {
 	})
 })
 
-func insertVideoInRedis(ctx context.Context, videoDAO *videoRedisDAO, video *Video) {
+func insertVideoInRedis(ctx context.Context, videoDAO *redisVideoDAO, video *Video) {
 	Expect(videoDAO.cache.Set(&cache.Item{
 		Ctx:   ctx,
 		Key:   getVideoKey(video.ID),
@@ -197,11 +197,11 @@ func insertVideoInRedis(ctx context.Context, videoDAO *videoRedisDAO, video *Vid
 	})).NotTo(HaveOccurred())
 }
 
-func deleteVideoInRedis(ctx context.Context, videoDAO *videoRedisDAO, key string) {
+func deleteVideoInRedis(ctx context.Context, videoDAO *redisVideoDAO, key string) {
 	Expect(videoDAO.cache.Delete(ctx, key)).NotTo(HaveOccurred())
 }
 
-func insertVideosInRedis(ctx context.Context, videoDAO *videoRedisDAO, videos []*Video, limit int64, skip int64) {
+func insertVideosInRedis(ctx context.Context, videoDAO *redisVideoDAO, videos []*Video, limit int64, skip int64) {
 	Expect(videoDAO.cache.Set(&cache.Item{
 		Ctx:   ctx,
 		Key:   listVideoKey(limit, skip),
@@ -210,7 +210,7 @@ func insertVideosInRedis(ctx context.Context, videoDAO *videoRedisDAO, videos []
 	})).NotTo(HaveOccurred())
 }
 
-func deleteVideosInRedis(ctx context.Context, videoDAO *videoRedisDAO, limit int64, skip int64) {
+func deleteVideosInRedis(ctx context.Context, videoDAO *redisVideoDAO, limit int64, skip int64) {
 	Expect(videoDAO.cache.Delete(ctx, listVideoKey(limit, skip))).NotTo(HaveOccurred())
 }
 

@@ -87,7 +87,7 @@ func NewFakeVideo() *Video {
 		Size:     144000,
 		Duration: 10.234,
 		URL:      "https://storage.example.com/videos/" + id.Hex() + ".mp4",
-		Status:   "SUCCESS",
+		Status:   VideoStatusSuccess,
 		Variants: map[string]string{
 			"1080p": "https://storage.example.com/videos/" + id.Hex() + "-1080p.mp4",
 			"720p":  "https://storage.example.com/videos/" + id.Hex() + "-720p.mp4",
