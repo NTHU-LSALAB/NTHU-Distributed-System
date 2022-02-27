@@ -9,6 +9,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/mock/daomock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -43,10 +44,16 @@ var _ = Describe("Service", func() {
 
 	Describe("ListComment", func() {
 		var (
-			req  *pb.ListCommentRequest
-			resp *pb.ListCommentResponse
-			err  error
+			req     *pb.ListCommentRequest
+			videoId string
+			resp    *pb.ListCommentResponse
+			err     error
 		)
+
+		BeforeEach(func() {
+			videoId = "fake id"
+			req = &pb.ListCommentRequest{VideoId: videoId, Limit: 10, Skip: 0}
+		})
 
 		JustBeforeEach(func() {
 			resp, err = svc.ListComment(ctx, req)
@@ -77,6 +84,61 @@ var _ = Describe("Service", func() {
 						comments[0].ToProto(),
 						comments[1].ToProto(),
 					},
+				}))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("CreateComment", func() {
+		var (
+			req     *pb.CreateCommentRequest
+			videoId string
+			content string
+			resp    *pb.CreateCommentResponse
+			err     error
+		)
+
+		BeforeEach(func() {
+			videoId = "fake id"
+			content = "fake content"
+			req = &pb.CreateCommentRequest{
+				VideoId: videoId,
+				Content: content,
+			}
+		})
+
+		JustBeforeEach(func() {
+			resp, err = svc.CreateComment(ctx, req)
+		})
+
+		When("postgres error", func() {
+			var comment *dao.Comment
+
+			BeforeEach(func() {
+				comment = dao.NewFakeComment()
+				commentDAO.EXPECT().Create(ctx, comment).Return(nil, errPGUnknown)
+			})
+
+			It("returns the error", func() {
+				Expect(resp).To(BeNil())
+				Expect(err).To(MatchError(errPGUnknown))
+			})
+		})
+
+		When("success", func() {
+			var comment *dao.Comment
+			var id uuid.UUID
+
+			BeforeEach(func() {
+				comment = dao.NewFakeComment()
+				id = uuid.New()
+				commentDAO.EXPECT().Create(ctx, comment).Return(id, nil)
+			})
+
+			It("returns the error", func() {
+				Expect(resp).To(Equal(&pb.CreateCommentResponse{
+					Id: id.String(),
 				}))
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -141,9 +203,14 @@ var _ = Describe("Service", func() {
 		var (
 			req  *pb.DeleteCommentRequest
 			resp *pb.DeleteCommentResponse
-			id   string
+			id   uuid.UUID
 			err  error
 		)
+
+		BeforeEach(func() {
+			id = uuid.New()
+			req = &pb.DeleteCommentRequest{Id: id.String()}
+		})
 
 		JustBeforeEach(func() {
 			resp, err = svc.DeleteComment(ctx, req)
@@ -152,7 +219,7 @@ var _ = Describe("Service", func() {
 		When("postgres error", func() {
 
 			BeforeEach(func() {
-				commentDAO.EXPECT().Delete(ctx, comment).Return(errPGUnknown)
+				commentDAO.EXPECT().Delete(ctx, id).Return(errPGUnknown)
 			})
 
 			It("returns the error", func() {
@@ -162,11 +229,8 @@ var _ = Describe("Service", func() {
 		})
 
 		When("comment not found", func() {
-			var comment *dao.Comment
-
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
-				commentDAO.EXPECT().Delete(ctx, comment).Return(ErrCommentNotFound)
+				commentDAO.EXPECT().Delete(ctx, id).Return(ErrCommentNotFound)
 			})
 
 			It("return comment not found error", func() {
@@ -176,15 +240,12 @@ var _ = Describe("Service", func() {
 		})
 
 		When("success", func() {
-			var comment *dao.Comment
-
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
-				commentDAO.EXPECT().Update(ctx, comment).Return(nil)
+				commentDAO.EXPECT().Delete(ctx, id).Return(nil)
 			})
 
 			It("returns without any error", func() {
-				Expect(resp).To(Equal(&pb.UpdateCommentResponse{}))
+				Expect(resp).To(Equal(&pb.DeleteCommentResponse{}))
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
