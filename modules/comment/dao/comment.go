@@ -30,7 +30,7 @@ func (c *Comment) ToProto() *pb.CommentInfo {
 }
 
 type CommentDAO interface {
-	List(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error)
+	ListByVideoID(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error)
 	Create(ctx context.Context, comment *Comment) (uuid.UUID, error)
 	Update(ctx context.Context, comment *Comment) error
 	Delete(ctx context.Context, id uuid.UUID) error
@@ -41,13 +41,14 @@ var (
 	ErrCommentNotFound = errors.New("comment not found")
 )
 
-func NewFakeComment() *Comment {
-	id := uuid.New()
-	videoID := primitive.NewObjectID()
+func NewFakeComment(videoID string) *Comment {
+	if videoID == "" {
+		videoID = primitive.NewObjectID().Hex()
+	}
 
 	return &Comment{
-		ID:      id,
-		VideoID: videoID.Hex(),
+		ID:      uuid.New(),
+		VideoID: videoID,
 		Content: "comment test",
 	}
 }
