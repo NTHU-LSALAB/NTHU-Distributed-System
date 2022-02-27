@@ -79,19 +79,19 @@ func (mr *MockCommentDAOMockRecorder) DeleteByVideoID(arg0, arg1 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByVideoID", reflect.TypeOf((*MockCommentDAO)(nil).DeleteByVideoID), arg0, arg1)
 }
 
-// List mocks base method.
-func (m *MockCommentDAO) List(arg0 context.Context, arg1 string, arg2, arg3 int) ([]*dao.Comment, error) {
+// ListByVideoID mocks base method.
+func (m *MockCommentDAO) ListByVideoID(arg0 context.Context, arg1 string, arg2, arg3 int) ([]*dao.Comment, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "ListByVideoID", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].([]*dao.Comment)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// List indicates an expected call of List.
-func (mr *MockCommentDAOMockRecorder) List(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+// ListByVideoID indicates an expected call of ListByVideoID.
+func (mr *MockCommentDAOMockRecorder) ListByVideoID(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockCommentDAO)(nil).List), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByVideoID", reflect.TypeOf((*MockCommentDAO)(nil).ListByVideoID), arg0, arg1, arg2, arg3)
 }
 
 // Update mocks base method.

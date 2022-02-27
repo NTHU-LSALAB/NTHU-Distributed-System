@@ -46,13 +46,17 @@ var _ = Describe("Service", func() {
 		var (
 			req     *pb.ListCommentRequest
 			videoId string
+			limit   int32
+			skip    int32
 			resp    *pb.ListCommentResponse
 			err     error
 		)
 
 		BeforeEach(func() {
 			videoId = "fake id"
-			req = &pb.ListCommentRequest{VideoId: videoId, Limit: 10, Skip: 0}
+			limit = 10
+			skip = 0
+			req = &pb.ListCommentRequest{VideoId: videoId, Limit: limit, Skip: skip}
 		})
 
 		JustBeforeEach(func() {
@@ -61,7 +65,7 @@ var _ = Describe("Service", func() {
 
 		When("postgres error", func() {
 			BeforeEach(func() {
-				commentDAO.EXPECT().List(ctx, req.GetVideoId(), req.GetLimit(), req.GetSkip()).Return(nil, errPGUnknown)
+				commentDAO.EXPECT().ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetSkip())).Return(nil, errPGUnknown)
 			})
 
 			It("returns the error", func() {
@@ -74,8 +78,8 @@ var _ = Describe("Service", func() {
 			var comments []*dao.Comment
 
 			BeforeEach(func() {
-				comments = []*dao.Comment{dao.NewFakeComment(), dao.NewFakeComment()}
-				commentDAO.EXPECT().List(ctx, req.GetVideoId(), req.GetLimit(), req.GetSkip()).Return(comments, nil)
+				comments = []*dao.Comment{dao.NewFakeComment(""), dao.NewFakeComment("")}
+				commentDAO.EXPECT().ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetSkip())).Return(comments, nil)
 			})
 
 			It("returns comments with no error", func() {
@@ -116,8 +120,8 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
-				commentDAO.EXPECT().Create(ctx, comment).Return(nil, errPGUnknown)
+				comment = dao.NewFakeComment("")
+				commentDAO.EXPECT().Create(ctx, comment).Return(uuid.Nil, errPGUnknown)
 			})
 
 			It("returns the error", func() {
@@ -131,12 +135,12 @@ var _ = Describe("Service", func() {
 			var id uuid.UUID
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
+				comment = dao.NewFakeComment("")
 				id = uuid.New()
 				commentDAO.EXPECT().Create(ctx, comment).Return(id, nil)
 			})
 
-			It("returns the error", func() {
+			It("returns no error", func() {
 				Expect(resp).To(Equal(&pb.CreateCommentResponse{
 					Id: id.String(),
 				}))
@@ -160,7 +164,7 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
+				comment = dao.NewFakeComment("")
 				commentDAO.EXPECT().Update(ctx, comment).Return(errPGUnknown)
 			})
 
@@ -174,7 +178,7 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
+				comment = dao.NewFakeComment("")
 				commentDAO.EXPECT().Update(ctx, comment).Return(ErrCommentNotFound)
 			})
 
@@ -188,7 +192,7 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment()
+				comment = dao.NewFakeComment("")
 				commentDAO.EXPECT().Update(ctx, comment).Return(nil)
 			})
 
