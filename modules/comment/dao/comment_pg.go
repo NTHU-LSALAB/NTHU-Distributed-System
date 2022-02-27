@@ -64,8 +64,7 @@ func (dao *pgCommentDAO) Delete(ctx context.Context, id uuid.UUID) error {
 
 // delete all comments when the video deleted
 func (dao *pgCommentDAO) DeleteByVideoID(ctx context.Context, videoID string) error {
-	var comment *Comment
-	if res, err := dao.client.ModelContext(ctx, comment).Where("video_id = ?", videoID).Delete(); err != nil {
+	if res, err := dao.client.ModelContext(ctx, (*Comment)(nil)).Where("video_id = ?", videoID).Delete(); err != nil {
 		return err
 	} else if res.RowsAffected() == 0 {
 		return ErrCommentNotFound

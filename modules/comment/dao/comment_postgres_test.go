@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 
+	"github.com/go-pg/pg/v10"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -231,7 +232,7 @@ var _ = Describe("PGCommentDAO", func() {
 				_, err := pgClient.QueryOne(&getComment, "SELECT * FROM comments WHERE id = ?", id)
 
 				Expect(getComment).To(Equal(emptyComment))
-				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(pg.ErrNoRows))
 			})
 		})
 	})
@@ -289,7 +290,7 @@ var _ = Describe("PGCommentDAO", func() {
 				_, err := pgClient.QueryOne(&getComments, "SELECT * FROM comments WHERE video_id = ?", videoID)
 
 				Expect(getComments).To(HaveLen(0))
-				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(pg.ErrNoRows))
 			})
 		})
 	})
