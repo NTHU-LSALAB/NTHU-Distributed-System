@@ -33,7 +33,7 @@ func NewPGClient(ctx context.Context, conf *PGConfig) *PGClient {
 	logger := logkit.FromContext(ctx).With(zap.String("url", conf.URL))
 	opts, err := pg.ParseURL(conf.URL)
 	if err != nil {
-		logger.Fatal("Failed to parse PostgreSQL url", zap.Error(err))
+		logger.Fatal("failed to parse PostgreSQL url", zap.Error(err))
 	}
 
 	db := pg.Connect(opts).WithContext(ctx)

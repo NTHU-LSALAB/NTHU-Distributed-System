@@ -28,10 +28,12 @@ services:
 
   postgres:
     image: postgres:14-alpine
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
 
   redis:
     image: redis:6.2-alpine
-    
+
   generate:
     <<: *common-build
     command:
@@ -95,3 +97,27 @@ services:
     - gateway
     ports:
     - 10080:8080
+
+  comment-api:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+    command:
+    - /cmd
+    - comment
+    - api
+    depends_on:
+    - postgres
+    - redis
+
+  comment-gateway:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+      GRPC_ADDR: comment-api:8081
+    command:
+    - /cmd
+    - comment
+    - gateway
+    ports:
+    - 10081:8080

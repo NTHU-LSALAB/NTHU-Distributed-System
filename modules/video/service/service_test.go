@@ -111,6 +111,10 @@ var _ = Describe("Service", func() {
 			err  error
 		)
 
+		BeforeEach(func() {
+			req = &pb.ListVideoRequest{Limit: 10, Skip: 0}
+		})
+
 		JustBeforeEach(func() {
 			resp, err = svc.ListVideo(ctx, req)
 		})
