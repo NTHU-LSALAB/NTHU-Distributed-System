@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("CommentPostgresDAO", func() {
+var _ = Describe("PGCommentDAO", func() {
 	var commentDAO *pgCommentDAO
 	var ctx context.Context
 
@@ -32,28 +32,34 @@ var _ = Describe("CommentPostgresDAO", func() {
 		)
 
 		BeforeEach(func() {
-			comments = []*Comment{NewFakeComment(), NewFakeComment(), NewFakeComment()}
 			fakeVideoID := primitive.NewObjectID().Hex()
 
-			for i := 0; i < len(comments); i++ {
-				comments[i].VideoID = fakeVideoID
+			comments = []*Comment{
+				NewFakeComment(),
+				NewFakeComment(),
+				NewFakeComment(),
+			}
 
-				insertComment(comments[i])
+			for _, comment := range comments {
+				comment.VideoID = fakeVideoID
+				insertComment(comment)
 			}
 		})
 
 		AfterEach(func() {
-			deletCommentByVideoID(comments[0].VideoID)
+			for _, comment := range comments {
+				deleteComment(comment.ID)
+			}
 		})
 
 		JustBeforeEach(func() {
 			resp, err = commentDAO.List(ctx, videoID, limit, skip)
 		})
 
-		When("video not found", func() {
+		When("videos not found", func() {
 			BeforeEach(func() { videoID = primitive.NewObjectID().Hex() })
 
-			It("returns video not found error", func() {
+			It("returns empty list with no error", func() {
 				Expect(resp).To(BeNil())
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -63,7 +69,7 @@ var _ = Describe("CommentPostgresDAO", func() {
 			BeforeEach(func() { videoID = comments[0].VideoID })
 
 			When("no limit and offset", func() {
-				It("return comments with no offer", func() {
+				It("return comments with no error", func() {
 					for i := range resp {
 						Expect(resp[i]).To(matchComment(comments[i]))
 					}
@@ -95,8 +101,8 @@ var _ = Describe("CommentPostgresDAO", func() {
 		var (
 			comment *Comment
 
-			res uuid.UUID
-			err error
+			resp uuid.UUID
+			err  error
 		)
 
 		BeforeEach(func() {
@@ -109,22 +115,22 @@ var _ = Describe("CommentPostgresDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			res, err = commentDAO.Create(ctx, comment)
+			resp, err = commentDAO.Create(ctx, comment)
 		})
 
 		When("success", func() {
 			It("returns the new comment ID with no error", func() {
-				Expect(res).NotTo(Equal(uuid.Nil))
+				Expect(resp).NotTo(Equal(uuid.Nil))
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("inserts the comment", func() {
 				var getComment Comment
-				query := "SELECT * FROM comments WHERE id = ?"
-				_, err := pgClient.DB.QueryOne(&getComment, query, comment.ID)
 
+				_, err := pgClient.QueryOne(&getComment, "SELECT * FROM comments WHERE id = ?", comment.ID)
+
+				Expect(&getComment).To(matchComment(comment))
 				Expect(err).NotTo(HaveOccurred())
-				Expect(&getComment).To(Equal(comment))
 			})
 		})
 	})
@@ -174,11 +180,10 @@ var _ = Describe("CommentPostgresDAO", func() {
 
 			It("updates the comment", func() {
 				var getComment Comment
-				query := "SELECT * FROM comments WHERE id = ?"
-				_, err := pgClient.DB.QueryOne(&getComment, query, comment.ID)
+
+				_, err := pgClient.QueryOne(&getComment, "SELECT * FROM comments WHERE id = ?", comment.ID)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(getComment.Content).To(Equal(content))
 				Expect(&getComment).To(matchComment(comment))
 			})
 		})
@@ -220,6 +225,15 @@ var _ = Describe("CommentPostgresDAO", func() {
 			It("returns no error", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
+
+			It("deletes the comment", func() {
+				var getComment, emptyComment Comment
+
+				_, err := pgClient.QueryOne(&getComment, "SELECT * FROM comments WHERE id = ?", id)
+
+				Expect(getComment).To(Equal(emptyComment))
+				Expect(err).To(HaveOccurred())
+			})
 		})
 	})
 
@@ -232,12 +246,16 @@ var _ = Describe("CommentPostgresDAO", func() {
 		)
 
 		BeforeEach(func() {
-			comments = []*Comment{NewFakeComment(), NewFakeComment(), NewFakeComment()}
+			comments = []*Comment{
+				NewFakeComment(),
+				NewFakeComment(),
+				NewFakeComment(),
+			}
 			fakeVideoID := primitive.NewObjectID().Hex()
 
-			for i := 0; i < len(comments); i++ {
-				comments[i].VideoID = fakeVideoID
-				insertComment(comments[i])
+			for _, comment := range comments {
+				comment.VideoID = fakeVideoID
+				insertComment(comment)
 			}
 		})
 
@@ -249,18 +267,30 @@ var _ = Describe("CommentPostgresDAO", func() {
 			BeforeEach(func() { videoID = primitive.NewObjectID().Hex() })
 
 			AfterEach(func() {
-				deletCommentByVideoID(comments[0].VideoID)
+				for _, comment := range comments {
+					deleteComment(comment.ID)
+				}
 			})
 
 			It("returns comment not found error", func() {
-				Expect(err).NotTo(HaveOccurred())
+				Expect(err).To(MatchError(ErrCommentNotFound))
 			})
 		})
 
 		When("success", func() {
 			BeforeEach(func() { videoID = comments[0].VideoID })
+
 			It("returns no error", func() {
 				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("deletes those comments", func() {
+				var getComment []*Comment
+
+				_, err := pgClient.QueryOne(&getComment, "SELECT * FROM comments WHERE video_id = ?", videoID)
+
+				Expect(getComment).To(HaveLen(0))
+				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
@@ -276,12 +306,6 @@ func deleteComment(id uuid.UUID) {
 	query := "DELETE FROM comments WHERE id = ?;"
 
 	pgExec(query, id)
-}
-
-func deletCommentByVideoID(videoID string) {
-	query := "DELETE FROM comments WHERE video_id = ?;"
-
-	pgExec(query, videoID)
 }
 
 func matchComment(comment *Comment) types.GomegaMatcher {

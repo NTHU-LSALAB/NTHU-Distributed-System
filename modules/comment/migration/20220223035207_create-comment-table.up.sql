@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS comments;
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     video_id TEXT NOT NULL,
     content TEXT NOT NULL,
