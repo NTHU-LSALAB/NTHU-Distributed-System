@@ -45,7 +45,7 @@ var _ = Describe("Service", func() {
 	Describe("ListComment", func() {
 		var (
 			req     *pb.ListCommentRequest
-			videoId string
+			videoID string
 			limit   int32
 			skip    int32
 			resp    *pb.ListCommentResponse
@@ -53,10 +53,10 @@ var _ = Describe("Service", func() {
 		)
 
 		BeforeEach(func() {
-			videoId = "fake id"
+			videoID = "fake id"
 			limit = 10
 			skip = 0
-			req = &pb.ListCommentRequest{VideoId: videoId, Limit: limit, Skip: skip}
+			req = &pb.ListCommentRequest{VideoId: videoID, Limit: limit, Skip: skip}
 		})
 
 		JustBeforeEach(func() {
@@ -97,17 +97,17 @@ var _ = Describe("Service", func() {
 	Describe("CreateComment", func() {
 		var (
 			req     *pb.CreateCommentRequest
-			videoId string
+			videoID string
 			content string
 			resp    *pb.CreateCommentResponse
 			err     error
 		)
 
 		BeforeEach(func() {
-			videoId = "fake id"
+			videoID = "fake id"
 			content = "fake content"
 			req = &pb.CreateCommentRequest{
-				VideoId: videoId,
+				VideoId: videoID,
 				Content: content,
 			}
 		})
@@ -121,7 +121,7 @@ var _ = Describe("Service", func() {
 
 			BeforeEach(func() {
 				comment = &dao.Comment{
-					VideoID: videoId,
+					VideoID: videoID,
 					Content: content,
 				}
 
@@ -140,7 +140,7 @@ var _ = Describe("Service", func() {
 
 			BeforeEach(func() {
 				comment = &dao.Comment{
-					VideoID: videoId,
+					VideoID: videoID,
 					Content: content,
 				}
 				id = uuid.New()
