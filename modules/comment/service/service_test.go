@@ -120,7 +120,11 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment("")
+				comment = &dao.Comment{
+					VideoID: videoId,
+					Content: content,
+				}
+
 				commentDAO.EXPECT().Create(ctx, comment).Return(uuid.Nil, errPGUnknown)
 			})
 
@@ -135,7 +139,10 @@ var _ = Describe("Service", func() {
 			var id uuid.UUID
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment("")
+				comment = &dao.Comment{
+					VideoID: videoId,
+					Content: content,
+				}
 				id = uuid.New()
 				commentDAO.EXPECT().Create(ctx, comment).Return(id, nil)
 			})
@@ -151,10 +158,21 @@ var _ = Describe("Service", func() {
 
 	Describe("UpdateComment", func() {
 		var (
-			req  *pb.UpdateCommentRequest
-			resp *pb.UpdateCommentResponse
-			err  error
+			req     *pb.UpdateCommentRequest
+			id      uuid.UUID
+			content string
+			resp    *pb.UpdateCommentResponse
+			err     error
 		)
+
+		BeforeEach(func() {
+			id = uuid.New()
+			content = "fake content"
+			req = &pb.UpdateCommentRequest{
+				Id:      id.String(),
+				Content: content,
+			}
+		})
 
 		JustBeforeEach(func() {
 			resp, err = svc.UpdateComment(ctx, req)
@@ -164,7 +182,10 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment("")
+				comment = &dao.Comment{
+					ID:      id,
+					Content: content,
+				}
 				commentDAO.EXPECT().Update(ctx, comment).Return(errPGUnknown)
 			})
 
@@ -178,7 +199,10 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment("")
+				comment = &dao.Comment{
+					ID:      id,
+					Content: content,
+				}
 				commentDAO.EXPECT().Update(ctx, comment).Return(ErrCommentNotFound)
 			})
 
@@ -192,7 +216,10 @@ var _ = Describe("Service", func() {
 			var comment *dao.Comment
 
 			BeforeEach(func() {
-				comment = dao.NewFakeComment("")
+				comment = &dao.Comment{
+					ID:      id,
+					Content: content,
+				}
 				commentDAO.EXPECT().Update(ctx, comment).Return(nil)
 			})
 
