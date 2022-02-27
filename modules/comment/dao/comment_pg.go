@@ -19,7 +19,7 @@ func NewPGCommentDAO(pgClient *pgkit.PGClient) *pgCommentDAO {
 	}
 }
 
-func (dao *pgCommentDAO) List(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error) {
+func (dao *pgCommentDAO) ListByVideoID(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error) {
 	var comments []*Comment
 	query := dao.client.ModelContext(ctx, &comments).
 		Where("video_id = ?", videoID).

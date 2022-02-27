@@ -20,7 +20,7 @@ var _ = Describe("PGCommentDAO", func() {
 		ctx = context.Background()
 	})
 
-	Describe("List", func() {
+	Describe("ListByVideoID", func() {
 		var (
 			comments []*Comment
 			videoID  string
@@ -53,7 +53,7 @@ var _ = Describe("PGCommentDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			resp, err = commentDAO.List(ctx, videoID, limit, skip)
+			resp, err = commentDAO.ListByVideoID(ctx, videoID, limit, skip)
 		})
 
 		When("videos not found", func() {
