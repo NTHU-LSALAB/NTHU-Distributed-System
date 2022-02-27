@@ -79,5 +79,4 @@ var _ = Describe("Loggerkit", func() {
 			})
 		})
 	})
-
 })
