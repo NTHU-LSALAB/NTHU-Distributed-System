@@ -57,6 +57,7 @@ services:
     depends_on:
     - mongo
     - redis
+    - postgres
 
   build:
     <<: *common-build
