@@ -41,13 +41,14 @@ var (
 	ErrCommentNotFound = errors.New("comment not found")
 )
 
-func NewFakeComment() *Comment {
-	id := uuid.New()
-	videoID := primitive.NewObjectID()
+func NewFakeComment(videoID string) *Comment {
+	if videoID == "" {
+		videoID = primitive.NewObjectID().Hex()
+	}
 
 	return &Comment{
-		ID:      id,
-		VideoID: videoID.Hex(),
+		ID:      uuid.New(),
+		VideoID: videoID,
 		Content: "comment test",
 	}
 }

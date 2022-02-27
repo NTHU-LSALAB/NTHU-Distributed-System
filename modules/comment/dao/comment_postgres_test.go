@@ -35,13 +35,12 @@ var _ = Describe("PGCommentDAO", func() {
 			fakeVideoID := primitive.NewObjectID().Hex()
 
 			comments = []*Comment{
-				NewFakeComment(),
-				NewFakeComment(),
-				NewFakeComment(),
+				NewFakeComment(fakeVideoID),
+				NewFakeComment(fakeVideoID),
+				NewFakeComment(fakeVideoID),
 			}
 
 			for _, comment := range comments {
-				comment.VideoID = fakeVideoID
 				insertComment(comment)
 			}
 		})
@@ -106,7 +105,7 @@ var _ = Describe("PGCommentDAO", func() {
 		)
 
 		BeforeEach(func() {
-			comment = NewFakeComment()
+			comment = NewFakeComment("")
 			comment.ID = uuid.Nil
 		})
 
@@ -144,7 +143,7 @@ var _ = Describe("PGCommentDAO", func() {
 		)
 
 		BeforeEach(func() {
-			comment = NewFakeComment()
+			comment = NewFakeComment("")
 			id = comment.ID
 
 			insertComment(comment)
@@ -198,7 +197,7 @@ var _ = Describe("PGCommentDAO", func() {
 		)
 
 		BeforeEach(func() {
-			comment = NewFakeComment()
+			comment = NewFakeComment("")
 
 			insertComment(comment)
 		})
@@ -246,15 +245,15 @@ var _ = Describe("PGCommentDAO", func() {
 		)
 
 		BeforeEach(func() {
-			comments = []*Comment{
-				NewFakeComment(),
-				NewFakeComment(),
-				NewFakeComment(),
-			}
 			fakeVideoID := primitive.NewObjectID().Hex()
 
+			comments = []*Comment{
+				NewFakeComment(fakeVideoID),
+				NewFakeComment(fakeVideoID),
+				NewFakeComment(fakeVideoID),
+			}
+
 			for _, comment := range comments {
-				comment.VideoID = fakeVideoID
 				insertComment(comment)
 			}
 		})
@@ -285,11 +284,11 @@ var _ = Describe("PGCommentDAO", func() {
 			})
 
 			It("deletes those comments", func() {
-				var getComment []*Comment
+				var getComments []*Comment
 
-				_, err := pgClient.QueryOne(&getComment, "SELECT * FROM comments WHERE video_id = ?", videoID)
+				_, err := pgClient.QueryOne(&getComments, "SELECT * FROM comments WHERE video_id = ?", videoID)
 
-				Expect(getComment).To(HaveLen(0))
+				Expect(getComments).To(HaveLen(0))
 				Expect(err).To(HaveOccurred())
 			})
 		})
