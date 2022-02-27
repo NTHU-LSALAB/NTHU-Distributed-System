@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -15,12 +16,17 @@ func TestRediskit(t *testing.T) {
 }
 
 var _ = Describe("Rediskit", func() {
-	var ctx context.Context
-	var redisClient *RedisClient
-	var redisConf RedisConfig
+	var (
+		ctx         context.Context
+		redisClient *RedisClient
+		redisConf   RedisConfig
+	)
 
 	BeforeEach(func() {
-		ctx = context.Background()
+		ctx = logkit.NewLogger(&logkit.LoggerConfig{
+			Development: true,
+		}).WithContext(context.Background())
+
 		redisConf.Addr = "localhost:6379"
 		if addr := os.Getenv("REDIS_ADDR"); addr != "" {
 			redisConf.Addr = addr
