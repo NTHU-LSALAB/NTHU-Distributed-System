@@ -24,7 +24,7 @@ func TestService(t *testing.T) {
 }
 
 var (
-	errMongoUnknown = errors.New("unknown mongo error")
+	errDAOUnknown = errors.New("unknown DAO error")
 )
 
 var _ = Describe("Service", func() {
@@ -65,14 +65,14 @@ var _ = Describe("Service", func() {
 			resp, err = svc.GetVideo(ctx, req)
 		})
 
-		When("mongo error", func() {
+		When("DAO error", func() {
 			BeforeEach(func() {
-				videoDAO.EXPECT().Get(ctx, id).Return(nil, errMongoUnknown)
+				videoDAO.EXPECT().Get(ctx, id).Return(nil, errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errMongoUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 
@@ -119,14 +119,14 @@ var _ = Describe("Service", func() {
 			resp, err = svc.ListVideo(ctx, req)
 		})
 
-		When("mongo error", func() {
+		When("DAO error", func() {
 			BeforeEach(func() {
-				videoDAO.EXPECT().List(ctx, req.GetLimit(), req.GetSkip()).Return(nil, errMongoUnknown)
+				videoDAO.EXPECT().List(ctx, req.GetLimit(), req.GetSkip()).Return(nil, errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errMongoUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 
@@ -227,14 +227,14 @@ var _ = Describe("Service", func() {
 			resp, err = svc.DeleteVideo(ctx, req)
 		})
 
-		When("mongo error", func() {
+		When("DAO error", func() {
 			BeforeEach(func() {
-				videoDAO.EXPECT().Delete(ctx, id).Return(errMongoUnknown)
+				videoDAO.EXPECT().Delete(ctx, id).Return(errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errMongoUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 

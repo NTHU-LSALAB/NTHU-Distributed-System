@@ -32,7 +32,7 @@ message CreateCommentResponse {
 message ListCommentRequest {
 	string video_id = 1;
 	int32 limit = 2;
-	int32 skip = 3;
+	int32 offset = 3;
 }
 
 message ListCommentResponse {

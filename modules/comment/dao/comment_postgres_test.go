@@ -26,7 +26,7 @@ var _ = Describe("PGCommentDAO", func() {
 			comments []*Comment
 			videoID  string
 			limit    int
-			skip     int
+			offset   int
 
 			resp []*Comment
 			err  error
@@ -53,7 +53,7 @@ var _ = Describe("PGCommentDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			resp, err = commentDAO.ListByVideoID(ctx, videoID, limit, skip)
+			resp, err = commentDAO.ListByVideoID(ctx, videoID, limit, offset)
 		})
 
 		When("videos not found", func() {
@@ -86,8 +86,8 @@ var _ = Describe("PGCommentDAO", func() {
 				})
 			})
 
-			When("limit = 1 and skip = 1", func() {
-				BeforeEach(func() { limit, skip = 1, 1 })
+			When("limit = 1 and offset = 1", func() {
+				BeforeEach(func() { limit, offset = 1, 1 })
 
 				It("returns the second comment with no error", func() {
 					Expect(resp[0]).To(matchComment(comments[1]))

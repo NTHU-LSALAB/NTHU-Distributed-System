@@ -26,7 +26,7 @@ func (s *service) Healthz(ctx context.Context, req *pb.HealthzRequest) (*pb.Heal
 }
 
 func (s *service) ListComment(ctx context.Context, req *pb.ListCommentRequest) (*pb.ListCommentResponse, error) {
-	comments, err := s.commentDAO.ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetSkip()))
+	comments, err := s.commentDAO.ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetOffset()))
 	if err != nil {
 		return nil, err
 	}

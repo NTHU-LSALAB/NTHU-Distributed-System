@@ -20,7 +20,7 @@ func TestService(t *testing.T) {
 }
 
 var (
-	errPGUnknown = errors.New("unknown postgres error")
+	errDAOUnknown = errors.New("unknown DAO error")
 )
 
 var _ = Describe("Service", func() {
@@ -47,7 +47,7 @@ var _ = Describe("Service", func() {
 			req     *pb.ListCommentRequest
 			videoID string
 			limit   int32
-			skip    int32
+			offset  int32
 			resp    *pb.ListCommentResponse
 			err     error
 		)
@@ -55,22 +55,22 @@ var _ = Describe("Service", func() {
 		BeforeEach(func() {
 			videoID = "fake id"
 			limit = 10
-			skip = 0
-			req = &pb.ListCommentRequest{VideoId: videoID, Limit: limit, Skip: skip}
+			offset = 0
+			req = &pb.ListCommentRequest{VideoId: videoID, Limit: limit, Offset: offset}
 		})
 
 		JustBeforeEach(func() {
 			resp, err = svc.ListComment(ctx, req)
 		})
 
-		When("postgres error", func() {
+		When("DAO error", func() {
 			BeforeEach(func() {
-				commentDAO.EXPECT().ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetSkip())).Return(nil, errPGUnknown)
+				commentDAO.EXPECT().ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetOffset())).Return(nil, errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errPGUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 
@@ -79,7 +79,7 @@ var _ = Describe("Service", func() {
 
 			BeforeEach(func() {
 				comments = []*dao.Comment{dao.NewFakeComment(""), dao.NewFakeComment("")}
-				commentDAO.EXPECT().ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetSkip())).Return(comments, nil)
+				commentDAO.EXPECT().ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetOffset())).Return(comments, nil)
 			})
 
 			It("returns comments with no error", func() {
@@ -97,18 +97,19 @@ var _ = Describe("Service", func() {
 	Describe("CreateComment", func() {
 		var (
 			req     *pb.CreateCommentRequest
-			videoID string
-			content string
+			comment *dao.Comment
 			resp    *pb.CreateCommentResponse
 			err     error
 		)
 
 		BeforeEach(func() {
-			videoID = "fake id"
-			content = "fake content"
 			req = &pb.CreateCommentRequest{
-				VideoId: videoID,
-				Content: content,
+				VideoId: "fake id",
+				Content: "fake conetent",
+			}
+			comment = &dao.Comment{
+				VideoID: req.GetVideoId(),
+				Content: req.GetContent(),
 			}
 		})
 
@@ -116,33 +117,21 @@ var _ = Describe("Service", func() {
 			resp, err = svc.CreateComment(ctx, req)
 		})
 
-		When("postgres error", func() {
-			var comment *dao.Comment
-
+		When("DAO error", func() {
 			BeforeEach(func() {
-				comment = &dao.Comment{
-					VideoID: videoID,
-					Content: content,
-				}
-
-				commentDAO.EXPECT().Create(ctx, comment).Return(uuid.Nil, errPGUnknown)
+				commentDAO.EXPECT().Create(ctx, comment).Return(uuid.Nil, errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errPGUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 
 		When("success", func() {
-			var comment *dao.Comment
 			var id uuid.UUID
 
 			BeforeEach(func() {
-				comment = &dao.Comment{
-					VideoID: videoID,
-					Content: content,
-				}
 				id = uuid.New()
 				commentDAO.EXPECT().Create(ctx, comment).Return(id, nil)
 			})
@@ -159,18 +148,19 @@ var _ = Describe("Service", func() {
 	Describe("UpdateComment", func() {
 		var (
 			req     *pb.UpdateCommentRequest
-			id      uuid.UUID
-			content string
+			comment *dao.Comment
 			resp    *pb.UpdateCommentResponse
 			err     error
 		)
 
 		BeforeEach(func() {
-			id = uuid.New()
-			content = "fake content"
 			req = &pb.UpdateCommentRequest{
-				Id:      id.String(),
-				Content: content,
+				Id:      uuid.NewString(),
+				Content: "fake content",
+			}
+			comment = &dao.Comment{
+				ID:      uuid.MustParse(req.GetId()),
+				Content: req.GetContent(),
 			}
 		})
 
@@ -178,31 +168,19 @@ var _ = Describe("Service", func() {
 			resp, err = svc.UpdateComment(ctx, req)
 		})
 
-		When("postgres error", func() {
-			var comment *dao.Comment
-
+		When("DAO error", func() {
 			BeforeEach(func() {
-				comment = &dao.Comment{
-					ID:      id,
-					Content: content,
-				}
-				commentDAO.EXPECT().Update(ctx, comment).Return(errPGUnknown)
+				commentDAO.EXPECT().Update(ctx, comment).Return(errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errPGUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 
 		When("comment not found", func() {
-			var comment *dao.Comment
-
 			BeforeEach(func() {
-				comment = &dao.Comment{
-					ID:      id,
-					Content: content,
-				}
 				commentDAO.EXPECT().Update(ctx, comment).Return(ErrCommentNotFound)
 			})
 
@@ -213,13 +191,7 @@ var _ = Describe("Service", func() {
 		})
 
 		When("success", func() {
-			var comment *dao.Comment
-
 			BeforeEach(func() {
-				comment = &dao.Comment{
-					ID:      id,
-					Content: content,
-				}
 				commentDAO.EXPECT().Update(ctx, comment).Return(nil)
 			})
 
@@ -247,15 +219,15 @@ var _ = Describe("Service", func() {
 			resp, err = svc.DeleteComment(ctx, req)
 		})
 
-		When("postgres error", func() {
+		When("DAO error", func() {
 
 			BeforeEach(func() {
-				commentDAO.EXPECT().Delete(ctx, id).Return(errPGUnknown)
+				commentDAO.EXPECT().Delete(ctx, id).Return(errDAOUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errPGUnknown))
+				Expect(err).To(MatchError(errDAOUnknown))
 			})
 		})
 
