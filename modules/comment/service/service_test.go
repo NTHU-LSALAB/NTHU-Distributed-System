@@ -44,19 +44,13 @@ var _ = Describe("Service", func() {
 
 	Describe("ListComment", func() {
 		var (
-			req     *pb.ListCommentRequest
-			videoID string
-			limit   int32
-			offset  int32
-			resp    *pb.ListCommentResponse
-			err     error
+			req  *pb.ListCommentRequest
+			resp *pb.ListCommentResponse
+			err  error
 		)
 
 		BeforeEach(func() {
-			videoID = "fake id"
-			limit = 10
-			offset = 0
-			req = &pb.ListCommentRequest{VideoId: videoID, Limit: limit, Offset: offset}
+			req = &pb.ListCommentRequest{VideoId: "fake id", Limit: 10, Offset: 0}
 		})
 
 		JustBeforeEach(func() {
