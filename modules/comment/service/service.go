@@ -26,7 +26,7 @@ func (s *service) Healthz(ctx context.Context, req *pb.HealthzRequest) (*pb.Heal
 }
 
 func (s *service) ListComment(ctx context.Context, req *pb.ListCommentRequest) (*pb.ListCommentResponse, error) {
-	comments, err := s.commentDAO.ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetSkip()))
+	comments, err := s.commentDAO.ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetOffset()))
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (s *service) CreateComment(ctx context.Context, req *pb.CreateCommentReques
 func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentRequest) (*pb.UpdateCommentResponse, error) {
 	commentID, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, ErrInvalidObjectID
+		return nil, ErrInvalidUUID
 	}
 
 	comment := &dao.Comment{
@@ -76,7 +76,7 @@ func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentReques
 func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.DeleteCommentResponse, error) {
 	commentID, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, ErrInvalidObjectID
+		return nil, ErrInvalidUUID
 	}
 
 	if err := s.commentDAO.Delete(ctx, commentID); err != nil {
