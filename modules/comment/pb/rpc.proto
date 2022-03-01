@@ -41,4 +41,6 @@ service Comment {
 			response_body: "*"
 		};
 	}
+
+	rpc DeleteCommentByVideoID(DeleteCommentByVideoIDRequest) returns (DeleteCommentByVideoIdResponse) {}
 }

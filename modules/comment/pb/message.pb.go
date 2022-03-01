@@ -575,6 +575,91 @@ func (*DeleteCommentResponse) Descriptor() ([]byte, []int) {
 	return file_modules_comment_pb_message_proto_rawDescGZIP(), []int{10}
 }
 
+type DeleteCommentByVideoIDRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	VideoId string `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+}
+
+func (x *DeleteCommentByVideoIDRequest) Reset() {
+	*x = DeleteCommentByVideoIDRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_modules_comment_pb_message_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCommentByVideoIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCommentByVideoIDRequest) ProtoMessage() {}
+
+func (x *DeleteCommentByVideoIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_modules_comment_pb_message_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCommentByVideoIDRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCommentByVideoIDRequest) Descriptor() ([]byte, []int) {
+	return file_modules_comment_pb_message_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteCommentByVideoIDRequest) GetVideoId() string {
+	if x != nil {
+		return x.VideoId
+	}
+	return ""
+}
+
+type DeleteCommentByVideoIdResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *DeleteCommentByVideoIdResponse) Reset() {
+	*x = DeleteCommentByVideoIdResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_modules_comment_pb_message_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCommentByVideoIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCommentByVideoIdResponse) ProtoMessage() {}
+
+func (x *DeleteCommentByVideoIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_modules_comment_pb_message_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCommentByVideoIdResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCommentByVideoIdResponse) Descriptor() ([]byte, []int) {
+	return file_modules_comment_pb_message_proto_rawDescGZIP(), []int{12}
+}
+
 var File_modules_comment_pb_message_proto protoreflect.FileDescriptor
 
 var file_modules_comment_pb_message_proto_rawDesc = []byte{
@@ -626,12 +711,17 @@ var file_modules_comment_pb_message_proto_rawDesc = []byte{
 	0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x17, 0x0a, 0x15, 0x44,
 	0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x42, 0x43, 0x5a, 0x41, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
-	0x6f, 0x6d, 0x2f, 0x4e, 0x54, 0x48, 0x55, 0x2d, 0x4c, 0x53, 0x41, 0x4c, 0x41, 0x42, 0x2f, 0x4e,
-	0x54, 0x48, 0x55, 0x2d, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x64, 0x2d,
-	0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x73, 0x2f, 0x63,
-	0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x3a, 0x0a, 0x1d, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f,
+	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x42, 0x79, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x49, 0x44, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x49, 0x64,
+	0x22, 0x20, 0x0a, 0x1e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x42, 0x79, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x42, 0x43, 0x5a, 0x41, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x4e, 0x54, 0x48, 0x55, 0x2d, 0x4c, 0x53, 0x41, 0x4c, 0x41, 0x42, 0x2f, 0x4e, 0x54, 0x48,
+	0x55, 0x2d, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x64, 0x2d, 0x53, 0x79,
+	0x73, 0x74, 0x65, 0x6d, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x73, 0x2f, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -646,24 +736,26 @@ func file_modules_comment_pb_message_proto_rawDescGZIP() []byte {
 	return file_modules_comment_pb_message_proto_rawDescData
 }
 
-var file_modules_comment_pb_message_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_modules_comment_pb_message_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_modules_comment_pb_message_proto_goTypes = []interface{}{
-	(*HealthzRequest)(nil),        // 0: pb.HealthzRequest
-	(*HealthzResponse)(nil),       // 1: pb.HealthzResponse
-	(*CommentInfo)(nil),           // 2: pb.CommentInfo
-	(*CreateCommentRequest)(nil),  // 3: pb.CreateCommentRequest
-	(*CreateCommentResponse)(nil), // 4: pb.CreateCommentResponse
-	(*ListCommentRequest)(nil),    // 5: pb.ListCommentRequest
-	(*ListCommentResponse)(nil),   // 6: pb.ListCommentResponse
-	(*UpdateCommentRequest)(nil),  // 7: pb.UpdateCommentRequest
-	(*UpdateCommentResponse)(nil), // 8: pb.UpdateCommentResponse
-	(*DeleteCommentRequest)(nil),  // 9: pb.DeleteCommentRequest
-	(*DeleteCommentResponse)(nil), // 10: pb.DeleteCommentResponse
-	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
+	(*HealthzRequest)(nil),                 // 0: pb.HealthzRequest
+	(*HealthzResponse)(nil),                // 1: pb.HealthzResponse
+	(*CommentInfo)(nil),                    // 2: pb.CommentInfo
+	(*CreateCommentRequest)(nil),           // 3: pb.CreateCommentRequest
+	(*CreateCommentResponse)(nil),          // 4: pb.CreateCommentResponse
+	(*ListCommentRequest)(nil),             // 5: pb.ListCommentRequest
+	(*ListCommentResponse)(nil),            // 6: pb.ListCommentResponse
+	(*UpdateCommentRequest)(nil),           // 7: pb.UpdateCommentRequest
+	(*UpdateCommentResponse)(nil),          // 8: pb.UpdateCommentResponse
+	(*DeleteCommentRequest)(nil),           // 9: pb.DeleteCommentRequest
+	(*DeleteCommentResponse)(nil),          // 10: pb.DeleteCommentResponse
+	(*DeleteCommentByVideoIDRequest)(nil),  // 11: pb.DeleteCommentByVideoIDRequest
+	(*DeleteCommentByVideoIdResponse)(nil), // 12: pb.DeleteCommentByVideoIdResponse
+	(*timestamppb.Timestamp)(nil),          // 13: google.protobuf.Timestamp
 }
 var file_modules_comment_pb_message_proto_depIdxs = []int32{
-	11, // 0: pb.CommentInfo.created_at:type_name -> google.protobuf.Timestamp
-	11, // 1: pb.CommentInfo.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 0: pb.CommentInfo.created_at:type_name -> google.protobuf.Timestamp
+	13, // 1: pb.CommentInfo.updated_at:type_name -> google.protobuf.Timestamp
 	2,  // 2: pb.ListCommentResponse.comments:type_name -> pb.CommentInfo
 	3,  // [3:3] is the sub-list for method output_type
 	3,  // [3:3] is the sub-list for method input_type
@@ -810,6 +902,30 @@ func file_modules_comment_pb_message_proto_init() {
 				return nil
 			}
 		}
+		file_modules_comment_pb_message_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteCommentByVideoIDRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_modules_comment_pb_message_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteCommentByVideoIdResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -817,7 +933,7 @@ func file_modules_comment_pb_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_modules_comment_pb_message_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

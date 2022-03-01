@@ -30,6 +30,7 @@ func newGatewayCommand() *cobra.Command {
 type GatewayArgs struct {
 	HTTPAddr              string        `long:"http_addr" env:"HTTP_ADDR" default:":8080"`
 	GRPCAddr              string        `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
+	COMMENTAddr           string        `long:"comment_addr" env:"COMMENT_ADDR" default:":8083"`
 	GRPCDialTimeout       time.Duration `long:"grpc_dial_timeout" env:"GRPC_DIAL_TIMEOUT" default:"30s"`
 	runkit.GracefulConfig `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig   `group:"logger" namespace:"logger" env-namespace:"LOGGER"`

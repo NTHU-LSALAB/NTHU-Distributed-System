@@ -63,3 +63,11 @@ message DeleteVideoRequest {
 }
 
 message DeleteVideoResponse {}
+
+message ValidateVideoIDRequest {
+	string video_id = 1;
+}
+
+message ValidateVideoIDResponse {
+	bool ok = 1;
+}

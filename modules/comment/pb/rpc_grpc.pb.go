@@ -27,6 +27,7 @@ type CommentClient interface {
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error)
 	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*UpdateCommentResponse, error)
 	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*DeleteCommentResponse, error)
+	DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIdResponse, error)
 }
 
 type commentClient struct {
@@ -82,6 +83,15 @@ func (c *commentClient) DeleteComment(ctx context.Context, in *DeleteCommentRequ
 	return out, nil
 }
 
+func (c *commentClient) DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIdResponse, error) {
+	out := new(DeleteCommentByVideoIdResponse)
+	err := c.cc.Invoke(ctx, "/pb.Comment/DeleteCommentByVideoID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommentServer is the server API for Comment service.
 // All implementations must embed UnimplementedCommentServer
 // for forward compatibility
@@ -91,6 +101,7 @@ type CommentServer interface {
 	CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error)
 	UpdateComment(context.Context, *UpdateCommentRequest) (*UpdateCommentResponse, error)
 	DeleteComment(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error)
+	DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIdResponse, error)
 	mustEmbedUnimplementedCommentServer()
 }
 
@@ -112,6 +123,9 @@ func (UnimplementedCommentServer) UpdateComment(context.Context, *UpdateCommentR
 }
 func (UnimplementedCommentServer) DeleteComment(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
+}
+func (UnimplementedCommentServer) DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCommentByVideoID not implemented")
 }
 func (UnimplementedCommentServer) mustEmbedUnimplementedCommentServer() {}
 
@@ -216,6 +230,24 @@ func _Comment_DeleteComment_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Comment_DeleteCommentByVideoID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCommentByVideoIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServer).DeleteCommentByVideoID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Comment/DeleteCommentByVideoID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServer).DeleteCommentByVideoID(ctx, req.(*DeleteCommentByVideoIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Comment_ServiceDesc is the grpc.ServiceDesc for Comment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +274,10 @@ var Comment_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteComment",
 			Handler:    _Comment_DeleteComment_Handler,
+		},
+		{
+			MethodName: "DeleteCommentByVideoID",
+			Handler:    _Comment_DeleteCommentByVideoID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
