@@ -36,7 +36,7 @@ func (dao *redisCommentDAO) ListByVideoID(ctx context.Context, videoID string, l
 	var comment []*Comment
 
 	if err := dao.cache.Once(&cache.Item{
-		Key:   listCommentKey(limit, offset),
+		Key:   listCommentKey(videoID, limit, offset),
 		Value: &comment,
 		TTL:   commentDAORedisCacheDuration,
 		Do: func(*cache.Item) (interface{}, error) {

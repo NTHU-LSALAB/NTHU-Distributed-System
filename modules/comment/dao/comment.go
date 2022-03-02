@@ -42,8 +42,8 @@ var (
 	ErrCommentNotFound = errors.New("comment not found")
 )
 
-func listCommentKey(limit, offset int) string {
-	return fmt.Sprintf("listComment:%d:%d", limit, offset)
+func listCommentKey(videoID string, limit, offset int) string {
+	return fmt.Sprintf("listComment:%s:%d:%d", videoID, limit, offset)
 }
 
 func NewFakeComment(videoID string) *Comment {
