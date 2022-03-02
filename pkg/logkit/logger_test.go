@@ -1,6 +1,7 @@
 package logkit
 
 import (
+	"context"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -23,6 +24,22 @@ var _ = Describe("Loggerkit", func() {
 		Context("success", func() {
 			It("returns new Logger", func() {
 				Expect(logger).NotTo(BeNil())
+			})
+		})
+
+	})
+
+	Describe("WithContext", func() {
+		var logger *Logger
+		ctx := context.Background()
+
+		JustBeforeEach(func() {
+			ctx = WithContext(ctx, logger)
+		})
+
+		Context("success", func() {
+			It("Return looger and context", func() {
+				Expect(ctx).NotTo(BeNil())
 			})
 		})
 	})
