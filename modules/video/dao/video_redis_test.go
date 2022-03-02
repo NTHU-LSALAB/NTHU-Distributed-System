@@ -156,6 +156,7 @@ var _ = Describe("VideoRedisDAO", func() {
 
 		Context("cache miss", func() {
 			BeforeEach(func() {
+				limit, skip = 3, 0
 				for _, video := range videos {
 					insertVideo(ctx, mongoVideoDAO, video)
 				}
