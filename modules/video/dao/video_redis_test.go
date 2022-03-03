@@ -49,15 +49,6 @@ var _ = Describe("VideoRedisDAO", func() {
 				deleteVideoInRedis(ctx, redisVideoDAO, getVideoKey(video.ID))
 			})
 
-			When("video not found", func() {
-				BeforeEach(func() { id = primitive.NewObjectID() })
-
-				It("returns video not found error", func() {
-					Expect(resp).To(BeNil())
-					Expect(err).To(MatchError(ErrVideoNotFound))
-				})
-			})
-
 			When("success", func() {
 				BeforeEach(func() { id = video.ID })
 
@@ -135,15 +126,6 @@ var _ = Describe("VideoRedisDAO", func() {
 				deleteVideosInRedis(ctx, redisVideoDAO, limit, skip)
 			})
 
-			When("videos not found", func() {
-				BeforeEach(func() { limit = 1 })
-
-				It("returns empty list with no error", func() {
-					Expect(resp).To(HaveLen(0))
-					Expect(err).NotTo(HaveOccurred())
-				})
-			})
-
 			When("success", func() {
 				It("returns the videos with no error", func() {
 					for i := range resp {
@@ -167,6 +149,15 @@ var _ = Describe("VideoRedisDAO", func() {
 					deleteVideo(ctx, mongoVideoDAO, video.ID)
 				}
 				deleteVideoInRedis(ctx, redisVideoDAO, listVideoKey(limit, skip))
+			})
+
+			When("videos not found", func() {
+				BeforeEach(func() { limit, skip = 4, 4 })
+
+				It("returns empty list with no error", func() {
+					Expect(resp).To(HaveLen(0))
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 
 			When("success", func() {
