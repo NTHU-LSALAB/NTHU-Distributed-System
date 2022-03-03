@@ -129,3 +129,15 @@ services:
     - gateway
     ports:
     - 10081:8080
+
+  prometheus-server:
+    image: prom/prometheus
+    volumes:
+      - $PWD/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
