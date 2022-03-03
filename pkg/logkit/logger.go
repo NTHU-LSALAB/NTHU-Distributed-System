@@ -56,7 +56,7 @@ func (l *Logger) WithContext(ctx context.Context) context.Context {
 }
 
 func (l *Logger) With(fields ...zapcore.Field) *Logger {
-	l.Logger = l.Logger.With(fields...)
-
-	return l
+	return &Logger{
+		Logger: l.Logger.With(fields...),
+	}
 }
