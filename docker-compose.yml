@@ -78,6 +78,8 @@ services:
     image: nthu-distributed-system:latest
     environment:
       <<: *common-env
+      METER_NAME: video.api
+      METER_HISTOGRAM_BOUNDARIES: "10,100,200,500,1000"
     command:
     - /cmd
     - video
@@ -85,6 +87,8 @@ services:
     depends_on:
     - mongo
     - redis
+    ports:
+    - 10122:2222 # prometheus exporter
 
   video-gateway:
     image: nthu-distributed-system:latest
@@ -102,6 +106,8 @@ services:
     image: nthu-distributed-system:latest
     environment:
       <<: *common-env
+      METER_NAME: comment.api
+      METER_HISTOGRAM_BOUNDARIES: "10,100,200,500,1000"
     command:
     - /cmd
     - comment
@@ -109,6 +115,8 @@ services:
     depends_on:
     - postgres
     - redis
+    ports:
+    - 10123:2222 # prometheus exporter
 
   comment-gateway:
     image: nthu-distributed-system:latest
@@ -121,3 +129,15 @@ services:
     - gateway
     ports:
     - 10081:8080
+
+  prometheus-server:
+    image: prom/prometheus
+    volumes:
+      - $PWD/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090

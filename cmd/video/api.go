@@ -12,6 +12,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/service"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/mongokit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/otelkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
@@ -31,14 +32,15 @@ func newAPICommand() *cobra.Command {
 }
 
 type APIArgs struct {
-	GRPCAddr               string        `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
-	CommentGRPCAddr        string        `long:"comment_grpc_addr" env:"COMMENT_GRPC_ADDR" default:":8083"`
-	GRPCDialTimeout        time.Duration `long:"grpc_dial_timeout" env:"GRPC_DIAL_TIMEOUT" default:"30s"`
-	runkit.GracefulConfig  `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
-	logkit.LoggerConfig    `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
-	mongokit.MongoConfig   `group:"mongo" namespace:"mongo" env-namespace:"MONGO"`
-	storagekit.MinIOConfig `group:"minio" namespace:"minio" env-namespace:"MINIO"`
-	rediskit.RedisConfig   `group:"redis" namespace:"redis" env-namespace:"REDIS"`
+	GRPCAddr                             string        `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
+	CommentGRPCAddr                      string        `long:"comment_grpc_addr" env:"COMMENT_GRPC_ADDR" default:":8083"`
+	GRPCDialTimeout                      time.Duration `long:"grpc_dial_timeout" env:"GRPC_DIAL_TIMEOUT" default:"30s"`
+	runkit.GracefulConfig                `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
+	logkit.LoggerConfig                  `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
+	mongokit.MongoConfig                 `group:"mongo" namespace:"mongo" env-namespace:"MONGO"`
+	storagekit.MinIOConfig               `group:"minio" namespace:"minio" env-namespace:"MINIO"`
+	rediskit.RedisConfig                 `group:"redis" namespace:"redis" env-namespace:"REDIS"`
+	otelkit.PrometheusServiceMeterConfig `group:"meter" namespace:"meter" env-namespace:"METER"`
 }
 
 func runAPI(_ *cobra.Command, _ []string) error {
@@ -104,11 +106,18 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	return runkit.GracefulRun(serveGRPC(lis, svc, logger), &args.GracefulConfig)
+	meter := otelkit.NewPrometheusServiceMeter(ctx, &args.PrometheusServiceMeterConfig)
+	defer func() {
+		if err := meter.Close(); err != nil {
+			logger.Fatal("failed to close meter", zap.Error(err))
+		}
+	}()
+
+	return runkit.GracefulRun(serveGRPC(lis, svc, logger, grpc.UnaryInterceptor(meter.UnaryServerInterceptor())), &args.GracefulConfig)
 }
 
-func serveGRPC(lis net.Listener, svc pb.VideoServer, logger *logkit.Logger) runkit.GracefulRunFunc {
-	grpcServer := grpc.NewServer()
+func serveGRPC(lis net.Listener, svc pb.VideoServer, logger *logkit.Logger, opt ...grpc.ServerOption) runkit.GracefulRunFunc {
+	grpcServer := grpc.NewServer(opt...)
 	pb.RegisterVideoServer(grpcServer, svc)
 
 	return func(ctx context.Context) error {
