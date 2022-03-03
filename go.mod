@@ -14,6 +14,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.22
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
+	github.com/prometheus/common v0.32.1
 	github.com/spf13/cobra v1.3.0
 	go.mongodb.org/mongo-driver v1.8.3
 	go.opentelemetry.io/otel v1.4.1
@@ -58,7 +59,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
