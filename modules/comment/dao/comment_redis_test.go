@@ -51,24 +51,6 @@ var _ = Describe("CommentRedisDAO", func() {
 				deleteCommentsInRedis(ctx, redisCommentDAO, videoID, limit, offset)
 			})
 
-			When("comments not found due to non-exist {limit, offset}", func() {
-				BeforeEach(func() { limit = 1 })
-
-				It("returns empty list with no error", func() {
-					Expect(resp).To(HaveLen(0))
-					Expect(err).NotTo(HaveOccurred())
-				})
-			})
-
-			When("comments not found due to non-exist videoID", func() {
-				BeforeEach(func() { videoID = primitive.NewObjectID().Hex() })
-
-				It("returns empty list with no error", func() {
-					Expect(resp).To(HaveLen(0))
-					Expect(err).NotTo(HaveOccurred())
-				})
-			})
-
 			When("success", func() {
 				It("returns the comments with no error", func() {
 					for i := range resp {
@@ -93,6 +75,33 @@ var _ = Describe("CommentRedisDAO", func() {
 					deleteComment(comment.ID)
 				}
 				deleteCommentsInRedis(ctx, redisCommentDAO, videoID, limit, offset)
+			})
+
+			When("comments not found due to non-exist limit", func() {
+				BeforeEach(func() { offset, limit = 3, 3 })
+
+				It("returns empty list with no error", func() {
+					Expect(resp).To(HaveLen(0))
+					Expect(err).NotTo(HaveOccurred())
+				})
+			})
+
+			When("comments not found due to non-exist offset", func() {
+				BeforeEach(func() { offset = 3 })
+
+				It("returns empty list with no error", func() {
+					Expect(resp).To(HaveLen(0))
+					Expect(err).NotTo(HaveOccurred())
+				})
+			})
+
+			When("comments not found due to non-exist videoID", func() {
+				BeforeEach(func() { videoID = primitive.NewObjectID().Hex() })
+
+				It("returns empty list with no error", func() {
+					Expect(resp).To(HaveLen(0))
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 
 			When("success", func() {
