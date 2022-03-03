@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	commentPb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
+	commentpb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/service"
@@ -32,7 +32,7 @@ func newAPICommand() *cobra.Command {
 
 type APIArgs struct {
 	GRPCAddr               string        `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
-	COMMENTAddr            string        `long:"comment_addr" env:"COMMENT_ADDR" default:":8083"`
+	CommentGRPCAddr        string        `long:"comment_grpc_addr" env:"COMMENT_GRPC_ADDR" default:":8083"`
 	GRPCDialTimeout        time.Duration `long:"grpc_dial_timeout" env:"GRPC_DIAL_TIMEOUT" default:"30s"`
 	runkit.GracefulConfig  `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig    `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
@@ -76,11 +76,11 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	videoDAO := dao.NewRedisVideoDAO(redisClient, mongoVideoDAO)
 	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
 
-	var commentCancel context.CancelFunc
-	ctx, commentCancel = context.WithTimeout(ctx, args.GRPCDialTimeout)
-	defer commentCancel()
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, args.GRPCDialTimeout)
+	defer cancel()
 
-	conn, cerr := grpc.DialContext(ctx, args.COMMENTAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, cerr := grpc.DialContext(ctx, args.CommentGRPCAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if cerr != nil {
 		logger.Fatal("failed to connect to comment server", zap.Error(cerr))
 	}
@@ -89,7 +89,7 @@ func runAPI(_ *cobra.Command, _ []string) error {
 			logger.Fatal("failed to close gRPC client connection", zap.Error(err))
 		}
 	}()
-	client := commentPb.NewCommentClient(conn)
+	client := commentpb.NewCommentClient(conn)
 
 	svc := service.NewService(videoDAO, storage, client)
 

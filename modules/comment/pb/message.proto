@@ -56,5 +56,5 @@ message DeleteCommentByVideoIDRequest {
 	string video_id = 1;
 }
 
-message DeleteCommentByVideoIdResponse {}
+message DeleteCommentByVideoIDResponse {}
 

@@ -688,100 +688,6 @@ func (*DeleteVideoResponse) Descriptor() ([]byte, []int) {
 	return file_modules_video_pb_message_proto_rawDescGZIP(), []int{11}
 }
 
-type ValidateVideoIDRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	VideoId string `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
-}
-
-func (x *ValidateVideoIDRequest) Reset() {
-	*x = ValidateVideoIDRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_modules_video_pb_message_proto_msgTypes[12]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ValidateVideoIDRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateVideoIDRequest) ProtoMessage() {}
-
-func (x *ValidateVideoIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_modules_video_pb_message_proto_msgTypes[12]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidateVideoIDRequest.ProtoReflect.Descriptor instead.
-func (*ValidateVideoIDRequest) Descriptor() ([]byte, []int) {
-	return file_modules_video_pb_message_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *ValidateVideoIDRequest) GetVideoId() string {
-	if x != nil {
-		return x.VideoId
-	}
-	return ""
-}
-
-type ValidateVideoIDResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok bool `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-}
-
-func (x *ValidateVideoIDResponse) Reset() {
-	*x = ValidateVideoIDResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_modules_video_pb_message_proto_msgTypes[13]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ValidateVideoIDResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateVideoIDResponse) ProtoMessage() {}
-
-func (x *ValidateVideoIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_modules_video_pb_message_proto_msgTypes[13]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidateVideoIDResponse.ProtoReflect.Descriptor instead.
-func (*ValidateVideoIDResponse) Descriptor() ([]byte, []int) {
-	return file_modules_video_pb_message_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *ValidateVideoIDResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
 var File_modules_video_pb_message_proto protoreflect.FileDescriptor
 
 var file_modules_video_pb_message_proto_rawDesc = []byte{
@@ -848,13 +754,7 @@ var file_modules_video_pb_message_proto_rawDesc = []byte{
 	0x6c, 0x65, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
 	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
 	0x22, 0x15, 0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x33, 0x0a, 0x16, 0x56, 0x61, 0x6c, 0x69, 0x64,
-	0x61, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x19, 0x0a, 0x08, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x49, 0x64, 0x22, 0x29, 0x0a, 0x17,
-	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x49, 0x44, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x42, 0x41, 0x5a, 0x3f, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x41, 0x5a, 0x3f, 0x67, 0x69, 0x74, 0x68, 0x75,
 	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x4e, 0x54, 0x48, 0x55, 0x2d, 0x4c, 0x53, 0x41, 0x4c, 0x41,
 	0x42, 0x2f, 0x4e, 0x54, 0x48, 0x55, 0x2d, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
 	0x65, 0x64, 0x2d, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65,
@@ -874,29 +774,27 @@ func file_modules_video_pb_message_proto_rawDescGZIP() []byte {
 	return file_modules_video_pb_message_proto_rawDescData
 }
 
-var file_modules_video_pb_message_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_modules_video_pb_message_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_modules_video_pb_message_proto_goTypes = []interface{}{
-	(*HealthzRequest)(nil),          // 0: pb.HealthzRequest
-	(*HealthzResponse)(nil),         // 1: pb.HealthzResponse
-	(*VideoInfo)(nil),               // 2: pb.VideoInfo
-	(*VideoHeader)(nil),             // 3: pb.VideoHeader
-	(*GetVideoRequest)(nil),         // 4: pb.GetVideoRequest
-	(*GetVideoResponse)(nil),        // 5: pb.GetVideoResponse
-	(*ListVideoRequest)(nil),        // 6: pb.ListVideoRequest
-	(*ListVideoResponse)(nil),       // 7: pb.ListVideoResponse
-	(*UploadVideoRequest)(nil),      // 8: pb.UploadVideoRequest
-	(*UploadVideoResponse)(nil),     // 9: pb.UploadVideoResponse
-	(*DeleteVideoRequest)(nil),      // 10: pb.DeleteVideoRequest
-	(*DeleteVideoResponse)(nil),     // 11: pb.DeleteVideoResponse
-	(*ValidateVideoIDRequest)(nil),  // 12: pb.ValidateVideoIDRequest
-	(*ValidateVideoIDResponse)(nil), // 13: pb.ValidateVideoIDResponse
-	nil,                             // 14: pb.VideoInfo.VariantsEntry
-	(*timestamppb.Timestamp)(nil),   // 15: google.protobuf.Timestamp
+	(*HealthzRequest)(nil),        // 0: pb.HealthzRequest
+	(*HealthzResponse)(nil),       // 1: pb.HealthzResponse
+	(*VideoInfo)(nil),             // 2: pb.VideoInfo
+	(*VideoHeader)(nil),           // 3: pb.VideoHeader
+	(*GetVideoRequest)(nil),       // 4: pb.GetVideoRequest
+	(*GetVideoResponse)(nil),      // 5: pb.GetVideoResponse
+	(*ListVideoRequest)(nil),      // 6: pb.ListVideoRequest
+	(*ListVideoResponse)(nil),     // 7: pb.ListVideoResponse
+	(*UploadVideoRequest)(nil),    // 8: pb.UploadVideoRequest
+	(*UploadVideoResponse)(nil),   // 9: pb.UploadVideoResponse
+	(*DeleteVideoRequest)(nil),    // 10: pb.DeleteVideoRequest
+	(*DeleteVideoResponse)(nil),   // 11: pb.DeleteVideoResponse
+	nil,                           // 12: pb.VideoInfo.VariantsEntry
+	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
 }
 var file_modules_video_pb_message_proto_depIdxs = []int32{
-	14, // 0: pb.VideoInfo.variants:type_name -> pb.VideoInfo.VariantsEntry
-	15, // 1: pb.VideoInfo.created_at:type_name -> google.protobuf.Timestamp
-	15, // 2: pb.VideoInfo.updated_at:type_name -> google.protobuf.Timestamp
+	12, // 0: pb.VideoInfo.variants:type_name -> pb.VideoInfo.VariantsEntry
+	13, // 1: pb.VideoInfo.created_at:type_name -> google.protobuf.Timestamp
+	13, // 2: pb.VideoInfo.updated_at:type_name -> google.protobuf.Timestamp
 	2,  // 3: pb.GetVideoResponse.video:type_name -> pb.VideoInfo
 	2,  // 4: pb.ListVideoResponse.videos:type_name -> pb.VideoInfo
 	3,  // 5: pb.UploadVideoRequest.header:type_name -> pb.VideoHeader
@@ -1057,30 +955,6 @@ func file_modules_video_pb_message_proto_init() {
 				return nil
 			}
 		}
-		file_modules_video_pb_message_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ValidateVideoIDRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_modules_video_pb_message_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ValidateVideoIDResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
 	}
 	file_modules_video_pb_message_proto_msgTypes[8].OneofWrappers = []interface{}{
 		(*UploadVideoRequest_Header)(nil),
@@ -1092,7 +966,7 @@ func file_modules_video_pb_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_modules_video_pb_message_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

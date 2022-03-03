@@ -40,7 +40,7 @@ var _ = Describe("Service", func() {
 		controller = gomock.NewController(GinkgoT())
 		videoDAO = daomock.NewMockVideoDAO(controller)
 		storage = storagemock.NewMockStorage(controller)
-		svc = NewService(videoDAO, storage)
+		svc = NewService(videoDAO, storage, nil) // FIXME: use mock client
 		ctx = context.Background()
 	})
 

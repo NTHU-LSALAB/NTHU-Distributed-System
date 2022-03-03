@@ -42,5 +42,5 @@ service Comment {
 		};
 	}
 
-	rpc DeleteCommentByVideoID(DeleteCommentByVideoIDRequest) returns (DeleteCommentByVideoIdResponse) {}
+	rpc DeleteCommentByVideoID(DeleteCommentByVideoIDRequest) returns (DeleteCommentByVideoIDResponse) {}
 }

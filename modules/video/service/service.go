@@ -8,7 +8,7 @@ import (
 	"io"
 	"path"
 
-	commentPb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
+	commentpb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
@@ -20,10 +20,10 @@ type service struct {
 
 	videoDAO dao.VideoDAO
 	storage  storagekit.Storage
-	client   commentPb.CommentClient
+	client   commentpb.CommentClient
 }
 
-func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, client commentPb.CommentClient) *service {
+func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, client commentpb.CommentClient) *service {
 	return &service{
 		videoDAO: videoDAO,
 		storage:  storage,
@@ -139,9 +139,9 @@ func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (
 		return nil, err
 	}
 
-	_, err = s.client.DeleteCommentByVideoID(ctx, &commentPb.DeleteCommentByVideoIDRequest{VideoId: id.Hex()})
-	// what if error occurs here but the video is already deleted?
-	if err != nil {
+	if _, err := s.client.DeleteCommentByVideoID(ctx, &commentpb.DeleteCommentByVideoIDRequest{
+		VideoId: id.Hex(),
+	}); err != nil {
 		return nil, err
 	}
 

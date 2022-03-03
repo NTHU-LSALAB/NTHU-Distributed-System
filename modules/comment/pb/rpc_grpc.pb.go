@@ -27,7 +27,7 @@ type CommentClient interface {
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error)
 	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*UpdateCommentResponse, error)
 	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*DeleteCommentResponse, error)
-	DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIdResponse, error)
+	DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIDResponse, error)
 }
 
 type commentClient struct {
@@ -83,8 +83,8 @@ func (c *commentClient) DeleteComment(ctx context.Context, in *DeleteCommentRequ
 	return out, nil
 }
 
-func (c *commentClient) DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIdResponse, error) {
-	out := new(DeleteCommentByVideoIdResponse)
+func (c *commentClient) DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIDResponse, error) {
+	out := new(DeleteCommentByVideoIDResponse)
 	err := c.cc.Invoke(ctx, "/pb.Comment/DeleteCommentByVideoID", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ type CommentServer interface {
 	CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error)
 	UpdateComment(context.Context, *UpdateCommentRequest) (*UpdateCommentResponse, error)
 	DeleteComment(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error)
-	DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIdResponse, error)
+	DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIDResponse, error)
 	mustEmbedUnimplementedCommentServer()
 }
 
@@ -124,7 +124,7 @@ func (UnimplementedCommentServer) UpdateComment(context.Context, *UpdateCommentR
 func (UnimplementedCommentServer) DeleteComment(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
 }
-func (UnimplementedCommentServer) DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIdResponse, error) {
+func (UnimplementedCommentServer) DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCommentByVideoID not implemented")
 }
 func (UnimplementedCommentServer) mustEmbedUnimplementedCommentServer() {}
