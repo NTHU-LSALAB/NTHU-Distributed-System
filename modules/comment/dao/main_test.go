@@ -8,6 +8,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/migrationkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,7 +19,8 @@ func TestDAO(t *testing.T) {
 }
 
 var (
-	pgClient *pgkit.PGClient
+	pgClient    *pgkit.PGClient
+	redisClient *rediskit.RedisClient
 )
 
 var _ = BeforeSuite(func() {
@@ -34,6 +36,10 @@ var _ = BeforeSuite(func() {
 		URL:    pgConf.URL,
 	}
 
+	redisConf := &rediskit.RedisConfig{
+		Addr: "redis:6379",
+	}
+
 	ctx := logkit.NewLogger(&logkit.LoggerConfig{
 		Development: true,
 	}).WithContext(context.Background())
@@ -46,10 +52,12 @@ var _ = BeforeSuite(func() {
 	Expect(migration.Up()).NotTo(HaveOccurred())
 
 	pgClient = pgkit.NewPGClient(ctx, pgConf)
+	redisClient = rediskit.NewRedisClient(ctx, redisConf)
 })
 
 var _ = AfterSuite(func() {
 	Expect(pgClient.Close()).NotTo(HaveOccurred())
+	Expect(redisClient.Close()).NotTo(HaveOccurred())
 })
 
 var pgExec = func(query string, params ...interface{}) {

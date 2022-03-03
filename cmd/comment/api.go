@@ -10,6 +10,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/service"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/spf13/cobra"
@@ -30,6 +31,7 @@ type APIArgs struct {
 	runkit.GracefulConfig `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig   `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
 	pgkit.PGConfig        `group:"pg" namespace:"pg" env-namespace:"PG"`
+	rediskit.RedisConfig  `group:"redis" namespace:"redis" env-namespace:"REDIS"`
 }
 
 func runAPI(_ *cobra.Command, _ []string) error {
@@ -56,9 +58,17 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	pgCommentDAO := dao.NewPGCommentDAO(pgClient)
+	redisClient := rediskit.NewRedisClient(ctx, &args.RedisConfig)
+	defer func() {
+		if err := redisClient.Close(); err != nil {
+			logger.Fatal("failed to close redis client", zap.Error(err))
+		}
+	}()
 
-	svc := service.NewService(pgCommentDAO)
+	pgCommentDAO := dao.NewPGCommentDAO(pgClient)
+	commentDAO := dao.NewRedisCommentDAO(redisClient, pgCommentDAO)
+
+	svc := service.NewService(commentDAO)
 
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
 	lis, err := net.Listen("tcp", args.GRPCAddr)

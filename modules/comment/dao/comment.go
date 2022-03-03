@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
@@ -40,6 +41,10 @@ type CommentDAO interface {
 var (
 	ErrCommentNotFound = errors.New("comment not found")
 )
+
+func listCommentKey(videoID string, limit, offset int) string {
+	return fmt.Sprintf("listComment:%s:%d:%d", videoID, limit, offset)
+}
 
 func NewFakeComment(videoID string) *Comment {
 	if videoID == "" {

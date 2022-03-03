@@ -50,11 +50,11 @@ func (dao *redisVideoDAO) Get(ctx context.Context, id primitive.ObjectID) (*Vide
 }
 
 func (dao *redisVideoDAO) List(ctx context.Context, limit, skip int64) ([]*Video, error) {
-	var video []*Video
+	var videos []*Video
 
 	if err := dao.cache.Once(&cache.Item{
 		Key:   listVideoKey(limit, skip),
-		Value: &video,
+		Value: &videos,
 		TTL:   videoDAORedisCacheDuration,
 		Do: func(*cache.Item) (interface{}, error) {
 			return dao.baseDAO.List(ctx, limit, skip)
@@ -63,7 +63,7 @@ func (dao *redisVideoDAO) List(ctx context.Context, limit, skip int64) ([]*Video
 		return nil, err
 	}
 
-	return video, nil
+	return videos, nil
 }
 
 // The following operations are not cachable, just pass down to baseDAO.
