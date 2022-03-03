@@ -10,7 +10,6 @@ import (
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/instrument"
-	"go.opentelemetry.io/otel/metric/instrument/syncfloat64"
 	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
@@ -25,7 +24,7 @@ type PrometheusServiceMeterConfig struct {
 	Addr                string    `long:"addr" env:"ADDR" description:"the prometheus exporter address" default:":2222"`
 	Path                string    `long:"path" env:"PATH" description:"the prometheus exporter path" default:"/metrics"`
 	Name                string    `long:"name" env:"NAME" description:"the unique instrumentation name" required:"true"`
-	HistogramBoundaries []float64 `long:"histogram_boundaries" env:"HISTOGRAM_BOUNDARIES" env-delim:"," description:"the default histogram boundaries of prometheus" default:"1,2,5,10,20,50"`
+	HistogramBoundaries []float64 `long:"histogram_boundaries" env:"HISTOGRAM_BOUNDARIES" env-delim:"," description:"the default histogram boundaries of prometheus" required:"true"`
 }
 
 // PrometheusServiceMeter provides 3 meter to measure:
@@ -36,7 +35,7 @@ type PrometheusServiceMeter struct {
 
 	server                *http.Server
 	requestCounter        syncint64.Counter
-	responseTimeHistogram syncfloat64.Histogram
+	responseTimeHistogram syncint64.Histogram
 }
 
 // UnaryServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Unary RPCs.
@@ -55,7 +54,7 @@ func (m *PrometheusServiceMeter) UnaryServerInterceptor() func(ctx context.Conte
 
 		// measure response time
 		responseTime := time.Since(start)
-		m.responseTimeHistogram.Record(ctx, float64(responseTime.Milliseconds()), attributes...)
+		m.responseTimeHistogram.Record(ctx, responseTime.Milliseconds(), attributes...)
 
 		return resp, err
 	}
@@ -82,7 +81,7 @@ func NewPrometheusServiceMeter(ctx context.Context, conf *PrometheusServiceMeter
 		logger.Fatal("failed to create requests counter", zap.Error(err))
 	}
 
-	responseTimeHistogram, err := meter.SyncFloat64().Histogram("response_time", instrument.WithDescription("measure response time"))
+	responseTimeHistogram, err := meter.SyncInt64().Histogram("response_time", instrument.WithDescription("measure response time"))
 	if err != nil {
 		logger.Fatal("failed to create response time histogram", zap.Error(err))
 	}
