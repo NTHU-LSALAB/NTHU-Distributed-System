@@ -9,6 +9,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/service"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/otelkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
@@ -27,11 +28,12 @@ func newAPICommand() *cobra.Command {
 }
 
 type APIArgs struct {
-	GRPCAddr              string `long:"grpc_addr" env:"GRPC_ADDR" default:":8083"`
-	runkit.GracefulConfig `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
-	logkit.LoggerConfig   `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
-	pgkit.PGConfig        `group:"pg" namespace:"pg" env-namespace:"PG"`
-	rediskit.RedisConfig  `group:"redis" namespace:"redis" env-namespace:"REDIS"`
+	GRPCAddr                             string `long:"grpc_addr" env:"GRPC_ADDR" default:":8083"`
+	runkit.GracefulConfig                `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
+	logkit.LoggerConfig                  `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
+	pgkit.PGConfig                       `group:"pg" namespace:"pg" env-namespace:"PG"`
+	rediskit.RedisConfig                 `group:"redis" namespace:"redis" env-namespace:"REDIS"`
+	otelkit.PrometheusServiceMeterConfig `group:"meter" namespace:"meter" env-namespace:"METER"`
 }
 
 func runAPI(_ *cobra.Command, _ []string) error {
@@ -81,11 +83,18 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	return runkit.GracefulRun(serveGRPC(lis, svc, logger), &args.GracefulConfig)
+	meter := otelkit.NewPrometheusServiceMeter(ctx, &args.PrometheusServiceMeterConfig)
+	defer func() {
+		if err := meter.Close(); err != nil {
+			logger.Fatal("failed to close meter", zap.Error(err))
+		}
+	}()
+
+	return runkit.GracefulRun(serveGRPC(lis, svc, logger, grpc.UnaryInterceptor(meter.UnaryServerInterceptor())), &args.GracefulConfig)
 }
 
-func serveGRPC(lis net.Listener, svc pb.CommentServer, logger *logkit.Logger) runkit.GracefulRunFunc {
-	grpcServer := grpc.NewServer()
+func serveGRPC(lis net.Listener, svc pb.CommentServer, logger *logkit.Logger, opt ...grpc.ServerOption) runkit.GracefulRunFunc {
+	grpcServer := grpc.NewServer(opt...)
 	pb.RegisterCommentServer(grpcServer, svc)
 
 	return func(ctx context.Context) error {
