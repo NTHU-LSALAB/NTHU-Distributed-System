@@ -27,9 +27,10 @@ type PrometheusServiceMeterConfig struct {
 	HistogramBoundaries []float64 `long:"histogram_boundaries" env:"HISTOGRAM_BOUNDARIES" env-delim:"," description:"the default histogram boundaries of prometheus" required:"true"`
 }
 
-// PrometheusServiceMeter provides 3 meter to measure:
+// PrometheusServiceMeter provides 3 meters to measure:
 // 1. Count number of requests
 // 2. Measure response time
+// // TODO: 3. Count number of error requests
 type PrometheusServiceMeter struct {
 	metric.Meter
 
