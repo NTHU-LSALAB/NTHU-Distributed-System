@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package video.pb;
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb";
 

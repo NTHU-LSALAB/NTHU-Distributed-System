@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	commentpbmock "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/mock/pbmock"
+	commentpb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/daomock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/pbmock"
@@ -29,18 +31,20 @@ var (
 
 var _ = Describe("Service", func() {
 	var (
-		controller *gomock.Controller
-		videoDAO   *daomock.MockVideoDAO
-		storage    *storagemock.MockStorage
-		svc        *service
-		ctx        context.Context
+		controller    *gomock.Controller
+		videoDAO      *daomock.MockVideoDAO
+		storage       *storagemock.MockStorage
+		commentClient *commentpbmock.MockCommentClient
+		svc           *service
+		ctx           context.Context
 	)
 
 	BeforeEach(func() {
 		controller = gomock.NewController(GinkgoT())
 		videoDAO = daomock.NewMockVideoDAO(controller)
 		storage = storagemock.NewMockStorage(controller)
-		svc = NewService(videoDAO, storage, nil) // FIXME: use mock client
+		commentClient = commentpbmock.NewMockCommentClient(controller)
+		svc = NewService(videoDAO, storage, commentClient)
 		ctx = context.Background()
 	})
 
@@ -252,6 +256,9 @@ var _ = Describe("Service", func() {
 		When("success", func() {
 			BeforeEach(func() {
 				videoDAO.EXPECT().Delete(ctx, id).Return(nil)
+				commentClient.EXPECT().DeleteCommentByVideoID(ctx, &commentpb.DeleteCommentByVideoIDRequest{
+					VideoId: id.Hex(),
+				})
 			})
 
 			It("returns no error", func() {

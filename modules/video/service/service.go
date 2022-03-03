@@ -18,16 +18,16 @@ import (
 type service struct {
 	pb.UnimplementedVideoServer
 
-	videoDAO dao.VideoDAO
-	storage  storagekit.Storage
-	client   commentpb.CommentClient
+	videoDAO      dao.VideoDAO
+	storage       storagekit.Storage
+	commentClient commentpb.CommentClient
 }
 
-func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, client commentpb.CommentClient) *service {
+func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, commentClient commentpb.CommentClient) *service {
 	return &service{
-		videoDAO: videoDAO,
-		storage:  storage,
-		client:   client,
+		videoDAO:      videoDAO,
+		storage:       storage,
+		commentClient: commentClient,
 	}
 }
 
@@ -139,7 +139,7 @@ func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (
 		return nil, err
 	}
 
-	if _, err := s.client.DeleteCommentByVideoID(ctx, &commentpb.DeleteCommentByVideoIDRequest{
+	if _, err := s.commentClient.DeleteCommentByVideoID(ctx, &commentpb.DeleteCommentByVideoIDRequest{
 		VideoId: id.Hex(),
 	}); err != nil {
 		return nil, err

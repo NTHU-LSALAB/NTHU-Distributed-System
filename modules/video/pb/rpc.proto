@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package video.pb;
 
 import "google/api/annotations.proto";
 import "modules/video/pb/message.proto";

@@ -93,7 +93,6 @@ func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentReques
 func (s *service) DeleteCommentByVideoID(ctx context.Context, req *pb.DeleteCommentByVideoIDRequest) (*pb.DeleteCommentByVideoIDResponse, error) {
 	if err := s.commentDAO.DeleteByVideoID(ctx, req.GetVideoId()); err != nil {
 		if errors.Is(err, dao.ErrCommentNotFound) {
-			// if no related comment, it should not be an error?
 			return nil, ErrCommentNotFound
 		}
 
