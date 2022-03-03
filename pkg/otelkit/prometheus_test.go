@@ -111,7 +111,7 @@ var _ = Describe("PrometheusServiceMeter", func() {
 })
 
 func validateMetric(ctx context.Context, conf *PrometheusServiceMeterConfig, handlerCallCount int, responseTime time.Duration) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
 	Expect(err).NotTo(HaveOccurred())
 
 	resp, err := http.DefaultClient.Do(req)
