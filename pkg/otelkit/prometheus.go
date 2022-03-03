@@ -53,6 +53,7 @@ func (m *PrometheusServiceMeter) UnaryServerInterceptor() func(ctx context.Conte
 
 		resp, err := handler(ctx, req)
 
+		// measure response time
 		responseTime := time.Since(start)
 		m.responseTimeHistogram.Record(ctx, float64(responseTime.Milliseconds()), attributes...)
 
