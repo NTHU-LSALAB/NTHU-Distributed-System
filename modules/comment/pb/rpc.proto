@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package comment.pb;
 
 import "google/api/annotations.proto";
 import "modules/comment/pb/message.proto";
@@ -41,4 +41,6 @@ service Comment {
 			response_body: "*"
 		};
 	}
+
+	rpc DeleteCommentByVideoID(DeleteCommentByVideoIDRequest) returns (DeleteCommentByVideoIDResponse) {}
 }

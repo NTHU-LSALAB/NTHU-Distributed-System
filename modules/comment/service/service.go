@@ -89,3 +89,15 @@ func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentReques
 
 	return &pb.DeleteCommentResponse{}, nil
 }
+
+func (s *service) DeleteCommentByVideoID(ctx context.Context, req *pb.DeleteCommentByVideoIDRequest) (*pb.DeleteCommentByVideoIDResponse, error) {
+	if err := s.commentDAO.DeleteByVideoID(ctx, req.GetVideoId()); err != nil {
+		if errors.Is(err, dao.ErrCommentNotFound) {
+			return nil, ErrCommentNotFound
+		}
+
+		return nil, err
+	}
+
+	return &pb.DeleteCommentByVideoIDResponse{}, nil
+}

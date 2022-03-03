@@ -27,6 +27,7 @@ type CommentClient interface {
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error)
 	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*UpdateCommentResponse, error)
 	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*DeleteCommentResponse, error)
+	DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIDResponse, error)
 }
 
 type commentClient struct {
@@ -39,7 +40,7 @@ func NewCommentClient(cc grpc.ClientConnInterface) CommentClient {
 
 func (c *commentClient) Healthz(ctx context.Context, in *HealthzRequest, opts ...grpc.CallOption) (*HealthzResponse, error) {
 	out := new(HealthzResponse)
-	err := c.cc.Invoke(ctx, "/pb.Comment/Healthz", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/comment.pb.Comment/Healthz", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (c *commentClient) Healthz(ctx context.Context, in *HealthzRequest, opts ..
 
 func (c *commentClient) ListComment(ctx context.Context, in *ListCommentRequest, opts ...grpc.CallOption) (*ListCommentResponse, error) {
 	out := new(ListCommentResponse)
-	err := c.cc.Invoke(ctx, "/pb.Comment/ListComment", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/comment.pb.Comment/ListComment", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func (c *commentClient) ListComment(ctx context.Context, in *ListCommentRequest,
 
 func (c *commentClient) CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error) {
 	out := new(CreateCommentResponse)
-	err := c.cc.Invoke(ctx, "/pb.Comment/CreateComment", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/comment.pb.Comment/CreateComment", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +67,7 @@ func (c *commentClient) CreateComment(ctx context.Context, in *CreateCommentRequ
 
 func (c *commentClient) UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*UpdateCommentResponse, error) {
 	out := new(UpdateCommentResponse)
-	err := c.cc.Invoke(ctx, "/pb.Comment/UpdateComment", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/comment.pb.Comment/UpdateComment", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +76,16 @@ func (c *commentClient) UpdateComment(ctx context.Context, in *UpdateCommentRequ
 
 func (c *commentClient) DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*DeleteCommentResponse, error) {
 	out := new(DeleteCommentResponse)
-	err := c.cc.Invoke(ctx, "/pb.Comment/DeleteComment", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/comment.pb.Comment/DeleteComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commentClient) DeleteCommentByVideoID(ctx context.Context, in *DeleteCommentByVideoIDRequest, opts ...grpc.CallOption) (*DeleteCommentByVideoIDResponse, error) {
+	out := new(DeleteCommentByVideoIDResponse)
+	err := c.cc.Invoke(ctx, "/comment.pb.Comment/DeleteCommentByVideoID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +101,7 @@ type CommentServer interface {
 	CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error)
 	UpdateComment(context.Context, *UpdateCommentRequest) (*UpdateCommentResponse, error)
 	DeleteComment(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error)
+	DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIDResponse, error)
 	mustEmbedUnimplementedCommentServer()
 }
 
@@ -112,6 +123,9 @@ func (UnimplementedCommentServer) UpdateComment(context.Context, *UpdateCommentR
 }
 func (UnimplementedCommentServer) DeleteComment(context.Context, *DeleteCommentRequest) (*DeleteCommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
+}
+func (UnimplementedCommentServer) DeleteCommentByVideoID(context.Context, *DeleteCommentByVideoIDRequest) (*DeleteCommentByVideoIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCommentByVideoID not implemented")
 }
 func (UnimplementedCommentServer) mustEmbedUnimplementedCommentServer() {}
 
@@ -136,7 +150,7 @@ func _Comment_Healthz_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Comment/Healthz",
+		FullMethod: "/comment.pb.Comment/Healthz",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommentServer).Healthz(ctx, req.(*HealthzRequest))
@@ -154,7 +168,7 @@ func _Comment_ListComment_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Comment/ListComment",
+		FullMethod: "/comment.pb.Comment/ListComment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommentServer).ListComment(ctx, req.(*ListCommentRequest))
@@ -172,7 +186,7 @@ func _Comment_CreateComment_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Comment/CreateComment",
+		FullMethod: "/comment.pb.Comment/CreateComment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommentServer).CreateComment(ctx, req.(*CreateCommentRequest))
@@ -190,7 +204,7 @@ func _Comment_UpdateComment_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Comment/UpdateComment",
+		FullMethod: "/comment.pb.Comment/UpdateComment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommentServer).UpdateComment(ctx, req.(*UpdateCommentRequest))
@@ -208,10 +222,28 @@ func _Comment_DeleteComment_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Comment/DeleteComment",
+		FullMethod: "/comment.pb.Comment/DeleteComment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommentServer).DeleteComment(ctx, req.(*DeleteCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Comment_DeleteCommentByVideoID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCommentByVideoIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServer).DeleteCommentByVideoID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/comment.pb.Comment/DeleteCommentByVideoID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServer).DeleteCommentByVideoID(ctx, req.(*DeleteCommentByVideoIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -220,7 +252,7 @@ func _Comment_DeleteComment_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Comment_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.Comment",
+	ServiceName: "comment.pb.Comment",
 	HandlerType: (*CommentServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -242,6 +274,10 @@ var Comment_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteComment",
 			Handler:    _Comment_DeleteComment_Handler,
+		},
+		{
+			MethodName: "DeleteCommentByVideoID",
+			Handler:    _Comment_DeleteCommentByVideoID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

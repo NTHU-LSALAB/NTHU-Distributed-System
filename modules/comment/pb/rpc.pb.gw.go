@@ -289,7 +289,7 @@ func RegisterCommentHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Comment/Healthz", runtime.WithHTTPPathPattern("/"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/comment.pb.Comment/Healthz", runtime.WithHTTPPathPattern("/"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -312,7 +312,7 @@ func RegisterCommentHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Comment/ListComment", runtime.WithHTTPPathPattern("/v1/comments/{video_id}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/comment.pb.Comment/ListComment", runtime.WithHTTPPathPattern("/v1/comments/{video_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -335,7 +335,7 @@ func RegisterCommentHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Comment/CreateComment", runtime.WithHTTPPathPattern("/v1/comments"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/comment.pb.Comment/CreateComment", runtime.WithHTTPPathPattern("/v1/comments"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -358,7 +358,7 @@ func RegisterCommentHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Comment/UpdateComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/comment.pb.Comment/UpdateComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -381,7 +381,7 @@ func RegisterCommentHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Comment/DeleteComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/comment.pb.Comment/DeleteComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -443,7 +443,7 @@ func RegisterCommentHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Comment/Healthz", runtime.WithHTTPPathPattern("/"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/comment.pb.Comment/Healthz", runtime.WithHTTPPathPattern("/"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -463,7 +463,7 @@ func RegisterCommentHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Comment/ListComment", runtime.WithHTTPPathPattern("/v1/comments/{video_id}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/comment.pb.Comment/ListComment", runtime.WithHTTPPathPattern("/v1/comments/{video_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -483,7 +483,7 @@ func RegisterCommentHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Comment/CreateComment", runtime.WithHTTPPathPattern("/v1/comments"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/comment.pb.Comment/CreateComment", runtime.WithHTTPPathPattern("/v1/comments"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -503,7 +503,7 @@ func RegisterCommentHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Comment/UpdateComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/comment.pb.Comment/UpdateComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -523,7 +523,7 @@ func RegisterCommentHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Comment/DeleteComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/comment.pb.Comment/DeleteComment", runtime.WithHTTPPathPattern("/v1/comments/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

@@ -201,7 +201,7 @@ func RegisterVideoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Video/Healthz", runtime.WithHTTPPathPattern("/"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/video.pb.Video/Healthz", runtime.WithHTTPPathPattern("/"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -224,7 +224,7 @@ func RegisterVideoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Video/GetVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/video.pb.Video/GetVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -247,7 +247,7 @@ func RegisterVideoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Video/ListVideo", runtime.WithHTTPPathPattern("/v1/videos"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/video.pb.Video/ListVideo", runtime.WithHTTPPathPattern("/v1/videos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -270,7 +270,7 @@ func RegisterVideoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.Video/DeleteVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/video.pb.Video/DeleteVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -332,7 +332,7 @@ func RegisterVideoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Video/Healthz", runtime.WithHTTPPathPattern("/"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/video.pb.Video/Healthz", runtime.WithHTTPPathPattern("/"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -352,7 +352,7 @@ func RegisterVideoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Video/GetVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/video.pb.Video/GetVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -372,7 +372,7 @@ func RegisterVideoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Video/ListVideo", runtime.WithHTTPPathPattern("/v1/videos"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/video.pb.Video/ListVideo", runtime.WithHTTPPathPattern("/v1/videos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -392,7 +392,7 @@ func RegisterVideoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.Video/DeleteVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/video.pb.Video/DeleteVideo", runtime.WithHTTPPathPattern("/v1/videos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

@@ -39,7 +39,7 @@ func NewVideoClient(cc grpc.ClientConnInterface) VideoClient {
 
 func (c *videoClient) Healthz(ctx context.Context, in *HealthzRequest, opts ...grpc.CallOption) (*HealthzResponse, error) {
 	out := new(HealthzResponse)
-	err := c.cc.Invoke(ctx, "/pb.Video/Healthz", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/video.pb.Video/Healthz", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *videoClient) Healthz(ctx context.Context, in *HealthzRequest, opts ...g
 
 func (c *videoClient) GetVideo(ctx context.Context, in *GetVideoRequest, opts ...grpc.CallOption) (*GetVideoResponse, error) {
 	out := new(GetVideoResponse)
-	err := c.cc.Invoke(ctx, "/pb.Video/GetVideo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/video.pb.Video/GetVideo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *videoClient) GetVideo(ctx context.Context, in *GetVideoRequest, opts ..
 
 func (c *videoClient) ListVideo(ctx context.Context, in *ListVideoRequest, opts ...grpc.CallOption) (*ListVideoResponse, error) {
 	out := new(ListVideoResponse)
-	err := c.cc.Invoke(ctx, "/pb.Video/ListVideo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/video.pb.Video/ListVideo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *videoClient) ListVideo(ctx context.Context, in *ListVideoRequest, opts 
 }
 
 func (c *videoClient) UploadVideo(ctx context.Context, opts ...grpc.CallOption) (Video_UploadVideoClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Video_ServiceDesc.Streams[0], "/pb.Video/UploadVideo", opts...)
+	stream, err := c.cc.NewStream(ctx, &Video_ServiceDesc.Streams[0], "/video.pb.Video/UploadVideo", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (x *videoUploadVideoClient) CloseAndRecv() (*UploadVideoResponse, error) {
 
 func (c *videoClient) DeleteVideo(ctx context.Context, in *DeleteVideoRequest, opts ...grpc.CallOption) (*DeleteVideoResponse, error) {
 	out := new(DeleteVideoResponse)
-	err := c.cc.Invoke(ctx, "/pb.Video/DeleteVideo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/video.pb.Video/DeleteVideo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func _Video_Healthz_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Video/Healthz",
+		FullMethod: "/video.pb.Video/Healthz",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServer).Healthz(ctx, req.(*HealthzRequest))
@@ -179,7 +179,7 @@ func _Video_GetVideo_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Video/GetVideo",
+		FullMethod: "/video.pb.Video/GetVideo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServer).GetVideo(ctx, req.(*GetVideoRequest))
@@ -197,7 +197,7 @@ func _Video_ListVideo_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Video/ListVideo",
+		FullMethod: "/video.pb.Video/ListVideo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServer).ListVideo(ctx, req.(*ListVideoRequest))
@@ -241,7 +241,7 @@ func _Video_DeleteVideo_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Video/DeleteVideo",
+		FullMethod: "/video.pb.Video/DeleteVideo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServer).DeleteVideo(ctx, req.(*DeleteVideoRequest))
@@ -253,7 +253,7 @@ func _Video_DeleteVideo_Handler(srv interface{}, ctx context.Context, dec func(i
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Video_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.Video",
+	ServiceName: "video.pb.Video",
 	HandlerType: (*VideoServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

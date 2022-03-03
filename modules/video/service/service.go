@@ -8,6 +8,7 @@ import (
 	"io"
 	"path"
 
+	commentpb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
@@ -17,14 +18,16 @@ import (
 type service struct {
 	pb.UnimplementedVideoServer
 
-	videoDAO dao.VideoDAO
-	storage  storagekit.Storage
+	videoDAO      dao.VideoDAO
+	storage       storagekit.Storage
+	commentClient commentpb.CommentClient
 }
 
-func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage) *service {
+func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, commentClient commentpb.CommentClient) *service {
 	return &service{
-		videoDAO: videoDAO,
-		storage:  storage,
+		videoDAO:      videoDAO,
+		storage:       storage,
+		commentClient: commentClient,
 	}
 }
 
@@ -133,6 +136,12 @@ func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (
 			return nil, ErrVideoNotFound
 		}
 
+		return nil, err
+	}
+
+	if _, err := s.commentClient.DeleteCommentByVideoID(ctx, &commentpb.DeleteCommentByVideoIDRequest{
+		VideoId: id.Hex(),
+	}); err != nil {
 		return nil, err
 	}
 

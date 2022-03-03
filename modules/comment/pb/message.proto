@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package comment.pb;
 
 option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb";
 
@@ -51,3 +51,10 @@ message DeleteCommentRequest {
 }
 
 message DeleteCommentResponse {}
+
+message DeleteCommentByVideoIDRequest {
+	string video_id = 1;
+}
+
+message DeleteCommentByVideoIDResponse {}
+
