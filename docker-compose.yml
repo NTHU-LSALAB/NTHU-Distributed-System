@@ -4,7 +4,7 @@ x-common-env: &common-env
   GOPATH: /go
   GOCACHE: /src/.cache/gocache
   MONGO_URL: mongodb://mongo:27017/
-  MONGO_DATABASE: nthu_distributes_system
+  MONGO_DATABASE: nthu_distributed_system
   POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
   REDIS_ADDR: redis:6379
   # KAFKA_ADDR:
