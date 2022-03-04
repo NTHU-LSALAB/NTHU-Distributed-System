@@ -70,10 +70,15 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
+	videoClientConn := grpckit.NewGrpcClientConn(ctx, &args.VideoClientConnConfig)
+	defer func() {
+		if err := videoClientConn.Close(); err != nil {
+			logger.Fatal("failed to close video gRPC client", zap.Error(err))
+		}
+	}()
+
 	pgCommentDAO := dao.NewPGCommentDAO(pgClient)
 	commentDAO := dao.NewRedisCommentDAO(redisClient, pgCommentDAO)
-
-	videoClientConn := grpckit.NewGrpcClientConn(ctx, &args.VideoClientConnConfig)
 	videoClient := videopb.NewVideoClient(videoClientConn)
 
 	svc := service.NewService(commentDAO, videoClient)

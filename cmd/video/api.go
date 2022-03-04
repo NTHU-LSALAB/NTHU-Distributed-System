@@ -72,11 +72,16 @@ func runAPI(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
+	commentClientConn := grpckit.NewGrpcClientConn(ctx, &args.CommentClientConnConfig)
+	defer func() {
+		if err := commentClientConn.Close(); err != nil {
+			logger.Fatal("failed to close comment gRPC client", zap.Error(err))
+		}
+	}()
+
 	mongoVideoDAO := dao.NewMongoVideoDAO(mongoClient.Database().Collection("videos"))
 	videoDAO := dao.NewRedisVideoDAO(redisClient, mongoVideoDAO)
 	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
-
-	commentClientConn := grpckit.NewGrpcClientConn(ctx, &args.CommentClientConnConfig)
 	commentClient := commentpb.NewCommentClient(commentClientConn)
 
 	svc := service.NewService(videoDAO, storage, commentClient)
