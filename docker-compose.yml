@@ -34,6 +34,18 @@ services:
   redis:
     image: redis:6.2-alpine
 
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+
   generate:
     <<: *common-build
     command:
@@ -88,8 +100,6 @@ services:
     depends_on:
     - mongo
     - redis
-    ports:
-    - 10122:2222 # prometheus exporter
 
   video-gateway:
     image: nthu-distributed-system:latest
@@ -117,8 +127,6 @@ services:
     depends_on:
     - postgres
     - redis
-    ports:
-    - 10123:2222 # prometheus exporter
 
   comment-gateway:
     image: nthu-distributed-system:latest
@@ -131,15 +139,3 @@ services:
     - gateway
     ports:
     - 10081:8080
-
-  prometheus-server:
-    image: prom/prometheus
-    volumes:
-      - $PWD/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - 9090:9090
