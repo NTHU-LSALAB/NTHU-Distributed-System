@@ -22,7 +22,7 @@ require (
 	go.opentelemetry.io/otel/metric v0.27.1-0.20220303020706-24414b2455ec
 	go.opentelemetry.io/otel/sdk/metric v0.27.1-0.20220303020706-24414b2455ec
 	go.uber.org/zap v1.21.0
-	google.golang.org/genproto v0.0.0-20220303160752-862486edd9cc
+	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8
 	google.golang.org/grpc v1.44.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
@@ -47,7 +47,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.14.4 // indirect
-	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.11 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
