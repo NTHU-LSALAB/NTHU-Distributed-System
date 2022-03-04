@@ -216,7 +216,9 @@ var _ = Describe("Service", func() {
 			})
 
 			It("returns without any error", func() {
-				Expect(resp).To(Equal(&pb.UpdateCommentResponse{}))
+				Expect(resp).To(Equal(&pb.UpdateCommentResponse{
+					Comment: comment.ToProto(),
+				}))
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})

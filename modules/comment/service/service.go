@@ -80,7 +80,9 @@ func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentReques
 		return nil, err
 	}
 
-	return &pb.UpdateCommentResponse{}, nil
+	return &pb.UpdateCommentResponse{
+		Comment: comment.ToProto(),
+	}, nil
 }
 
 func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.DeleteCommentResponse, error) {

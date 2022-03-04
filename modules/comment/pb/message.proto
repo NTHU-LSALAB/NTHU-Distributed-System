@@ -44,7 +44,9 @@ message UpdateCommentRequest {
 	string content = 2;
 }
 
-message UpdateCommentResponse {}
+message UpdateCommentResponse {
+	CommentInfo comment = 1;
+}
 
 message DeleteCommentRequest {
 	string id = 1;

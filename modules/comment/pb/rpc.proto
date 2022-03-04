@@ -33,7 +33,7 @@ service Comment {
 		option (google.api.http) = {
 			put: "/v1/comments/{id}"
 			body: "*"
-			response_body: "*"
+			response_body: "comment"
 		};
 	}
 
