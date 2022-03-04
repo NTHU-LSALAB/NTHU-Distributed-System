@@ -96,6 +96,8 @@ func (h *handler) HandleUploadVideo(w http.ResponseWriter, req *http.Request, pa
 }
 
 func (h *handler) encodeJSONResponse(w http.ResponseWriter, resp interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+
 	if message, ok := resp.(proto.Message); ok {
 		h.encodeProtoJSONResponse(w, message)
 		return
