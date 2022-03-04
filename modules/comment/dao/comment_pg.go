@@ -43,7 +43,7 @@ func (dao *pgCommentDAO) Create(ctx context.Context, comment *Comment) (uuid.UUI
 }
 
 func (dao *pgCommentDAO) Update(ctx context.Context, comment *Comment) error {
-	if res, err := dao.client.ModelContext(ctx, comment).Column("content").WherePK().Update(); err != nil {
+	if res, err := dao.client.ModelContext(ctx, comment).Column("content").WherePK().Returning("*").Update(); err != nil {
 		return err
 	} else if res.RowsAffected() == 0 {
 		return ErrCommentNotFound
