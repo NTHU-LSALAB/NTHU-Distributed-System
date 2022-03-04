@@ -2,8 +2,10 @@ package dao
 
 import (
 	"context"
+	"errors"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
+	"github.com/go-pg/pg/v10"
 	"github.com/google/uuid"
 )
 
@@ -43,10 +45,12 @@ func (dao *pgCommentDAO) Create(ctx context.Context, comment *Comment) (uuid.UUI
 }
 
 func (dao *pgCommentDAO) Update(ctx context.Context, comment *Comment) error {
-	if res, err := dao.client.ModelContext(ctx, comment).Column("content").WherePK().Returning("*").Update(); err != nil {
+	if _, err := dao.client.ModelContext(ctx, comment).Column("content").WherePK().Returning("*").Update(); err != nil {
+		if errors.Is(err, pg.ErrNoRows) {
+			return ErrCommentNotFound
+		}
+
 		return err
-	} else if res.RowsAffected() == 0 {
-		return ErrCommentNotFound
 	}
 
 	return nil
