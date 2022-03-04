@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/grpckit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/runkit"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 func newGatewayCommand() *cobra.Command {
@@ -27,11 +26,10 @@ func newGatewayCommand() *cobra.Command {
 }
 
 type GatewayArgs struct {
-	HTTPAddr              string        `long:"http_addr" env:"HTTP_ADDR" default:":8082"`
-	GRPCAddr              string        `long:"grpc_addr" env:"GRPC_ADDR" default:":8083"`
-	GRPCDialTimeout       time.Duration `long:"grpc_dial_timeout" env:"GRPC_DIAL_TIMEOUT" default:"30s"`
-	runkit.GracefulConfig `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
-	logkit.LoggerConfig   `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
+	HTTPAddr                     string `long:"http_addr" env:"HTTP_ADDR" default:":8082"`
+	grpckit.GrpcClientConnConfig `group:"grpc" namespace:"grpc" env-namespace:"GRPC"`
+	runkit.GracefulConfig        `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
+	logkit.LoggerConfig          `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
 }
 
 func runGateway(_ *cobra.Command, _ []string) error {
@@ -62,21 +60,14 @@ func runGateway(_ *cobra.Command, _ []string) error {
 		}
 	}()
 
-	var cancel context.CancelFunc
-	ctx, cancel = context.WithTimeout(ctx, args.GRPCDialTimeout)
-	defer cancel()
-
-	conn, cerr := grpc.DialContext(ctx, args.GRPCAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if cerr != nil {
-		logger.Fatal("failed to connect to gRPC server", zap.Error(cerr))
-	}
+	conn := grpckit.NewGrpcClientConn(ctx, &args.GrpcClientConnConfig)
 	defer func() {
 		if err := conn.Close(); err != nil {
 			logger.Fatal("failed to close gRPC client connection", zap.Error(err))
 		}
 	}()
 
-	return runkit.GracefulRun(serveHTTP(lis, conn, logger), &args.GracefulConfig)
+	return runkit.GracefulRun(serveHTTP(lis, conn.ClientConn, logger), &args.GracefulConfig)
 }
 
 func serveHTTP(lis net.Listener, conn *grpc.ClientConn, logger *logkit.Logger) runkit.GracefulRunFunc {
