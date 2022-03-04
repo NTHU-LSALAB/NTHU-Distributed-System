@@ -8,6 +8,8 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/mock/daomock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
+	videopbmock "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/pbmock"
+	videopb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
@@ -20,21 +22,24 @@ func TestService(t *testing.T) {
 }
 
 var (
-	errDAOUnknown = errors.New("unknown DAO error")
+	errDAOUnknown          = errors.New("unknown DAO error")
+	errVideoServiceUnknown = errors.New("unknown video service error")
 )
 
 var _ = Describe("Service", func() {
 	var (
-		controller *gomock.Controller
-		commentDAO *daomock.MockCommentDAO
-		svc        *service
-		ctx        context.Context
+		controller  *gomock.Controller
+		commentDAO  *daomock.MockCommentDAO
+		videoClient *videopbmock.MockVideoClient
+		svc         *service
+		ctx         context.Context
 	)
 
 	BeforeEach(func() {
 		controller = gomock.NewController(GinkgoT())
 		commentDAO = daomock.NewMockCommentDAO(controller)
-		svc = NewService(commentDAO)
+		videoClient = videopbmock.NewMockVideoClient(controller)
+		svc = NewService(commentDAO, videoClient)
 		ctx = context.Background()
 	})
 
@@ -111,30 +116,51 @@ var _ = Describe("Service", func() {
 			resp, err = svc.CreateComment(ctx, req)
 		})
 
-		When("DAO error", func() {
+		When("get video error", func() {
 			BeforeEach(func() {
-				commentDAO.EXPECT().Create(ctx, comment).Return(uuid.Nil, errDAOUnknown)
+				videoClient.EXPECT().GetVideo(ctx, &videopb.GetVideoRequest{
+					Id: req.GetVideoId(),
+				}).Return(nil, errVideoServiceUnknown)
 			})
 
 			It("returns the error", func() {
 				Expect(resp).To(BeNil())
-				Expect(err).To(MatchError(errDAOUnknown))
+				Expect(err).To(MatchError(errVideoServiceUnknown))
 			})
 		})
 
-		When("success", func() {
-			var id uuid.UUID
-
+		Context("get video no error", func() {
 			BeforeEach(func() {
-				id = uuid.New()
-				commentDAO.EXPECT().Create(ctx, comment).Return(id, nil)
+				videoClient.EXPECT().GetVideo(ctx, &videopb.GetVideoRequest{
+					Id: req.GetVideoId(),
+				}).Return(&videopb.GetVideoResponse{}, nil)
 			})
 
-			It("returns no error", func() {
-				Expect(resp).To(Equal(&pb.CreateCommentResponse{
-					Id: id.String(),
-				}))
-				Expect(err).NotTo(HaveOccurred())
+			When("DAO error", func() {
+				BeforeEach(func() {
+					commentDAO.EXPECT().Create(ctx, comment).Return(uuid.Nil, errDAOUnknown)
+				})
+
+				It("returns the error", func() {
+					Expect(resp).To(BeNil())
+					Expect(err).To(MatchError(errDAOUnknown))
+				})
+			})
+
+			When("success", func() {
+				var id uuid.UUID
+
+				BeforeEach(func() {
+					id = uuid.New()
+					commentDAO.EXPECT().Create(ctx, comment).Return(id, nil)
+				})
+
+				It("returns no error", func() {
+					Expect(resp).To(Equal(&pb.CreateCommentResponse{
+						Id: id.String(),
+					}))
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 		})
 	})

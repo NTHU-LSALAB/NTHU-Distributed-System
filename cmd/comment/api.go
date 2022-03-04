@@ -8,6 +8,8 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/service"
+	videopb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/grpckit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/otelkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
@@ -28,7 +30,8 @@ func newAPICommand() *cobra.Command {
 }
 
 type APIArgs struct {
-	GRPCAddr                             string `long:"grpc_addr" env:"GRPC_ADDR" default:":8083"`
+	GRPCAddr                             string                       `long:"grpc_addr" env:"GRPC_ADDR" default:":8083"`
+	VideoClientConnConfig                grpckit.GrpcClientConnConfig `group:"video" namespace:"video" env-namespace:"VIDEO"`
 	runkit.GracefulConfig                `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig                  `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
 	pgkit.PGConfig                       `group:"pg" namespace:"pg" env-namespace:"PG"`
@@ -70,7 +73,10 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	pgCommentDAO := dao.NewPGCommentDAO(pgClient)
 	commentDAO := dao.NewRedisCommentDAO(redisClient, pgCommentDAO)
 
-	svc := service.NewService(commentDAO)
+	videoClientConn := grpckit.NewGrpcClientConn(ctx, &args.VideoClientConnConfig)
+	videoClient := videopb.NewVideoClient(videoClientConn)
+
+	svc := service.NewService(commentDAO, videoClient)
 
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
 	lis, err := net.Listen("tcp", args.GRPCAddr)

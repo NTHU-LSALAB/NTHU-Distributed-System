@@ -6,18 +6,21 @@ import (
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
+	videopb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/google/uuid"
 )
 
 type service struct {
 	pb.UnimplementedCommentServer
 
-	commentDAO dao.CommentDAO
+	commentDAO  dao.CommentDAO
+	videoClient videopb.VideoClient
 }
 
-func NewService(commentDAO dao.CommentDAO) *service {
+func NewService(commentDAO dao.CommentDAO, videoClient videopb.VideoClient) *service {
 	return &service{
-		commentDAO: commentDAO,
+		commentDAO:  commentDAO,
+		videoClient: videoClient,
 	}
 }
 
@@ -40,10 +43,17 @@ func (s *service) ListComment(ctx context.Context, req *pb.ListCommentRequest) (
 }
 
 func (s *service) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
+	if _, err := s.videoClient.GetVideo(ctx, &videopb.GetVideoRequest{
+		Id: req.GetVideoId(),
+	}); err != nil {
+		return nil, err
+	}
+
 	comment := &dao.Comment{
 		VideoID: req.GetVideoId(),
 		Content: req.GetContent(),
 	}
+
 	commentID, err := s.commentDAO.Create(ctx, comment)
 	if err != nil {
 		return nil, err
