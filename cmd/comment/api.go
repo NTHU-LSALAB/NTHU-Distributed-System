@@ -30,7 +30,7 @@ func newAPICommand() *cobra.Command {
 }
 
 type APIArgs struct {
-	GRPCAddr                             string                       `long:"grpc_addr" env:"GRPC_ADDR" default:":8083"`
+	GRPCAddr                             string                       `long:"grpc_addr" env:"GRPC_ADDR" default:":8081"`
 	VideoClientConnConfig                grpckit.GrpcClientConnConfig `group:"video" namespace:"video" env-namespace:"VIDEO"`
 	runkit.GracefulConfig                `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig                  `group:"logger" namespace:"logger" env-namespace:"LOGGER"`

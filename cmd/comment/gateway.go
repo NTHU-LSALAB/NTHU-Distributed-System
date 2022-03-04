@@ -26,7 +26,7 @@ func newGatewayCommand() *cobra.Command {
 }
 
 type GatewayArgs struct {
-	HTTPAddr                     string `long:"http_addr" env:"HTTP_ADDR" default:":8082"`
+	HTTPAddr                     string `long:"http_addr" env:"HTTP_ADDR" default:":8080"`
 	grpckit.GrpcClientConnConfig `group:"grpc" namespace:"grpc" env-namespace:"GRPC"`
 	runkit.GracefulConfig        `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig          `group:"logger" namespace:"logger" env-namespace:"LOGGER"`

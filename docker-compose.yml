@@ -105,7 +105,7 @@ services:
     image: nthu-distributed-system:latest
     environment:
       <<: *common-env
-      GRPC_ADDR: video-api:8081
+      GRPC_SERVER_ADDR: video-api:8081
     command:
     - /cmd
     - video
@@ -132,7 +132,7 @@ services:
     image: nthu-distributed-system:latest
     environment:
       <<: *common-env
-      GRPC_ADDR: comment-api:8081
+      GRPC_SERVER_ADDR: comment-api:8081
     command:
     - /cmd
     - comment
