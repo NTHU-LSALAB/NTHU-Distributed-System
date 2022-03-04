@@ -78,6 +78,7 @@ services:
     image: nthu-distributed-system:latest
     environment:
       <<: *common-env
+      COMMENT_SERVER_ADDR: comment-api:8081
       METER_NAME: video.api
       METER_HISTOGRAM_BOUNDARIES: "10,100,200,500,1000"
     command:
@@ -106,6 +107,7 @@ services:
     image: nthu-distributed-system:latest
     environment:
       <<: *common-env
+      VIDEO_SERVER_ADDR: video-api:8081
       METER_NAME: comment.api
       METER_HISTOGRAM_BOUNDARIES: "10,100,200,500,1000"
     command:
