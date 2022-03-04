@@ -34,7 +34,7 @@ type APIArgs struct {
 	VideoClientConnConfig                grpckit.GrpcClientConnConfig `group:"video" namespace:"video" env-namespace:"VIDEO"`
 	runkit.GracefulConfig                `group:"graceful" namespace:"graceful" env-namespace:"GRACEFUL"`
 	logkit.LoggerConfig                  `group:"logger" namespace:"logger" env-namespace:"LOGGER"`
-	pgkit.PGConfig                       `group:"pg" namespace:"pg" env-namespace:"PG"`
+	pgkit.PGConfig                       `group:"postgres" namespace:"postgres" env-namespace:"POSTGRES"`
 	rediskit.RedisConfig                 `group:"redis" namespace:"redis" env-namespace:"REDIS"`
 	otelkit.PrometheusServiceMeterConfig `group:"meter" namespace:"meter" env-namespace:"METER"`
 }
