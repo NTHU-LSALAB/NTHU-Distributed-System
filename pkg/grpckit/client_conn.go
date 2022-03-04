@@ -42,6 +42,8 @@ func NewGrpcClientConn(ctx context.Context, conf *GrpcClientConnConfig) *GrpcCli
 		logger.Fatal("failed to connect to gRPC server", zap.Error(err))
 	}
 
+	logger.Info("connect to gRPC server successfully")
+
 	closeFunc := func() {
 		cancel()
 	}
