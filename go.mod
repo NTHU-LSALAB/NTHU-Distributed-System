@@ -15,6 +15,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
 	github.com/prometheus/common v0.32.1
+	github.com/segmentio/kafka-go v0.4.29
 	github.com/spf13/cobra v1.3.0
 	go.mongodb.org/mongo-driver v1.8.4
 	go.opentelemetry.io/otel v1.4.1
@@ -56,6 +57,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
+	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
