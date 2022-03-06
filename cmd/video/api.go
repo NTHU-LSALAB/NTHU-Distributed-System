@@ -10,6 +10,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/service"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/grpckit"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/mongokit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/otelkit"
@@ -39,6 +40,8 @@ type APIArgs struct {
 	storagekit.MinIOConfig               `group:"minio" namespace:"minio" env-namespace:"MINIO"`
 	rediskit.RedisConfig                 `group:"redis" namespace:"redis" env-namespace:"REDIS"`
 	otelkit.PrometheusServiceMeterConfig `group:"meter" namespace:"meter" env-namespace:"METER"`
+	// Wait for Justin to help
+	kafkakit.KafkaConfig `group:"kafka" namespace:"kafka" env-namespace:"KAFKA"`
 }
 
 func runAPI(_ *cobra.Command, _ []string) error {
@@ -82,9 +85,11 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	mongoVideoDAO := dao.NewMongoVideoDAO(mongoClient.Database().Collection("videos"))
 	videoDAO := dao.NewRedisVideoDAO(redisClient, mongoVideoDAO)
 	storage := storagekit.NewMinIOClient(ctx, &args.MinIOConfig)
+	// Wait for Justin to help
+	kafkaWriter := kafkakit.NewKafkaWriter(ctx, &args.KafkaConfig)
 	commentClient := commentpb.NewCommentClient(commentClientConn)
 
-	svc := service.NewService(videoDAO, storage, commentClient)
+	svc := service.NewService(videoDAO, storage, commentClient, kafkaWriter)
 
 	logger.Info("listen to gRPC addr", zap.String("grpc_addr", args.GRPCAddr))
 	lis, err := net.Listen("tcp", args.GRPCAddr)

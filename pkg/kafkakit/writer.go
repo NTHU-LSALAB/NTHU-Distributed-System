@@ -41,3 +41,11 @@ func NewKafkaWriter(ctx context.Context, conf *KafkaConfig) *KafkaWriter {
 		Writer: writer,
 	}
 }
+
+func (kw *KafkaWriter) WriteMessage(ctx context.Context, messageValue string) error {
+	msg := kafka.Message{
+		Value: []byte(messageValue),
+	}
+	err := kw.Writer.WriteMessages(ctx, msg)
+	return err
+}
