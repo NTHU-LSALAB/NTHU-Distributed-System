@@ -36,6 +36,7 @@ type PrometheusServiceMeter struct {
 
 	server                *http.Server
 	requestCounter        syncint64.Counter
+	errorCounter		  syncint64.Counter
 	responseTimeHistogram syncint64.Histogram
 }
 
@@ -54,6 +55,7 @@ func (m *PrometheusServiceMeter) UnaryServerInterceptor(logger *logkit.Logger) f
 		resp, err := handler(ctx, req)
 
 		if err != nil {
+			m.errorCounter.Add(ctx, 1, attributes...)
 			logger.Fatal("gRPC middleware handler retrun error.", zap.Error(err))
 		}
 
@@ -86,6 +88,11 @@ func NewPrometheusServiceMeter(ctx context.Context, conf *PrometheusServiceMeter
 		logger.Fatal("failed to create requests counter", zap.Error(err))
 	}
 
+	errorCounter, err := meter.SyncInt64().Counter("request", instrument.WithDescription("count number of requests error"))
+	if err != nil {
+		logger.Fatal("failed to create error counter", zap.Error(err))
+	}
+
 	responseTimeHistogram, err := meter.SyncInt64().Histogram("response_time", instrument.WithDescription("measure response time"))
 	if err != nil {
 		logger.Fatal("failed to create response time histogram", zap.Error(err))
@@ -94,6 +101,7 @@ func NewPrometheusServiceMeter(ctx context.Context, conf *PrometheusServiceMeter
 	return &PrometheusServiceMeter{
 		server:                server,
 		requestCounter:        requestCounter,
+		errorCounter:		   errorCounter,
 		responseTimeHistogram: responseTimeHistogram,
 	}
 }
