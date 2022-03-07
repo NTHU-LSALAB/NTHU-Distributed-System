@@ -36,7 +36,7 @@ type PrometheusServiceMeter struct {
 
 	server                *http.Server
 	requestCounter        syncint64.Counter
-	errorCounter		  syncint64.Counter
+	errorCounter          syncint64.Counter
 	responseTimeHistogram syncint64.Histogram
 }
 
@@ -101,7 +101,7 @@ func NewPrometheusServiceMeter(ctx context.Context, conf *PrometheusServiceMeter
 	return &PrometheusServiceMeter{
 		server:                server,
 		requestCounter:        requestCounter,
-		errorCounter:		   errorCounter,
+		errorCounter:          errorCounter,
 		responseTimeHistogram: responseTimeHistogram,
 	}
 }
