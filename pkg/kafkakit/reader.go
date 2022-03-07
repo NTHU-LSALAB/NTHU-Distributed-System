@@ -2,11 +2,15 @@ package kafkakit
 
 import (
 	"context"
-	"os"
 	"strings"
 
 	"github.com/segmentio/kafka-go"
 )
+
+type KafkaReaderConfig struct {
+	Addr  string
+	Topic string
+}
 
 type KafkaReader struct {
 	*kafka.Reader
@@ -21,15 +25,11 @@ func (kw *KafkaReader) Close() error {
 	return kw.Reader.Close()
 }
 
-func NewKafkaReader(ctx context.Context, conf *KafkaConfig) *KafkaReader {
-	if addr := os.ExpandEnv(conf.kafkaAddr); addr != "" {
-		conf.kafkaAddr = addr
-	}
-
-	brokers := strings.Split(conf.kafkaAddr, ",")
+func NewKafkaReader(ctx context.Context, conf *KafkaReaderConfig) *KafkaReader {
+	brokers := strings.Split(conf.Addr, ",")
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   brokers,
-		Topic:     conf.kafkaTopic,
+		Topic:     conf.Topic,
 		Partition: 0,
 		MinBytes:  10e3, // 10KB
 		MaxBytes:  10e6, // 10MB

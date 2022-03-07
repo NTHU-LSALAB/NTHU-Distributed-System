@@ -2,15 +2,14 @@ package kafkakit
 
 import (
 	"context"
-	"os"
 
 	"github.com/segmentio/kafka-go"
 )
 
-type KafkaConfig struct {
+type KafkaWriterConfig struct {
 	// Wait for Justin to help
-	kafkaAddr  string `long:"kaddr" env:"KAFKA_ADDR" description:"the address of kakfa server" required:"true"`
-	kafkaTopic string `long:"ktopic" env:"KAFKA_TOPIC" description:"the topic of changing resolution" required:"true"`
+	Addr  string `long:"kaddr" env:"KAFKA_ADDR" description:"the address of kakfa server" required:"true"`
+	Topic string `long:"ktopic" env:"KAFKA_TOPIC" description:"the topic of changing resolution" required:"true"`
 }
 
 type KafkaWriter struct {
@@ -26,14 +25,10 @@ func (kw *KafkaWriter) Close() error {
 	return kw.Writer.Close()
 }
 
-func NewKafkaWriter(ctx context.Context, conf *KafkaConfig) *KafkaWriter {
-	if addr := os.ExpandEnv(conf.kafkaAddr); addr != "" {
-		conf.kafkaAddr = addr
-	}
-
+func NewKafkaWriter(ctx context.Context, conf *KafkaWriterConfig) *KafkaWriter {
 	writer := &kafka.Writer{
-		Addr:     kafka.TCP(conf.kafkaAddr),
-		Topic:    conf.kafkaTopic,
+		Addr:     kafka.TCP(conf.Addr),
+		Topic:    conf.Topic,
 		Balancer: &kafka.LeastBytes{},
 	}
 
