@@ -40,7 +40,7 @@ type PrometheusServiceMeter struct {
 }
 
 // UnaryServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Unary RPCs.
-func (m *PrometheusServiceMeter) UnaryServerInterceptor() func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (m *PrometheusServiceMeter) UnaryServerInterceptor(logger *logkit.Logger) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		attributes := []attribute.KeyValue{
 			attribute.String("FullMethod", info.FullMethod),
@@ -52,6 +52,10 @@ func (m *PrometheusServiceMeter) UnaryServerInterceptor() func(ctx context.Conte
 		start := time.Now()
 
 		resp, err := handler(ctx, req)
+
+		if err != nil {
+			logger.Fatal("gRPC middleware handler retrun error.", zap.Error(err))
+		}
 
 		// measure response time
 		responseTime := time.Since(start)
