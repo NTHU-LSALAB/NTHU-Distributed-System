@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5bbcb68d-c2ea-4499-8009-71cfa2e13879" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/otelkit/prometheus.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/otelkit/prometheus.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,13 +70,28 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/feature/kit-test" />
+                        <option value="feature/implement-otel-prometheus-meter" />
                       </list>
                     </value>
                   </entry>
                 </map>
               </option>
             </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="feature/implement-otel-prometheus-meter" />
+                </option>
+              </RecentGroup>
+            </list>
           </value>
         </entry>
       </map>
