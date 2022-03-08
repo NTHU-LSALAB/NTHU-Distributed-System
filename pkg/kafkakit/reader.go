@@ -12,17 +12,21 @@ type KafkaReaderConfig struct {
 	Topic string
 }
 
+type Reader interface {
+	ReadMessages(ctx context.Context) (kafka.Message, error)
+}
+
 type KafkaReader struct {
 	*kafka.Reader
 	closeFunc func()
 }
 
-func (kw *KafkaReader) Close() error {
-	if kw.closeFunc != nil {
-		kw.closeFunc()
+func (kr *KafkaReader) Close() error {
+	if kr.closeFunc != nil {
+		kr.closeFunc()
 	}
 
-	return kw.Reader.Close()
+	return kr.Reader.Close()
 }
 
 func NewKafkaReader(ctx context.Context, conf *KafkaReaderConfig) *KafkaReader {
@@ -38,4 +42,10 @@ func NewKafkaReader(ctx context.Context, conf *KafkaReaderConfig) *KafkaReader {
 	return &KafkaReader{
 		Reader: reader,
 	}
+}
+
+func (kr *KafkaReader) ReadMessages(ctx context.Context) (kafka.Message, error) {
+	m, err := kr.ReadMessage(ctx)
+
+	return m, err
 }

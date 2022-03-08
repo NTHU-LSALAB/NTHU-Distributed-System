@@ -12,6 +12,10 @@ type KafkaWriterConfig struct {
 	Topic string `long:"ktopic" env:"KAFKA_TOPIC" description:"the topic of changing resolution" required:"true"`
 }
 
+type Writer interface {
+	WriteMessages(context.Context, kafka.Message) error
+}
+
 type KafkaWriter struct {
 	*kafka.Writer
 	closeFunc func()
@@ -37,7 +41,7 @@ func NewKafkaWriter(ctx context.Context, conf *KafkaWriterConfig) *KafkaWriter {
 	}
 }
 
-func (kw *KafkaWriter) WriteMessage(ctx context.Context, messageValue string) error {
+func (kw *KafkaWriter) WriteMessages(ctx context.Context, messageValue string) error {
 	msg := kafka.Message{
 		Value: []byte(messageValue),
 	}
