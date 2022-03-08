@@ -275,4 +275,44 @@ var _ = Describe("Service", func() {
 			})
 		})
 	})
+
+	Describe("DeleteCommentByVideoId", func() {
+		var (
+			req     *pb.DeleteCommentByVideoIDRequest
+			resp    *pb.DeleteCommentByVideoIDResponse
+			videoID string
+			err     error
+		)
+
+		BeforeEach(func() {
+			videoID = "fake id"
+			req = &pb.DeleteCommentByVideoIDRequest{VideoId: videoID}
+		})
+
+		JustBeforeEach(func() {
+			resp, err = svc.DeleteCommentByVideoID(ctx, req)
+		})
+
+		When("DAO error", func() {
+			BeforeEach(func() {
+				commentDAO.EXPECT().DeleteByVideoID(ctx, videoID).Return(errDAOUnknown)
+			})
+
+			It("returns the error", func() {
+				Expect(resp).To(BeNil())
+				Expect(err).To(MatchError(errDAOUnknown))
+			})
+		})
+
+		When("success", func() {
+			BeforeEach(func() {
+				commentDAO.EXPECT().DeleteByVideoID(ctx, videoID).Return(nil)
+			})
+
+			It("returns without any error", func() {
+				Expect(resp).To(Equal(&pb.DeleteCommentByVideoIDResponse{}))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
 })

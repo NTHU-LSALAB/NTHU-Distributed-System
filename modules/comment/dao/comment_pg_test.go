@@ -263,20 +263,6 @@ var _ = Describe("PGCommentDAO", func() {
 			err = commentDAO.DeleteByVideoID(ctx, videoID)
 		})
 
-		When("video not found", func() {
-			BeforeEach(func() { videoID = primitive.NewObjectID().Hex() })
-
-			AfterEach(func() {
-				for _, comment := range comments {
-					deleteComment(comment.ID)
-				}
-			})
-
-			It("returns comment not found error", func() {
-				Expect(err).To(MatchError(ErrCommentNotFound))
-			})
-		})
-
 		When("success", func() {
 			BeforeEach(func() { videoID = comments[0].VideoID })
 
