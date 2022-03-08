@@ -20,43 +20,24 @@ message CommentInfo {
 	google.protobuf.Timestamp updated_at = 5;
 }
 
-message CreateCommentRequest {
-	string video_id = 1;
-	string content = 2;
-}
+// gRPC TODO: Define following message schemas.
+message CreateCommentRequest {}
 
-message CreateCommentResponse {
-	string id = 1;
-}
+message CreateCommentResponse {}
 
-message ListCommentRequest {
-	string video_id = 1;
-	int32 limit = 2;
-	int32 offset = 3;
-}
+message ListCommentRequest {}
 
-message ListCommentResponse {
-	repeated CommentInfo comments = 1;
-}
+message ListCommentResponse {}
 
-message UpdateCommentRequest {
-	string id = 1;
-	string content = 2;
-}
+message UpdateCommentRequest {}
 
-message UpdateCommentResponse {
-	CommentInfo comment = 1;
-}
+message UpdateCommentResponse {}
 
-message DeleteCommentRequest {
-	string id = 1;
-}
+message DeleteCommentRequest {}
 
 message DeleteCommentResponse {}
 
-message DeleteCommentByVideoIDRequest {
-	string video_id = 1;
-}
+message DeleteCommentByVideoIDRequest {}
 
 message DeleteCommentByVideoIDResponse {}
 
