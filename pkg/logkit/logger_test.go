@@ -2,18 +2,12 @@ package logkit
 
 import (
 	"context"
-	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-func TestLoggerkit(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Test Loggerkit")
-}
-
-var _ = Describe("Loggerkit", func() {
+var _ = Describe("Logger", func() {
 	Describe("NewLogger", func() {
 		var logger *Logger
 
@@ -21,61 +15,25 @@ var _ = Describe("Loggerkit", func() {
 			logger = NewLogger(&LoggerConfig{Development: true})
 		})
 
-		Context("success", func() {
-			It("returns new Logger", func() {
+		When("success", func() {
+			It("returns new logger without error", func() {
 				Expect(logger).NotTo(BeNil())
 			})
 		})
-
 	})
 
 	Describe("WithContext", func() {
 		var logger *Logger
-		ctx := context.Background()
+		var ctx context.Context
 
 		JustBeforeEach(func() {
-			ctx = WithContext(ctx, logger)
+			logger = NewLogger(&LoggerConfig{Development: true})
+			ctx = logger.WithContext(context.Background())
 		})
 
-		Context("success", func() {
-			It("Return looger and context", func() {
-				Expect(ctx).NotTo(BeNil())
-			})
-		})
-	})
-
-	Describe("Loggerlevel", func() {
-		var (
-			level       string
-			getLevel    string
-			loggerlevel LoggerLevel
-			err         error
-		)
-
-		BeforeEach(func() { level = "info" })
-
-		When("MarshalFlag", func() {
-			JustBeforeEach(func() {
-				getLevel, err = loggerlevel.MarshalFlag()
-			})
-
-			Context("success", func() {
-				It("marshal loggerlevel correctly with no error", func() {
-					Expect(getLevel).To(Equal(level))
-					Expect(err).NotTo(HaveOccurred())
-				})
-			})
-		})
-
-		When("UnmarshalFlag", func() {
-			JustBeforeEach(func() {
-				err = loggerlevel.UnmarshalFlag(level)
-			})
-
-			Context("success", func() {
-				It("unmarshal level with no error", func() {
-					Expect(err).NotTo(HaveOccurred())
-				})
+		When("success", func() {
+			It("inserts logger into context", func() {
+				Expect(FromContext(ctx)).To(Equal(logger))
 			})
 		})
 	})

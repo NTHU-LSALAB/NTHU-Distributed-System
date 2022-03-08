@@ -1,4 +1,4 @@
-package otelkit
+package logkit
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestOtelKit(t *testing.T) {
+func TestLogKit(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Test Otel Kit")
+	RunSpecs(t, "Test Log Kit")
 }
