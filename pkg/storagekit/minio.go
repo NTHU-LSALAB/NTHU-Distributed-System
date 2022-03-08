@@ -27,6 +27,24 @@ type MinIOClient struct {
 
 var _ Storage = (*MinIOClient)(nil)
 
+func (c *MinIOClient) Endpoint() string {
+	return c.Client.EndpointURL().Path
+}
+
+func (c *MinIOClient) Bucket() string {
+	return c.bucketName
+}
+
+func (c *MinIOClient) PutObject(ctx context.Context, objectName string, reader io.Reader, objectSize int64, opts PutObjectOptions) error {
+	if _, err := c.Client.PutObject(ctx, c.bucketName, objectName, reader, objectSize, minio.PutObjectOptions{
+		ContentType: opts.ContentType,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewMinIOClient(ctx context.Context, conf *MinIOConfig) *MinIOClient {
 	logger := logkit.FromContext(ctx).
 		With(zap.String("endpoint", conf.Endpoint)).
@@ -65,24 +83,6 @@ func NewMinIOClient(ctx context.Context, conf *MinIOConfig) *MinIOClient {
 		Client:     client,
 		bucketName: conf.Bucket,
 	}
-}
-
-func (c *MinIOClient) Endpoint() string {
-	return c.Client.EndpointURL().Path
-}
-
-func (c *MinIOClient) Bucket() string {
-	return c.bucketName
-}
-
-func (c *MinIOClient) PutObject(ctx context.Context, objectName string, reader io.Reader, objectSize int64, opts PutObjectOptions) error {
-	if _, err := c.Client.PutObject(ctx, c.bucketName, objectName, reader, objectSize, minio.PutObjectOptions{
-		ContentType: opts.ContentType,
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func generatePolicy(bucketName string, policy string) string {
