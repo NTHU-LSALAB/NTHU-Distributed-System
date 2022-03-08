@@ -51,7 +51,5 @@ func (kr *KafkaReader) FetchMessage(ctx context.Context) (kafka.Message, error) 
 }
 
 func (kr *KafkaReader) CommitMessages(ctx context.Context, messages []kafka.Message) error {
-	err := kr.Reader.CommitMessages(ctx, messages...)
-
-	return err
+	return kr.Reader.CommitMessages(ctx, messages...)
 }
