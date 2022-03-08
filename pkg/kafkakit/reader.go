@@ -2,18 +2,19 @@ package kafkakit
 
 import (
 	"context"
-	"strings"
 
 	"github.com/segmentio/kafka-go"
 )
 
 type KafkaReaderConfig struct {
-	Addr  string
-	Topic string
+	Brokers []string `long:"brokers" env:"BROKERS" description:"the address of kakfa server" required:"true"`
+	Topic   string   `long:"topic" env:"TOPIC" description:"the topic of changing resolution" required:"true"`
+	GroupID string   `long:"group_id" env:"GROUP_ID" description:"the id of the consumer groups" required:"true"`
 }
 
 type Reader interface {
-	ReadMessages(ctx context.Context) (kafka.Message, error)
+	FetchMessage(ctx context.Context) (kafka.Message, error)
+	CommitMessages(ctx context.Context, messages []kafka.Message) error
 }
 
 type KafkaReader struct {
@@ -30,13 +31,12 @@ func (kr *KafkaReader) Close() error {
 }
 
 func NewKafkaReader(ctx context.Context, conf *KafkaReaderConfig) *KafkaReader {
-	brokers := strings.Split(conf.Addr, ",")
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   brokers,
-		Topic:     conf.Topic,
-		Partition: 0,
-		MinBytes:  10e3, // 10KB
-		MaxBytes:  10e6, // 10MB
+		Brokers:  conf.Brokers,
+		GroupID:  conf.GroupID,
+		Topic:    conf.Topic,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
 	})
 
 	return &KafkaReader{
@@ -44,8 +44,14 @@ func NewKafkaReader(ctx context.Context, conf *KafkaReaderConfig) *KafkaReader {
 	}
 }
 
-func (kr *KafkaReader) ReadMessages(ctx context.Context) (kafka.Message, error) {
-	m, err := kr.ReadMessage(ctx)
+func (kr *KafkaReader) FetchMessage(ctx context.Context) (kafka.Message, error) {
+	m, err := kr.Reader.FetchMessage(ctx)
 
 	return m, err
+}
+
+func (kr *KafkaReader) CommitMessages(ctx context.Context, messages []kafka.Message) error {
+	err := kr.Reader.CommitMessages(ctx, messages...)
+
+	return err
 }
