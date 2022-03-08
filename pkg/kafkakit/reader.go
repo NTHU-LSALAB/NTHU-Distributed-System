@@ -7,9 +7,9 @@ import (
 )
 
 type KafkaReaderConfig struct {
-	Brokers []string `long:"brokers" env:"BROKERS" description:"the address of kakfa server" required:"true"`
-	Topic   string   `long:"topic" env:"TOPIC" description:"the topic of changing resolution" required:"true"`
-	GroupID string   `long:"group_id" env:"GROUP_ID" description:"the id of the consumer groups" required:"true"`
+	Brokers []string `long:"brokers" env:"BROKERS" description:"the addresses of kakfa servers" required:"true"`
+	Topic   string   `long:"topic" env:"TOPIC" description:"the topic of the Kafka reader" required:"true"`
+	GroupID string   `long:"group_id" env:"GROUP_ID" description:"the id of the consumer group" required:"true"`
 }
 
 type Reader interface {
@@ -45,9 +45,7 @@ func NewKafkaReader(ctx context.Context, conf *KafkaReaderConfig) *KafkaReader {
 }
 
 func (kr *KafkaReader) FetchMessage(ctx context.Context) (kafka.Message, error) {
-	m, err := kr.Reader.FetchMessage(ctx)
-
-	return m, err
+	return kr.Reader.FetchMessage(ctx)
 }
 
 func (kr *KafkaReader) CommitMessages(ctx context.Context, messages []kafka.Message) error {

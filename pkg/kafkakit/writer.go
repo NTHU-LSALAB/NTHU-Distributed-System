@@ -8,8 +8,8 @@ import (
 
 type KafkaWriterConfig struct {
 	// Wait for Justin to help
-	Brokers []string `long:"brokers" env:"BROKERS" description:"the address of kakfa server" required:"true"`
-	Topic   string   `long:"topic" env:"TOPIC" description:"the topic of changing resolution" required:"true"`
+	Brokers []string `long:"brokers" env:"BROKERS" description:"the addresses of kakfa servers" required:"true"`
+	Topic   string   `long:"topic" env:"TOPIC" description:"the topic of the Kafka writer" required:"true"`
 }
 
 type Writer interface {
@@ -33,7 +33,7 @@ func NewKafkaWriter(ctx context.Context, conf *KafkaWriterConfig) *KafkaWriter {
 	writer := kafka.NewWriter(kafka.WriterConfig{
 		Brokers:  conf.Brokers,
 		Topic:    conf.Topic,
-		Balancer: &kafka.LeastBytes{},
+		Balancer: &kafka.RoundRobin{},
 	})
 
 	return &KafkaWriter{
