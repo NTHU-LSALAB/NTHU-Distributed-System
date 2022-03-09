@@ -9,7 +9,7 @@ import (
 )
 
 type KafkaConsumerConfig struct {
-	Addrs []string `long:"addrs" env:"ADDRS" env-delim:"," description:"the addresses of Kafka servers"`
+	Addrs []string `long:"addrs" env:"ADDRS" env-delim:"," description:"the addresses of Kafka servers" required:"true"`
 	Topic string   `long:"topic" env:"TOPIC" description:"the topic of the Kafka reader" required:"true"`
 	Group string   `long:"group" env:"GROUP" description:"the ID of the Kafka consumer group" required:"true"`
 }
