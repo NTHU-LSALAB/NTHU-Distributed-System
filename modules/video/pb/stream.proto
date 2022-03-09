@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package video.pb;
+
+option go_package = "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb";
+
+import "google/protobuf/empty.proto";
+
+service VideoStream {
+	rpc HandleVideoCreated(HandleVideoCreatedRequest) returns (google.protobuf.Empty) {}
+}
+
+message HandleVideoCreatedRequest {
+	string id = 1;
+	string url = 2;
+	int32 scale = 3;
+}
