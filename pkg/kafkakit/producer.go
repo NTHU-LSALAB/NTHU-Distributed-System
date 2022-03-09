@@ -9,7 +9,6 @@ import (
 )
 
 type Producer interface {
-	SendMessage(msg *ProducerMessage) (partition int32, offset int64, err error)
 	SendMessages(msgs []*ProducerMessage) error
 }
 
@@ -31,14 +30,6 @@ type KafkaProducer struct {
 }
 
 var _ Producer = (*KafkaProducer)(nil)
-
-func (kp *KafkaProducer) SendMessage(msg *ProducerMessage) (partition int32, offset int64, err error) {
-	return kp.SyncProducer.SendMessage(&sarama.ProducerMessage{
-		Topic: kp.topic,
-		Key:   sarama.ByteEncoder(msg.Key),
-		Value: sarama.ByteEncoder(msg.Value),
-	})
-}
 
 func (kp *KafkaProducer) SendMessages(msgs []*ProducerMessage) error {
 	smsgs := make([]*sarama.ProducerMessage, 0, len(msgs))
