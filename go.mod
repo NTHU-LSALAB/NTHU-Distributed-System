@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.8.0
 	github.com/jessevdk/go-flags v1.5.0
+	github.com/justin0u0/protoc-gen-grpc-sarama v0.0.1
 	github.com/minio/minio-go/v7 v7.0.23
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
@@ -24,7 +25,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.27.1-0.20220303020706-24414b2455ec
 	go.uber.org/zap v1.21.0
 	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.45.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
 )
