@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
-	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit"
+	"github.com/justin0u0/protoc-gen-grpc-sarama/pkg/saramakit"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -21,7 +21,7 @@ func (s *stream) HandleVideoCreated(ctx context.Context, req *pb.HandleVideoCrea
 	// FIXME: implement me
 
 	if req.Id == "" {
-		return nil, &kafkakit.HandlerError{Retry: false, Err: errors.New("video ID is required")}
+		return nil, &saramakit.HandlerError{Retry: false, Err: errors.New("video ID is required")}
 	}
 
 	return &emptypb.Empty{}, nil
