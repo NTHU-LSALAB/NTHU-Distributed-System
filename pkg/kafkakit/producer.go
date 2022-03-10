@@ -19,7 +19,7 @@ type ProducerMessage struct {
 
 type KafkaProducerConfig struct {
 	Addrs        []string `long:"addrs" env:"ADDRS" env-delim:"," description:"the addresses of Kafka servers" required:"true"`
-	Topic        string   `long:"topic" env:"TOPIC" description:"the topic of the Kafka reader" required:"true"`
+	Topic        string   `long:"topic" env:"TOPIC" description:"the topic for the Kafka producer to send" required:"true"`
 	RequiredAcks int16    `long:"required_acks" env:"REQUIRED_ACKS" description:"number of replica acks the producer must receive before responding, available values are 0, 1 and -1" default:"-1"`
 }
 
