@@ -2,16 +2,17 @@ package mongokit
 
 import (
 	"context"
+
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 )
 
 var _ = Describe("Mongokit", func() {
 	Describe("NewMongoClient", func() {
 		var (
 			mongoClient *MongoClient
-			ctx context.Context
+			ctx         context.Context
 			mongoConfig *MongoConfig
 		)
 
