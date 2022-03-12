@@ -61,8 +61,6 @@ jobs:
     needs:
     - lint
     - test
-    env:
-      IMAGE_NAME: ghcr.io/nthu-lsalab/nthu-distributed-system
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -96,6 +94,10 @@ jobs:
 
     - name: setup docker buildx
       uses: docker/setup-buildx-action@v1
+
+    - name: set image name
+      run: |
+        echo "IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> ${{ github.env }}
 
     - name: docker build and push
       uses: docker/build-push-action@v2
