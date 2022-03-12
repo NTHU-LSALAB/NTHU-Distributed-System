@@ -147,7 +147,7 @@ func newPrometheusServer(exporter *prometheus.Exporter, conf *PrometheusServiceM
 		}
 	}()
 
-	logger.Info("prometheus exporter starts")
+	logger.Info("serve prometheus exporter successfully")
 
 	return server
 }
