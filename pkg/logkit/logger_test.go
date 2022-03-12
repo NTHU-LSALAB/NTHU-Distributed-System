@@ -37,23 +37,4 @@ var _ = Describe("Logger", func() {
 			})
 		})
 	})
-
-	Describe("NewSaramaLogger", func() {
-		var logger *Logger
-		var smalogger *SaramaLogger
-
-		BeforeEach(func() {
-			logger = NewLogger(&LoggerConfig{Development: true})
-		})
-
-		JustBeforeEach(func() {
-			smalogger = NewSaramaLogger(logger)
-		})
-
-		When("success", func() {
-			It("returns new Saramalogger without error", func() {
-				Expect(smalogger).NotTo(BeNil())
-			})
-		})
-	})
 })
