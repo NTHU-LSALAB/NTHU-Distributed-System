@@ -23,7 +23,7 @@ var _ = Describe("MongoClient", func() {
 
 			mongoConfig = &MongoConfig{
 				URL:      "mongodb://mongo:27017",
-				Database: "video",
+				Database: "nthu_distributed_system",
 			}
 		})
 
