@@ -23,7 +23,7 @@ var _ = Describe("MongoClient", func() {
 
 			mongoConfig = &MongoConfig{
 				URL:      "mongodb://mongo:27017",
-				Database: "video",
+				Database: "nthu_distributed_system",
 			}
 		})
 
@@ -36,7 +36,7 @@ var _ = Describe("MongoClient", func() {
 		})
 
 		When("success", func() {
-			It("returns new Mongokit without error", func() {
+			It("returns new MongoClient without error", func() {
 				Expect(mongoClient).NotTo(BeNil())
 			})
 		})
