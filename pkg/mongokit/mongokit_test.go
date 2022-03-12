@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Mongokit", func() {
+var _ = Describe("MongoClient", func() {
 	Describe("NewMongoClient", func() {
 		var (
 			mongoClient *MongoClient
