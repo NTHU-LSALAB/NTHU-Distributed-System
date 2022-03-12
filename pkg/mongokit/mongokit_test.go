@@ -36,7 +36,7 @@ var _ = Describe("MongoClient", func() {
 		})
 
 		When("success", func() {
-			It("returns new Mongokit without error", func() {
+			It("returns new MongoClient without error", func() {
 				Expect(mongoClient).NotTo(BeNil())
 			})
 		})
