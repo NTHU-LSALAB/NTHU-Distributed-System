@@ -2,6 +2,7 @@ package mongokit
 
 import (
 	"context"
+	"os"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	. "github.com/onsi/ginkgo"
@@ -24,6 +25,14 @@ var _ = Describe("MongoClient", func() {
 			mongoConfig = &MongoConfig{
 				URL:      "mongodb://mongo:27017",
 				Database: "nthu_distributed_system",
+			}
+
+			if url := os.Getenv("MONGO_URL"); url != "" {
+				mongoConfig.URL = url
+			}
+
+			if database := os.Getenv("MONGO_DATABASE"); database != "" {
+				mongoConfig.Database = database
 			}
 		})
 
