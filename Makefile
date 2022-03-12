@@ -54,7 +54,7 @@ $1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gatewa
 endef
 $(foreach module,$(MODULES),$(eval $(call make-generate-rules,$(module))))
 
-pkg.generate:
+pkg.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/protoc-gen-grpc-sarama bin/mockgen
 	go generate ./pkg/...
 
 generate: pkg.generate $(addsuffix .generate,$(MODULES))
