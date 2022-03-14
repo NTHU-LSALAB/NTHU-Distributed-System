@@ -45,7 +45,7 @@ var _ = Describe("Migration", func() {
 		})
 
 		When("success", func() {
-			It("returns new MongoClient without error", func() {
+			It("returns new MigrationClient without error", func() {
 				Expect(migration).NotTo(BeNil())
 			})
 		})
