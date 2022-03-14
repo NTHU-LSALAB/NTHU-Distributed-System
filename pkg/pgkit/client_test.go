@@ -1,0 +1,48 @@
+package pgkit
+
+import (
+	"context"
+	"os"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
+)
+
+var _ = Describe("Pgkit", func() {
+	Describe("NewPGClient", func() {
+		var (
+			ctx      context.Context
+			pgConf   *PGConfig
+			pgClient *PGClient
+		)
+
+		BeforeEach(func() {
+			ctx = logkit.NewLogger(&logkit.LoggerConfig{
+				Development: true,
+			}).WithContext(context.Background())
+
+			pgConf = &PGConfig{
+				URL: "postgres://postgres@postgres:5432/postgres?sslmode=disable",
+			}
+			if url := os.Getenv("POSTGRES_URL"); url != "" {
+				pgConf.URL = url
+			}
+		})
+
+		JustBeforeEach(func() {
+			pgClient = NewPGClient(ctx, pgConf)
+		})
+
+		AfterEach(func() {
+			Expect(pgClient.Close()).NotTo(HaveOccurred())
+		})
+
+		When("success", func() {
+			It("returns new PGClient without error", func() {
+				Expect(pgClient).NotTo(BeNil())
+			})
+		})
+	})
+})
