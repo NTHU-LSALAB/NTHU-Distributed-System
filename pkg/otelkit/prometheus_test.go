@@ -2,6 +2,7 @@ package otelkit
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -73,7 +74,8 @@ var _ = Describe("PrometheusServiceMeter", func() {
 			BeforeEach(func() { responseTime = 5 * time.Millisecond })
 
 			It("success", func() {
-				validateMetric(ctx, conf, 1, responseTime)
+				validateCounter(ctx, conf, 1, "request")
+				validateHistogram(ctx, conf, 1, responseTime)
 			})
 
 			It("does not change handler response", func() {
@@ -86,7 +88,8 @@ var _ = Describe("PrometheusServiceMeter", func() {
 			BeforeEach(func() { responseTime = 50 * time.Millisecond })
 
 			It("success", func() {
-				validateMetric(ctx, conf, 1, responseTime)
+				validateCounter(ctx, conf, 1, "request")
+				validateHistogram(ctx, conf, 1, responseTime)
 			})
 
 			It("does not change handler response", func() {
@@ -99,7 +102,8 @@ var _ = Describe("PrometheusServiceMeter", func() {
 			BeforeEach(func() { responseTime = 150 * time.Millisecond })
 
 			It("success", func() {
-				validateMetric(ctx, conf, 1, responseTime)
+				validateCounter(ctx, conf, 1, "request")
+				validateHistogram(ctx, conf, 1, responseTime)
 			})
 
 			It("does not change handler response", func() {
@@ -108,9 +112,83 @@ var _ = Describe("PrometheusServiceMeter", func() {
 			})
 		})
 	})
+
+	Context("single handler fail", func() {
+		var (
+			handler      grpc.UnaryHandler
+			responseTime time.Duration
+			handlerReq   interface{}
+			handlerResp  interface{}
+			resp         interface{}
+			errFake      error
+			err          error
+		)
+
+		BeforeEach(func() {
+			errFake = errors.New("fake error")
+			handlerReq = "fake request"
+			handlerResp = "fake response"
+		})
+
+		JustBeforeEach(func() {
+			handler = func(ctx context.Context, req interface{}) (interface{}, error) {
+				time.Sleep(responseTime)
+				return handlerResp, errFake
+			}
+
+			resp, err = interceptor(ctx, handlerReq, &grpc.UnaryServerInfo{
+				FullMethod: "test_handler_fail",
+			}, handler)
+		})
+
+		When("handler takes 5ms to finish", func() {
+			BeforeEach(func() { responseTime = 5 * time.Microsecond })
+
+			It("fail to finish", func() {
+				validateCounter(ctx, conf, 1, "request")
+				validateCounter(ctx, conf, 1, "error_request")
+				validateHistogram(ctx, conf, 1, responseTime)
+			})
+
+			It("does not change handler response", func() {
+				Expect(resp).To(Equal(handlerResp))
+				Expect(err).To(MatchError(errFake))
+			})
+		})
+
+		When("handler takes 50ms to finish", func() {
+			BeforeEach(func() { responseTime = 50 * time.Microsecond })
+
+			It("fail to finish", func() {
+				validateCounter(ctx, conf, 1, "request")
+				validateCounter(ctx, conf, 1, "error_request")
+				validateHistogram(ctx, conf, 1, responseTime)
+			})
+
+			It("does not change handler response", func() {
+				Expect(resp).To(Equal(handlerResp))
+				Expect(err).To(MatchError(errFake))
+			})
+		})
+
+		When("handler takes 150ms to finish", func() {
+			BeforeEach(func() { responseTime = 150 * time.Microsecond })
+
+			It("fail to finish", func() {
+				validateCounter(ctx, conf, 1, "request")
+				validateCounter(ctx, conf, 1, "error_request")
+				validateHistogram(ctx, conf, 1, responseTime)
+			})
+
+			It("does not change handler response", func() {
+				Expect(resp).To(Equal(handlerResp))
+				Expect(err).To(MatchError(errFake))
+			})
+		})
+	})
 })
 
-func validateMetric(ctx context.Context, conf *PrometheusServiceMeterConfig, handlerCallCount int, responseTime time.Duration) {
+func validateCounter(ctx context.Context, conf *PrometheusServiceMeterConfig, handlerCallCount int, metricName string) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -125,14 +203,30 @@ func validateMetric(ctx context.Context, conf *PrometheusServiceMeterConfig, han
 	mfs, err := parser.TextToMetricFamilies(resp.Body)
 	Expect(err).NotTo(HaveOccurred())
 
-	requestMF := mfs["request"]
-	Expect(requestMF.GetName()).To(Equal("request"))
+	requestMF := mfs[metricName]
+	Expect(requestMF.GetName()).To(Equal(metricName))
 	Expect(requestMF.GetType().String()).To(Equal("COUNTER"))
 	Expect(requestMF.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
 		"Counter": PointTo(MatchFields(IgnoreExtras, Fields{
 			"Value": PointTo(Equal(float64(handlerCallCount))),
 		})),
 	}))))
+}
+
+func validateHistogram(ctx context.Context, conf *PrometheusServiceMeterConfig, handlerCallCount int, responseTime time.Duration) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
+	Expect(err).NotTo(HaveOccurred())
+
+	resp, err := http.DefaultClient.Do(req)
+	Expect(err).NotTo(HaveOccurred())
+
+	defer func() {
+		Expect(resp.Body.Close()).NotTo(HaveOccurred())
+	}()
+
+	var parser expfmt.TextParser
+	mfs, err := parser.TextToMetricFamilies(resp.Body)
+	Expect(err).NotTo(HaveOccurred())
 
 	responseTimeMF := mfs["response_time"]
 	Expect(responseTimeMF.GetName()).To(Equal("response_time"))
