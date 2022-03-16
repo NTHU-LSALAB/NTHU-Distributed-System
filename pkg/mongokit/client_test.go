@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

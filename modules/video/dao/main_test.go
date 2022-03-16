@@ -8,7 +8,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/mongokit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
