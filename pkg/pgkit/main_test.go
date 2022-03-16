@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestLogKit(t *testing.T) {
+func TestPGKit(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Test PG Kit")
 }

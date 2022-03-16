@@ -10,7 +10,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/logkit"
 )
 
-var _ = Describe("Pgkit", func() {
+var _ = Describe("PGClient", func() {
 	Describe("NewPGClient", func() {
 		var (
 			ctx      context.Context
