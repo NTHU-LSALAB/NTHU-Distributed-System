@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var errUnknown = errors.New("uknown error")
+var errUnknown = errors.New("unknown error")
 
 var _ = Describe("PrometheusServiceMeter", func() {
 	var (
