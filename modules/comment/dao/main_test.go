@@ -9,7 +9,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/migrationkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/pgkit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/rediskit"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

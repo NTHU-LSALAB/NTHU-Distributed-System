@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-redis/cache/v8"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
