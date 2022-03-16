@@ -73,9 +73,9 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		When("handler takes 5ms to finish", func() {
 			BeforeEach(func() { responseTime = 5 * time.Millisecond })
 
-			It("success", func() {
-				validateCounter(ctx, conf, 1, "request")
-				validateHistogram(ctx, conf, 1, responseTime)
+			It("count metrics correctly", func() {
+				validateCounter(ctx, conf, "request", 1)
+				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
 			})
 
 			It("does not change handler response", func() {
@@ -87,9 +87,9 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		When("handler takes 50ms to finish", func() {
 			BeforeEach(func() { responseTime = 50 * time.Millisecond })
 
-			It("success", func() {
-				validateCounter(ctx, conf, 1, "request")
-				validateHistogram(ctx, conf, 1, responseTime)
+			It("count metrics correctly", func() {
+				validateCounter(ctx, conf, "request", 1)
+				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
 			})
 
 			It("does not change handler response", func() {
@@ -101,9 +101,9 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		When("handler takes 150ms to finish", func() {
 			BeforeEach(func() { responseTime = 150 * time.Millisecond })
 
-			It("success", func() {
-				validateCounter(ctx, conf, 1, "request")
-				validateHistogram(ctx, conf, 1, responseTime)
+			It("count metrics correctly", func() {
+				validateCounter(ctx, conf, "request", 1)
+				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
 			})
 
 			It("does not change handler response", func() {
@@ -144,10 +144,10 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		When("handler takes 5ms to finish", func() {
 			BeforeEach(func() { responseTime = 5 * time.Microsecond })
 
-			It("fail to finish", func() {
-				validateCounter(ctx, conf, 1, "request")
-				validateCounter(ctx, conf, 1, "error_request")
-				validateHistogram(ctx, conf, 1, responseTime)
+			It("count metrics correctly", func() {
+				validateCounter(ctx, conf, "request", 1)
+				validateCounter(ctx, conf, "error_request", 1)
+				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
 			})
 
 			It("does not change handler response", func() {
@@ -159,10 +159,10 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		When("handler takes 50ms to finish", func() {
 			BeforeEach(func() { responseTime = 50 * time.Microsecond })
 
-			It("fail to finish", func() {
-				validateCounter(ctx, conf, 1, "request")
-				validateCounter(ctx, conf, 1, "error_request")
-				validateHistogram(ctx, conf, 1, responseTime)
+			It("count metrics correctly", func() {
+				validateCounter(ctx, conf, "request", 1)
+				validateCounter(ctx, conf, "error_request", 1)
+				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
 			})
 
 			It("does not change handler response", func() {
@@ -174,10 +174,10 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		When("handler takes 150ms to finish", func() {
 			BeforeEach(func() { responseTime = 150 * time.Microsecond })
 
-			It("fail to finish", func() {
-				validateCounter(ctx, conf, 1, "request")
-				validateCounter(ctx, conf, 1, "error_request")
-				validateHistogram(ctx, conf, 1, responseTime)
+			It("count metrics correctly", func() {
+				validateCounter(ctx, conf, "request", 1)
+				validateCounter(ctx, conf, "error_request", 1)
+				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
 			})
 
 			It("does not change handler response", func() {
@@ -188,7 +188,7 @@ var _ = Describe("PrometheusServiceMeter", func() {
 	})
 })
 
-func validateCounter(ctx context.Context, conf *PrometheusServiceMeterConfig, handlerCallCount int, metricName string) {
+func validateCounter(ctx context.Context, conf *PrometheusServiceMeterConfig, name string, count int) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -203,17 +203,17 @@ func validateCounter(ctx context.Context, conf *PrometheusServiceMeterConfig, ha
 	mfs, err := parser.TextToMetricFamilies(resp.Body)
 	Expect(err).NotTo(HaveOccurred())
 
-	requestMF := mfs[metricName]
-	Expect(requestMF.GetName()).To(Equal(metricName))
+	requestMF := mfs[name]
+	Expect(requestMF.GetName()).To(Equal(name))
 	Expect(requestMF.GetType().String()).To(Equal("COUNTER"))
 	Expect(requestMF.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
 		"Counter": PointTo(MatchFields(IgnoreExtras, Fields{
-			"Value": PointTo(Equal(float64(handlerCallCount))),
+			"Value": PointTo(Equal(float64(count))),
 		})),
 	}))))
 }
 
-func validateHistogram(ctx context.Context, conf *PrometheusServiceMeterConfig, handlerCallCount int, responseTime time.Duration) {
+func validateHistogram(ctx context.Context, conf *PrometheusServiceMeterConfig, name string, values []float64) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -228,28 +228,30 @@ func validateHistogram(ctx context.Context, conf *PrometheusServiceMeterConfig, 
 	mfs, err := parser.TextToMetricFamilies(resp.Body)
 	Expect(err).NotTo(HaveOccurred())
 
-	responseTimeMF := mfs["response_time"]
-	Expect(responseTimeMF.GetName()).To(Equal("response_time"))
+	responseTimeMF := mfs[name]
+	Expect(responseTimeMF.GetName()).To(Equal(name))
 	Expect(responseTimeMF.GetType().String()).To(Equal("HISTOGRAM"))
 	Expect(responseTimeMF.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
 		"Histogram": PointTo(MatchFields(IgnoreExtras, Fields{
-			"SampleCount": PointTo(Equal(uint64(handlerCallCount))),
-			"Bucket":      matchBucket(conf, handlerCallCount, responseTime),
+			"SampleCount": PointTo(Equal(uint64(len(values)))),
+			"Bucket":      matchBucket(conf, values),
 		})),
 	}))))
 }
 
-func matchBucket(conf *PrometheusServiceMeterConfig, handlerCallCount int, responseTime time.Duration) types.GomegaMatcher {
+func matchBucket(conf *PrometheusServiceMeterConfig, values []float64) types.GomegaMatcher {
 	matcher := make([]types.GomegaMatcher, 0, len(conf.HistogramBoundaries))
 
 	for _, bound := range conf.HistogramBoundaries {
-		count := 0
-		if float64(responseTime.Milliseconds()) <= bound {
-			count = handlerCallCount
+		count := uint64(0)
+		for _, value := range values {
+			if value <= bound {
+				count++
+			}
 		}
 
 		matcher = append(matcher, PointTo(MatchFields(IgnoreExtras, Fields{
-			"CumulativeCount": PointTo(Equal(uint64(count))),
+			"CumulativeCount": PointTo(Equal(count)),
 			"UpperBound":      PointTo(Equal(bound)),
 		})))
 	}
