@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
+	prompb "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 	"google.golang.org/grpc"
 )
@@ -189,24 +190,11 @@ var _ = Describe("PrometheusServiceMeter", func() {
 })
 
 func validateCounter(ctx context.Context, conf *PrometheusServiceMeterConfig, name string, count int) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
-	Expect(err).NotTo(HaveOccurred())
+	mf := parseMetric(ctx, conf, name)
 
-	resp, err := http.DefaultClient.Do(req)
-	Expect(err).NotTo(HaveOccurred())
-
-	defer func() {
-		Expect(resp.Body.Close()).NotTo(HaveOccurred())
-	}()
-
-	var parser expfmt.TextParser
-	mfs, err := parser.TextToMetricFamilies(resp.Body)
-	Expect(err).NotTo(HaveOccurred())
-
-	requestMF := mfs[name]
-	Expect(requestMF.GetName()).To(Equal(name))
-	Expect(requestMF.GetType().String()).To(Equal("COUNTER"))
-	Expect(requestMF.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
+	Expect(mf.GetName()).To(Equal(name))
+	Expect(mf.GetType().String()).To(Equal("COUNTER"))
+	Expect(mf.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
 		"Counter": PointTo(MatchFields(IgnoreExtras, Fields{
 			"Value": PointTo(Equal(float64(count))),
 		})),
@@ -214,6 +202,19 @@ func validateCounter(ctx context.Context, conf *PrometheusServiceMeterConfig, na
 }
 
 func validateHistogram(ctx context.Context, conf *PrometheusServiceMeterConfig, name string, values []float64) {
+	mf := parseMetric(ctx, conf, name)
+
+	Expect(mf.GetName()).To(Equal(name))
+	Expect(mf.GetType().String()).To(Equal("HISTOGRAM"))
+	Expect(mf.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
+		"Histogram": PointTo(MatchFields(IgnoreExtras, Fields{
+			"SampleCount": PointTo(Equal(uint64(len(values)))),
+			"Bucket":      matchBucket(conf, values),
+		})),
+	}))))
+}
+
+func parseMetric(ctx context.Context, conf *PrometheusServiceMeterConfig, name string) *prompb.MetricFamily {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+conf.Addr+conf.Path, http.NoBody)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -228,15 +229,7 @@ func validateHistogram(ctx context.Context, conf *PrometheusServiceMeterConfig, 
 	mfs, err := parser.TextToMetricFamilies(resp.Body)
 	Expect(err).NotTo(HaveOccurred())
 
-	responseTimeMF := mfs[name]
-	Expect(responseTimeMF.GetName()).To(Equal(name))
-	Expect(responseTimeMF.GetType().String()).To(Equal("HISTOGRAM"))
-	Expect(responseTimeMF.GetMetric()).To(ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
-		"Histogram": PointTo(MatchFields(IgnoreExtras, Fields{
-			"SampleCount": PointTo(Equal(uint64(len(values)))),
-			"Bucket":      matchBucket(conf, values),
-		})),
-	}))))
+	return mfs["name"]
 }
 
 func matchBucket(conf *PrometheusServiceMeterConfig, values []float64) types.GomegaMatcher {
