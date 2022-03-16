@@ -81,6 +81,10 @@ func (dao *mongoVideoDAO) Update(ctx context.Context, video *Video) error {
 	return nil
 }
 
+func (dao *mongoVideoDAO) UpdateVariant(ctx context.Context, id primitive.ObjectID, variant string, url string) error {
+	return nil
+}
+
 func (dao *mongoVideoDAO) Delete(ctx context.Context, id primitive.ObjectID) error {
 	if result, err := dao.collection.DeleteOne(ctx, bson.M{"_id": id}); err != nil {
 		return err
