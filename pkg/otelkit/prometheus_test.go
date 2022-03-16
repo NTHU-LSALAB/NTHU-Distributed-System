@@ -16,6 +16,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var errUnknown = errors.New("uknown error")
+
 var _ = Describe("PrometheusServiceMeter", func() {
 	var (
 		ctx         context.Context
@@ -49,14 +51,12 @@ var _ = Describe("PrometheusServiceMeter", func() {
 		var (
 			handler      grpc.UnaryHandler
 			responseTime time.Duration
-			handlerReq   interface{}
 			handlerResp  interface{}
 			resp         interface{}
 			err          error
 		)
 
 		BeforeEach(func() {
-			handlerReq = "fake request"
 			handlerResp = "fake response"
 		})
 
@@ -66,126 +66,72 @@ var _ = Describe("PrometheusServiceMeter", func() {
 				return handlerResp, nil
 			}
 
-			resp, err = interceptor(ctx, handlerReq, &grpc.UnaryServerInfo{
+			resp, err = interceptor(ctx, nil, &grpc.UnaryServerInfo{
 				FullMethod: "test_handler_success",
 			}, handler)
 		})
 
-		When("handler takes 5ms to finish", func() {
-			BeforeEach(func() { responseTime = 5 * time.Millisecond })
+		for _, t := range []time.Duration{5 * time.Millisecond, 50 * time.Millisecond, 150 * time.Millisecond} {
+			t := t
 
-			It("count metrics correctly", func() {
-				validateCounter(ctx, conf, "request", 1)
-				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
+			When("handler takes "+responseTime.String()+" to finish", func() {
+				BeforeEach(func() { responseTime = t })
+
+				It("record metrics correctly", func() {
+					validateCounter(ctx, conf, "request", 1)
+					validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
+				})
+
+				It("does not change handler response", func() {
+					Expect(resp).To(Equal(handlerResp))
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
-
-			It("does not change handler response", func() {
-				Expect(resp).To(Equal(handlerResp))
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		When("handler takes 50ms to finish", func() {
-			BeforeEach(func() { responseTime = 50 * time.Millisecond })
-
-			It("count metrics correctly", func() {
-				validateCounter(ctx, conf, "request", 1)
-				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
-			})
-
-			It("does not change handler response", func() {
-				Expect(resp).To(Equal(handlerResp))
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		When("handler takes 150ms to finish", func() {
-			BeforeEach(func() { responseTime = 150 * time.Millisecond })
-
-			It("count metrics correctly", func() {
-				validateCounter(ctx, conf, "request", 1)
-				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
-			})
-
-			It("does not change handler response", func() {
-				Expect(resp).To(Equal(handlerResp))
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
+		}
 	})
 
 	Context("single handler fail", func() {
 		var (
 			handler      grpc.UnaryHandler
 			responseTime time.Duration
-			handlerReq   interface{}
 			handlerResp  interface{}
 			resp         interface{}
-			errFake      error
 			err          error
 		)
 
 		BeforeEach(func() {
-			errFake = errors.New("fake error")
-			handlerReq = "fake request"
 			handlerResp = "fake response"
 		})
 
 		JustBeforeEach(func() {
 			handler = func(ctx context.Context, req interface{}) (interface{}, error) {
 				time.Sleep(responseTime)
-				return handlerResp, errFake
+				return handlerResp, errUnknown
 			}
 
-			resp, err = interceptor(ctx, handlerReq, &grpc.UnaryServerInfo{
-				FullMethod: "test_handler_fail",
+			resp, err = interceptor(ctx, nil, &grpc.UnaryServerInfo{
+				FullMethod: "test_handler_fail_and_success",
 			}, handler)
 		})
 
-		When("handler takes 5ms to finish", func() {
-			BeforeEach(func() { responseTime = 5 * time.Microsecond })
+		for _, t := range []time.Duration{5 * time.Millisecond, 50 * time.Millisecond, 150 * time.Millisecond} {
+			t := t
 
-			It("count metrics correctly", func() {
-				validateCounter(ctx, conf, "request", 1)
-				validateCounter(ctx, conf, "error_request", 1)
-				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
+			When("handler takes "+responseTime.String()+" to finish", func() {
+				BeforeEach(func() { responseTime = t })
+
+				It("record metrics correctly", func() {
+					validateCounter(ctx, conf, "request", 1)
+					validateCounter(ctx, conf, "error_request", 1)
+					validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
+				})
+
+				It("does not change handler response", func() {
+					Expect(resp).To(Equal(handlerResp))
+					Expect(err).To(MatchError(errUnknown))
+				})
 			})
-
-			It("does not change handler response", func() {
-				Expect(resp).To(Equal(handlerResp))
-				Expect(err).To(MatchError(errFake))
-			})
-		})
-
-		When("handler takes 50ms to finish", func() {
-			BeforeEach(func() { responseTime = 50 * time.Microsecond })
-
-			It("count metrics correctly", func() {
-				validateCounter(ctx, conf, "request", 1)
-				validateCounter(ctx, conf, "error_request", 1)
-				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
-			})
-
-			It("does not change handler response", func() {
-				Expect(resp).To(Equal(handlerResp))
-				Expect(err).To(MatchError(errFake))
-			})
-		})
-
-		When("handler takes 150ms to finish", func() {
-			BeforeEach(func() { responseTime = 150 * time.Microsecond })
-
-			It("count metrics correctly", func() {
-				validateCounter(ctx, conf, "request", 1)
-				validateCounter(ctx, conf, "error_request", 1)
-				validateHistogram(ctx, conf, "response_time", []float64{float64(responseTime.Milliseconds())})
-			})
-
-			It("does not change handler response", func() {
-				Expect(resp).To(Equal(handlerResp))
-				Expect(err).To(MatchError(errFake))
-			})
-		})
+		}
 	})
 })
 
@@ -229,7 +175,7 @@ func parseMetric(ctx context.Context, conf *PrometheusServiceMeterConfig, name s
 	mfs, err := parser.TextToMetricFamilies(resp.Body)
 	Expect(err).NotTo(HaveOccurred())
 
-	return mfs["name"]
+	return mfs[name]
 }
 
 func matchBucket(conf *PrometheusServiceMeterConfig, values []float64) types.GomegaMatcher {
