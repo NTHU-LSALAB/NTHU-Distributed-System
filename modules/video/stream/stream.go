@@ -83,6 +83,8 @@ func (s *stream) uploadVideoHandle(ctx context.Context, req *pb.HandleVideoCreat
 
 func (s *stream) updateMongoVideo(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
 	id, _ := primitive.ObjectIDFromHex(req.Id)
+	// Here has an error, I'm not sure whether is that go compile just detect there is no "UpdateVariant" in videoDAO interface.
+	// Will this error be remove after we pass mongoDAO here?
 	if err := s.videoDAO.UpdateVariant(ctx, id, string(req.Scale), req.Url); err != nil {
 		return err
 	}
