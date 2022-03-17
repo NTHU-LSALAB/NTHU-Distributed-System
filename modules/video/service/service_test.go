@@ -204,9 +204,12 @@ var _ = Describe("Service", func() {
 					gomock.Any(),
 				).Return(nil)
 
-				storage.EXPECT().Endpoint().Return("https://play.min.io")
-				storage.EXPECT().Bucket().Return("videos")
+				storage.EXPECT().Endpoint().AnyTimes().Return("https://play.min.io")
+				storage.EXPECT().Bucket().AnyTimes().Return("videos")
+
 				videoDAO.EXPECT().Create(ctx, gomock.Any()).Return(nil)
+
+				producer.EXPECT().SendMessages(gomock.Any()).Return(nil)
 
 				stream.EXPECT().SendAndClose(gomock.Any()).Return(nil)
 			})
