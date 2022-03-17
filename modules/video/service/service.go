@@ -120,7 +120,7 @@ func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
 		return err
 	}
 
-	if err := s.uploadVideoSuccessHandle(ctx, &pb.HandleVideoCreatedRequest{
+	if err := s.produceVideoCreatedEvent(ctx, &pb.HandleVideoCreatedRequest{
 		Id:  id.Hex(),
 		Url: path.Join(s.storage.Endpoint(), s.storage.Bucket(), objectName),
 	}); err != nil {
@@ -159,20 +159,18 @@ func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (
 	return &pb.DeleteVideoResponse{}, nil
 }
 
-func (s *service) uploadVideoSuccessHandle(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
+func (s *service) produceVideoCreatedEvent(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
 
 	valueBytes, err := proto.Marshal(req)
 	if err != nil {
 		return err
 	}
 
-	msg := make([]*kafkakit.ProducerMessage, 0, 1)
+	msgs := []*kafkakit.ProducerMessage{
+		{Value: valueBytes},
+	}
 
-	msg = append(msg, &kafkakit.ProducerMessage{
-		Value: valueBytes,
-	})
-
-	if err := s.producer.SendMessages(msg); err != nil {
+	if err := s.producer.SendMessages(msgs); err != nil {
 		return err
 	}
 

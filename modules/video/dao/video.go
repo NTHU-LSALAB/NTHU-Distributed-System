@@ -57,6 +57,7 @@ type VideoDAO interface {
 	List(ctx context.Context, limit, skip int64) ([]*Video, error)
 	Create(ctx context.Context, video *Video) error
 	Update(ctx context.Context, video *Video) error
+	UpdateVariant(ctx context.Context, id primitive.ObjectID, variant string, url string) error
 	Delete(ctx context.Context, id primitive.ObjectID) error
 }
 

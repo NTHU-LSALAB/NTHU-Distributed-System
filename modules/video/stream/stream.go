@@ -17,12 +17,11 @@ import (
 type stream struct {
 	pb.UnimplementedVideoStreamServer
 
-	producer kafkakit.Producer
 	videoDAO dao.VideoDAO
+	producer kafkakit.Producer
 }
 
 func NewStream(videoDAO dao.VideoDAO, producer kafkakit.Producer) *stream {
-	// pass producer and db
 	return &stream{
 		videoDAO: videoDAO,
 		producer: producer,
@@ -30,51 +29,45 @@ func NewStream(videoDAO dao.VideoDAO, producer kafkakit.Producer) *stream {
 }
 
 func (s *stream) HandleVideoCreated(ctx context.Context, req *pb.HandleVideoCreatedRequest) (*emptypb.Empty, error) {
-	// FIXME: implement me
-	if req.Scale == 0 {
-		reqHighRes := &pb.HandleVideoCreatedRequest{
-			Id:    req.Id,
-			Url:   req.Url,
-			Scale: 1080,
-		}
-		reqLowRes := &pb.HandleVideoCreatedRequest{
-			Id:    req.Id,
-			Url:   req.Url,
-			Scale: 720,
-		}
-		if err := s.uploadVideoHandle(ctx, reqHighRes); err != nil {
-			return &emptypb.Empty{}, err
-		}
-		if err := s.uploadVideoHandle(ctx, reqLowRes); err != nil {
-			return &emptypb.Empty{}, err
-		}
-	} else {
+	if req.Id == "" {
+		return nil, &saramakit.HandlerError{Retry: false, Err: errors.New("video ID is required")}
+	}
+
+	if req.Scale != 0 {
 		time.Sleep(time.Second * 3)
 		if err := s.updateMongoVideo(ctx, req); err != nil {
 			return &emptypb.Empty{}, err
 		}
+		return &emptypb.Empty{}, nil
 	}
-	if req.Id == "" {
-		return nil, &saramakit.HandlerError{Retry: false, Err: errors.New("video ID is required")}
+
+	variants := []int32{1080, 720, 480, 320}
+
+	for _, scale := range variants {
+		if err := s.updateVideoHandle(ctx, &pb.HandleVideoCreatedRequest{
+			Id:    req.GetId(),
+			Url:   req.GetUrl(),
+			Scale: scale,
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *stream) uploadVideoHandle(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
+func (s *stream) updateVideoHandle(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
 
 	valueBytes, err := proto.Marshal(req)
 	if err != nil {
 		return err
 	}
 
-	msg := make([]*kafkakit.ProducerMessage, 0, 1)
+	msgs := []*kafkakit.ProducerMessage{
+		{Value: valueBytes},
+	}
 
-	msg = append(msg, &kafkakit.ProducerMessage{
-		Value: valueBytes,
-	})
-
-	if err := s.producer.SendMessages(msg); err != nil {
+	if err := s.producer.SendMessages(msgs); err != nil {
 		return err
 	}
 
@@ -82,9 +75,11 @@ func (s *stream) uploadVideoHandle(ctx context.Context, req *pb.HandleVideoCreat
 }
 
 func (s *stream) updateMongoVideo(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
-	id, _ := primitive.ObjectIDFromHex(req.Id)
-	// Here has an error, I'm not sure whether is that go compile just detect there is no "UpdateVariant" in videoDAO interface.
-	// Will this error be remove after we pass mongoDAO here?
+	id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		return err
+	}
+
 	if err := s.videoDAO.UpdateVariant(ctx, id, string(req.Scale), req.Url); err != nil {
 		return err
 	}
