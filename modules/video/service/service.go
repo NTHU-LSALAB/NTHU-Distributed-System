@@ -11,8 +11,10 @@ import (
 	commentpb "github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/protobuf/proto"
 )
 
 type service struct {
@@ -21,13 +23,15 @@ type service struct {
 	videoDAO      dao.VideoDAO
 	storage       storagekit.Storage
 	commentClient commentpb.CommentClient
+	producer      kafkakit.Producer
 }
 
-func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, commentClient commentpb.CommentClient) *service {
+func NewService(videoDAO dao.VideoDAO, storage storagekit.Storage, commentClient commentpb.CommentClient, producer kafkakit.Producer) *service {
 	return &service{
 		videoDAO:      videoDAO,
 		storage:       storage,
 		commentClient: commentClient,
+		producer:      producer,
 	}
 }
 
@@ -116,6 +120,13 @@ func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
 		return err
 	}
 
+	if err := s.produceVideoCreatedEvent(&pb.HandleVideoCreatedRequest{
+		Id:  id.Hex(),
+		Url: path.Join(s.storage.Endpoint(), s.storage.Bucket(), objectName),
+	}); err != nil {
+		return err
+	}
+
 	if err := stream.SendAndClose(&pb.UploadVideoResponse{
 		Id: id.Hex(),
 	}); err != nil {
@@ -146,4 +157,21 @@ func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (
 	}
 
 	return &pb.DeleteVideoResponse{}, nil
+}
+
+func (s *service) produceVideoCreatedEvent(req *pb.HandleVideoCreatedRequest) error {
+	valueBytes, err := proto.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	msgs := []*kafkakit.ProducerMessage{
+		{Value: valueBytes},
+	}
+
+	if err := s.producer.SendMessages(msgs); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/daomock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/mock/pbmock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
+	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit/mock/kafkamock"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit/mock/storagemock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -35,6 +36,7 @@ var _ = Describe("Service", func() {
 		videoDAO      *daomock.MockVideoDAO
 		storage       *storagemock.MockStorage
 		commentClient *commentpbmock.MockCommentClient
+		producer      *kafkamock.MockProducer
 		svc           *service
 		ctx           context.Context
 	)
@@ -44,7 +46,8 @@ var _ = Describe("Service", func() {
 		videoDAO = daomock.NewMockVideoDAO(controller)
 		storage = storagemock.NewMockStorage(controller)
 		commentClient = commentpbmock.NewMockCommentClient(controller)
-		svc = NewService(videoDAO, storage, commentClient)
+		producer = kafkamock.NewMockProducer(controller)
+		svc = NewService(videoDAO, storage, commentClient, producer)
 		ctx = context.Background()
 	})
 
@@ -201,9 +204,12 @@ var _ = Describe("Service", func() {
 					gomock.Any(),
 				).Return(nil)
 
-				storage.EXPECT().Endpoint().Return("https://play.min.io")
-				storage.EXPECT().Bucket().Return("videos")
+				storage.EXPECT().Endpoint().AnyTimes().Return("https://play.min.io")
+				storage.EXPECT().Bucket().AnyTimes().Return("videos")
+
 				videoDAO.EXPECT().Create(ctx, gomock.Any()).Return(nil)
+
+				producer.EXPECT().SendMessages(gomock.Any()).Return(nil)
 
 				stream.EXPECT().SendAndClose(gomock.Any()).Return(nil)
 			})

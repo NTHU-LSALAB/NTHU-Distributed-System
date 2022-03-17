@@ -76,6 +76,10 @@ func (dao *redisVideoDAO) Update(ctx context.Context, video *Video) error {
 	return dao.baseDAO.Update(ctx, video)
 }
 
+func (dao *redisVideoDAO) UpdateVariant(ctx context.Context, id primitive.ObjectID, variant string, url string) error {
+	return dao.baseDAO.UpdateVariant(ctx, id, variant, url)
+}
+
 func (dao *redisVideoDAO) Delete(ctx context.Context, id primitive.ObjectID) error {
 	return dao.baseDAO.Delete(ctx, id)
 }
