@@ -84,7 +84,7 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	producer := kafkakit.NewProducer(ctx, &args.KafkaProducerConfig)
 	defer func() {
 		if err := producer.Close(); err != nil {
-			logger.Fatal("failed to close kafka producer", zap.Error(err))
+			logger.Fatal("failed to close Kafka producer", zap.Error(err))
 		}
 	}()
 

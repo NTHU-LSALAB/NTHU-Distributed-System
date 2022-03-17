@@ -2,7 +2,6 @@ package stream
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"time"
 
@@ -30,34 +29,46 @@ func NewStream(videoDAO dao.VideoDAO, producer kafkakit.Producer) *stream {
 }
 
 func (s *stream) HandleVideoCreated(ctx context.Context, req *pb.HandleVideoCreatedRequest) (*emptypb.Empty, error) {
-	if req.Id == "" {
-		return nil, &saramakit.HandlerError{Retry: false, Err: errors.New("video ID is required")}
+	id, err := primitive.ObjectIDFromHex(req.GetId())
+	if err != nil {
+		return nil, &saramakit.HandlerError{Retry: false, Err: err}
 	}
 
-	if req.Scale != 0 {
-		time.Sleep(time.Second * 3)
-		if err := s.updateMongoVideo(ctx, req); err != nil {
-			return &emptypb.Empty{}, err
+	if req.GetScale() != 0 {
+		variant := strconv.Itoa(int(req.GetScale()))
+
+		if err := s.handleVideoWithVariant(ctx, id, variant, req.GetUrl()); err != nil {
+			return nil, &saramakit.HandlerError{Retry: true, Err: err}
 		}
-		return &emptypb.Empty{}, nil
 	}
 
+	// fanout create events to each variant
 	variants := []int32{1080, 720, 480, 320}
-
 	for _, scale := range variants {
-		if err := s.updateVideoHandle(&pb.HandleVideoCreatedRequest{
+		if err := s.produceVideoCreatedWithScaleEvent(&pb.HandleVideoCreatedRequest{
 			Id:    req.GetId(),
 			Url:   req.GetUrl(),
 			Scale: scale,
 		}); err != nil {
-			return nil, err
+			return nil, &saramakit.HandlerError{Retry: true, Err: err}
 		}
 	}
 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *stream) updateVideoHandle(req *pb.HandleVideoCreatedRequest) error {
+func (s *stream) handleVideoWithVariant(ctx context.Context, id primitive.ObjectID, variant string, url string) error {
+	// we mock the video transcoding only
+	time.Sleep(3 * time.Second)
+
+	if err := s.videoDAO.UpdateVariant(ctx, id, variant, url); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *stream) produceVideoCreatedWithScaleEvent(req *pb.HandleVideoCreatedRequest) error {
 	valueBytes, err := proto.Marshal(req)
 	if err != nil {
 		return err
@@ -71,17 +82,5 @@ func (s *stream) updateVideoHandle(req *pb.HandleVideoCreatedRequest) error {
 		return err
 	}
 
-	return nil
-}
-
-func (s *stream) updateMongoVideo(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
-	id, err := primitive.ObjectIDFromHex(req.Id)
-	if err != nil {
-		return err
-	}
-
-	if err := s.videoDAO.UpdateVariant(ctx, id, strconv.Itoa(int(req.Scale)), req.Url); err != nil {
-		return err
-	}
 	return nil
 }
