@@ -13,8 +13,8 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/storagekit"
-	"github.com/golang/protobuf/proto"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/protobuf/proto"
 )
 
 type service struct {
@@ -120,7 +120,7 @@ func (s *service) UploadVideo(stream pb.Video_UploadVideoServer) error {
 		return err
 	}
 
-	if err := s.produceVideoCreatedEvent(ctx, &pb.HandleVideoCreatedRequest{
+	if err := s.produceVideoCreatedEvent(&pb.HandleVideoCreatedRequest{
 		Id:  id.Hex(),
 		Url: path.Join(s.storage.Endpoint(), s.storage.Bucket(), objectName),
 	}); err != nil {
@@ -159,8 +159,7 @@ func (s *service) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (
 	return &pb.DeleteVideoResponse{}, nil
 }
 
-func (s *service) produceVideoCreatedEvent(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
-
+func (s *service) produceVideoCreatedEvent(req *pb.HandleVideoCreatedRequest) error {
 	valueBytes, err := proto.Marshal(req)
 	if err != nil {
 		return err

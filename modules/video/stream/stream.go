@@ -3,14 +3,15 @@ package stream
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/dao"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit"
-	"github.com/golang/protobuf/proto"
 	"github.com/justin0u0/protoc-gen-grpc-sarama/pkg/saramakit"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -44,7 +45,7 @@ func (s *stream) HandleVideoCreated(ctx context.Context, req *pb.HandleVideoCrea
 	variants := []int32{1080, 720, 480, 320}
 
 	for _, scale := range variants {
-		if err := s.updateVideoHandle(ctx, &pb.HandleVideoCreatedRequest{
+		if err := s.updateVideoHandle(&pb.HandleVideoCreatedRequest{
 			Id:    req.GetId(),
 			Url:   req.GetUrl(),
 			Scale: scale,
@@ -56,8 +57,7 @@ func (s *stream) HandleVideoCreated(ctx context.Context, req *pb.HandleVideoCrea
 	return &emptypb.Empty{}, nil
 }
 
-func (s *stream) updateVideoHandle(ctx context.Context, req *pb.HandleVideoCreatedRequest) error {
-
+func (s *stream) updateVideoHandle(req *pb.HandleVideoCreatedRequest) error {
 	valueBytes, err := proto.Marshal(req)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (s *stream) updateMongoVideo(ctx context.Context, req *pb.HandleVideoCreate
 		return err
 	}
 
-	if err := s.videoDAO.UpdateVariant(ctx, id, string(req.Scale), req.Url); err != nil {
+	if err := s.videoDAO.UpdateVariant(ctx, id, strconv.Itoa(int(req.Scale)), req.Url); err != nil {
 		return err
 	}
 	return nil

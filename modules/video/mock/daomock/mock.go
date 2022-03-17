@@ -107,3 +107,17 @@ func (mr *MockVideoDAOMockRecorder) Update(arg0, arg1 interface{}) *gomock.Call 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockVideoDAO)(nil).Update), arg0, arg1)
 }
+
+// UpdateVariant mocks base method.
+func (m *MockVideoDAO) UpdateVariant(arg0 context.Context, arg1 primitive.ObjectID, arg2, arg3 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateVariant", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateVariant indicates an expected call of UpdateVariant.
+func (mr *MockVideoDAOMockRecorder) UpdateVariant(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateVariant", reflect.TypeOf((*MockVideoDAO)(nil).UpdateVariant), arg0, arg1, arg2, arg3)
+}
