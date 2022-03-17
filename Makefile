@@ -105,7 +105,8 @@ $(foreach module,$(MODULES),$(eval $(call make-lint-rules,$(module))))
 pkg.lint:
 	golangci-lint run ./pkg/...
 
-lint: pkg.lint $(addsuffix .lint,$(MODULES))
+lint:
+	golangci-lint run ./...
 
 ####################################################################################################
 ### Rule for the `test` command
