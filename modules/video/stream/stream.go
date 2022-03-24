@@ -40,6 +40,8 @@ func (s *stream) HandleVideoCreated(ctx context.Context, req *pb.HandleVideoCrea
 		if err := s.handleVideoWithVariant(ctx, id, variant, req.GetUrl()); err != nil {
 			return nil, &saramakit.HandlerError{Retry: true, Err: err}
 		}
+
+		return &emptypb.Empty{}, nil
 	}
 
 	// fanout create events to each variant

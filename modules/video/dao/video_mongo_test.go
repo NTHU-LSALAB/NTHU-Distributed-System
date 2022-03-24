@@ -211,6 +211,62 @@ var _ = Describe("mongoVideoDAO", func() {
 		})
 	})
 
+	Describe("UpdateVariant", func() {
+		var (
+			video   *Video
+			id      primitive.ObjectID
+			url     string
+			variant string
+
+			err error
+		)
+
+		BeforeEach(func() {
+			video = NewFakeVideo()
+			id = video.ID
+			variant = "720p"
+			url = video.URL
+
+			insertVideo(ctx, videoDAO, video)
+		})
+
+		AfterEach(func() {
+			deleteVideo(ctx, videoDAO, id)
+		})
+
+		JustBeforeEach(func() {
+			err = videoDAO.UpdateVariant(ctx, video.ID, variant, url)
+		})
+
+		When("video not found", func() {
+			BeforeEach(func() { video.ID = primitive.NewObjectID() })
+
+			It("returns video not found error", func() {
+				Expect(err).To(MatchError(ErrVideoNotFound))
+			})
+		})
+
+		When("success", func() {
+			BeforeEach(func() {
+				video.Variants[variant] = url
+			})
+
+			It("returns no error", func() {
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("updates the variant", func() {
+				var getVideo Video
+
+				Expect(
+					videoDAO.collection.FindOne(ctx, bson.M{"_id": video.ID}).Decode(&getVideo),
+				).NotTo(HaveOccurred())
+
+				Expect(getVideo.Variants[variant]).To(Equal(url))
+			})
+		})
+	})
+
 	Describe("Delete", func() {
 		var (
 			video *Video
