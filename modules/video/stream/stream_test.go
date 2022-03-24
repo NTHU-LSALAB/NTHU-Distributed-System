@@ -12,7 +12,7 @@ import (
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/kafkakit/mock/kafkamock"
 	"github.com/golang/mock/gomock"
 	"github.com/justin0u0/protoc-gen-grpc-sarama/pkg/saramakit"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/protobuf/types/known/emptypb"
