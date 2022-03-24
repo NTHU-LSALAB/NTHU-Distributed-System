@@ -29,19 +29,19 @@ var (
 
 var _ = Describe("Stream", func() {
 	var (
+		ctx        context.Context
 		controller *gomock.Controller
 		videoDAO   *daomock.MockVideoDAO
 		producer   *kafkamock.MockProducer
 		stream     *stream
-		ctx        context.Context
 	)
 
 	BeforeEach(func() {
+		ctx = context.Background()
 		controller = gomock.NewController(GinkgoT())
 		videoDAO = daomock.NewMockVideoDAO(controller)
 		producer = kafkamock.NewMockProducer(controller)
 		stream = NewStream(videoDAO, producer)
-		ctx = context.Background()
 	})
 
 	AfterEach(func() {
@@ -50,11 +50,10 @@ var _ = Describe("Stream", func() {
 
 	Describe("HandleVideoCreated", func() {
 		var (
-			req   *pb.HandleVideoCreatedRequest
-			resp  *emptypb.Empty
 			id    primitive.ObjectID
-			err   error
 			url   string
+			resp  *emptypb.Empty
+			err   error
 			scale int32
 		)
 
@@ -64,20 +63,17 @@ var _ = Describe("Stream", func() {
 		})
 
 		JustBeforeEach(func() {
-			resp, err = stream.HandleVideoCreated(ctx, req)
+			resp, err = stream.HandleVideoCreated(ctx, &pb.HandleVideoCreatedRequest{
+				Id:    id.Hex(),
+				Url:   url,
+				Scale: scale,
+			})
 		})
 
-		Context("Scale = 0", func() {
-			BeforeEach(func() {
-				scale = 0
-				req = &pb.HandleVideoCreatedRequest{
-					Id:    id.Hex(),
-					Url:   url,
-					Scale: scale,
-				}
-			})
+		Context("scale is not presenting", func() {
+			BeforeEach(func() { scale = 0 })
 
-			When("Producer send messages error", func() {
+			When("producer send messages error", func() {
 				BeforeEach(func() {
 					producer.EXPECT().SendMessages(gomock.Any()).Return(errSendMessagesUnknown)
 				})
@@ -100,15 +96,8 @@ var _ = Describe("Stream", func() {
 			})
 		})
 
-		Context("Scale != 0", func() {
-			BeforeEach(func() {
-				scale = 720
-				req = &pb.HandleVideoCreatedRequest{
-					Id:    id.Hex(),
-					Url:   url,
-					Scale: scale,
-				}
-			})
+		Context("scale is presenting", func() {
+			BeforeEach(func() { scale = 720 })
 
 			When("video not found", func() {
 				BeforeEach(func() {

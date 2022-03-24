@@ -224,6 +224,7 @@ var _ = Describe("mongoVideoDAO", func() {
 		BeforeEach(func() {
 			video = NewFakeVideo()
 			id = video.ID
+			variant = "720p"
 			url = video.URL
 
 			insertVideo(ctx, videoDAO, video)
@@ -234,7 +235,6 @@ var _ = Describe("mongoVideoDAO", func() {
 		})
 
 		JustBeforeEach(func() {
-			variant = "720p"
 			err = videoDAO.UpdateVariant(ctx, video.ID, variant, url)
 		})
 
@@ -247,7 +247,6 @@ var _ = Describe("mongoVideoDAO", func() {
 		})
 
 		When("success", func() {
-
 			BeforeEach(func() {
 				video.Variants[variant] = url
 			})
