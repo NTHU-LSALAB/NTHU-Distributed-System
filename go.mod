@@ -20,15 +20,15 @@ require (
 	github.com/prometheus/common v0.32.1
 	github.com/spf13/cobra v1.3.0
 	go.mongodb.org/mongo-driver v1.8.4
-	go.opentelemetry.io/otel v1.4.1
-	go.opentelemetry.io/otel/exporters/prometheus v0.27.1-0.20220303020706-24414b2455ec
-	go.opentelemetry.io/otel/metric v0.27.1-0.20220303020706-24414b2455ec
-	go.opentelemetry.io/otel/sdk/metric v0.27.1-0.20220303020706-24414b2455ec
+	go.opentelemetry.io/otel v1.6.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.28.0
+	go.opentelemetry.io/otel/metric v0.28.0
+	go.opentelemetry.io/otel/sdk/metric v0.28.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8
 	google.golang.org/grpc v1.45.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/protobuf v1.28.0
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/go-logr/logr v1.2.2 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -86,8 +86,8 @@ require (
 	github.com/xdg-go/scram v1.1.0 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
-	go.opentelemetry.io/otel/trace v1.4.1 // indirect
+	go.opentelemetry.io/otel/sdk v1.6.0 // indirect
+	go.opentelemetry.io/otel/trace v1.6.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
@@ -95,7 +95,7 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20211013180041-c96bc1413d57 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9-0.20211228192929-ee1ca4ffc4da // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
