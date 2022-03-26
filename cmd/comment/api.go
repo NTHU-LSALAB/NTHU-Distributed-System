@@ -24,7 +24,7 @@ import (
 func newAPICommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "api",
-		Short: "starts Comment API server",
+		Short: "starts comment API server",
 		RunE:  runAPI,
 	}
 }

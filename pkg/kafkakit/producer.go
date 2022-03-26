@@ -48,7 +48,7 @@ func (kp *KafkaProducer) Close() error {
 	return kp.SyncProducer.Close()
 }
 
-func NewProducer(ctx context.Context, conf *KafkaProducerConfig) *KafkaProducer {
+func NewKafkaProducer(ctx context.Context, conf *KafkaProducerConfig) *KafkaProducer {
 	logger := logkit.FromContext(ctx).With(
 		zap.Strings("addrs", conf.Addrs),
 		zap.String("topic", conf.Topic),

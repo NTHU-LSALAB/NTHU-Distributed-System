@@ -10,6 +10,7 @@ func NewVideoCommand() *cobra.Command {
 
 	cmd.AddCommand(newAPICommand())
 	cmd.AddCommand(newGatewayCommand())
+	cmd.AddCommand(newStreamCommand())
 
 	return cmd
 }
