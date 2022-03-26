@@ -7,7 +7,11 @@ x-common-env: &common-env
   MONGO_DATABASE: nthu_distributed_system
   POSTGRES_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
   REDIS_ADDR: redis:6379
-  # KAFKA_ADDR:
+  KAFKA_PRODUCER_ADDRS: kafka:29092
+  KAFKA_PRODUCER_TOPIC: video
+  KAFKA_CONSUMER_ADDRS: kafka:29092
+  KAFKA_CONSUMER_TOPIC: video
+  KAFKA_CONSUMER_GROUP: video-stream
   MINIO_ENDPOINT: play.min.io
   MINIO_BUCKET: videos
   MINIO_USERNAME: Q3AM3UQ867SPQQA43P2F
@@ -33,6 +37,27 @@ services:
 
   redis:
     image: redis:6.2-alpine
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
 
   prometheus:
     image: prom/prometheus
@@ -100,6 +125,7 @@ services:
     depends_on:
     - mongo
     - redis
+    - kafka
 
   video-gateway:
     image: nthu-distributed-system:latest
@@ -112,6 +138,18 @@ services:
     - gateway
     ports:
     - 10080:8080
+
+  video-stream:
+    image: nthu-distributed-system:latest
+    environment:
+      <<: *common-env
+    command:
+    - /cmd
+    - video
+    - stream
+    depends_on:
+    - postgres
+    - kafka
 
   comment-api:
     image: nthu-distributed-system:latest
