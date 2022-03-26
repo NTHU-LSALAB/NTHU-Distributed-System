@@ -83,7 +83,7 @@ func (dao *mongoVideoDAO) Update(ctx context.Context, video *Video) error {
 
 func (dao *mongoVideoDAO) UpdateVariant(ctx context.Context, id primitive.ObjectID, variant string, url string) error {
 	filter := bson.M{"_id": id}
-	update := bson.D{{Key: "$set", Value: bson.D{{Key: "Variants", Value: bson.M{variant: url}}}}}
+	update := bson.D{{Key: "$set", Value: bson.M{"variants." + variant: url}}}
 	opts := options.Update()
 
 	if result, err := dao.collection.UpdateOne(ctx, filter, update, opts); err != nil {
