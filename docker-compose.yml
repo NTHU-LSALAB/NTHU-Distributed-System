@@ -148,7 +148,7 @@ services:
     - video
     - stream
     depends_on:
-    - postgres
+    - mongo
     - kafka
 
   comment-api:
