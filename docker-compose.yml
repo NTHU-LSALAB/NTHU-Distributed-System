@@ -78,7 +78,7 @@ services:
     - generate
 
   lint:
-    image: golangci/golangci-lint:v1.44.0
+    image: golangci/golangci-lint:v1.44.2
     working_dir: /src
     environment:
       GOLANGCI_LINT_CACHE: /src/.cache/golangci-lint-cache
