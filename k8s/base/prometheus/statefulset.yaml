@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: prometheus-stateful-set
-  namespace: s107062223
 spec:
   replicas: 1
   serviceName: prometheus-service
@@ -52,4 +51,4 @@ spec:
         resources:
           requests:
             storage: 1Gi
-        storageClassName: prometheus
+        storageClassName: nfs-client
