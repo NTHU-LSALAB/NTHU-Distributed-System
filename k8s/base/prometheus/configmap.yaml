@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config-file
+  labels:
+    name: prometheus-config-file
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    # A scrape configuration containing exactly one endpoint to scrape:
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets:
+            - 'localhost:9090'
+
+      - job_name: 'video-api'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          regex: 'video-api'
+          action: keep
+
+      - job_name: 'comment-api'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          regex: 'comment-api'
+          action: keep
