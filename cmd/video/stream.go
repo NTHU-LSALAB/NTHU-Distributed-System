@@ -41,7 +41,9 @@ func runStream(_ *cobra.Command, _ []string) error {
 	}
 
 	logger := logkit.NewLogger(&args.LoggerConfig)
-	defer logger.Sync()
+	defer func() {
+		_ = logger.Sync()
+	}()
 
 	ctx = logger.WithContext(ctx)
 
