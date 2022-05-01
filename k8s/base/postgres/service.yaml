@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus
+  name: postgres
 spec:
   selector:
-    app: prometheus
+    app: postgres
   clusterIP: None
   ports:
-  - port: 80
-    targetPort: 9090
+    - port: 5432
+      targetPort: 5432
