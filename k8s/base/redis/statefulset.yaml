@@ -42,4 +42,3 @@ spec:
           requests:
             storage: 500Mi
         storageClassName: nfs
-      
