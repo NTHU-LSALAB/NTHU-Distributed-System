@@ -29,3 +29,12 @@ data:
         static_configs:
           - targets:
             - 'localhost:9090'
+      - job_name: video
+        static_configs:
+          - targets:
+            - 'video-api:80'
+
+      - job_name: comment
+        static_configs:
+          - targets:
+            - 'comment-api:80'
