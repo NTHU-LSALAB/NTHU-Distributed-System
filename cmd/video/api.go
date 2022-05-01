@@ -52,11 +52,7 @@ func runAPI(_ *cobra.Command, _ []string) error {
 	}
 
 	logger := logkit.NewLogger(&args.LoggerConfig)
-	defer func() {
-		if err := logger.Sync(); err != nil {
-			log.Fatal("failed to sync logger", err.Error())
-		}
-	}()
+	defer logger.Sync()
 
 	ctx = logger.WithContext(ctx)
 
