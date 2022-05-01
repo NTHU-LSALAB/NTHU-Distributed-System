@@ -4,7 +4,6 @@ metadata:
   name: prometheus-config-file
   labels:
     name: prometheus-config-file
-  namespace: s107062223
 data:
   prometheus.yml: |-
     global:
