@@ -25,7 +25,7 @@ spec:
               memory: 100Mi
             limits:
               cpu: 200m
-              memory: 200Mis
+              memory: 200Mi
           volumeMounts:
             - name: mongodb-persistent-storage-claim
               mountPath: /data/db
