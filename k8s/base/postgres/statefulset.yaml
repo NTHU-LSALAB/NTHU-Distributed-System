@@ -17,7 +17,8 @@ spec:
         - name: postgres
           image: postgres:14-alpine
           ports:
-            - containerPort: 5432
+            - name: postgres
+              containerPort: 5432
           resources:
             requests:
               cpu: 100m
