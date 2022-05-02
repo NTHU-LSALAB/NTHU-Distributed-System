@@ -8,12 +8,17 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+
+    - name: setup go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.17
 
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v2
+      uses: golangci/golangci-lint-action@v3
       with:
-        version: v1.44.0
+        version: v1.44.2
 
   # test should be run inside a container to start helper services (ex: mongo)
   test:
@@ -40,10 +45,10 @@ jobs:
       MINIO_PASSWORD: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
     steps:
     - name: checkout
-      uses: actions/checkout@v2 
+      uses: actions/checkout@v3
 
     - name: cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/go/pkg/mod
@@ -63,15 +68,15 @@ jobs:
     - test
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: setup go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: 1.17
 
     - name: cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/go/pkg/mod
