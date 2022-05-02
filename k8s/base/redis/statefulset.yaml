@@ -17,7 +17,8 @@ spec:
         - name: redis
           image: redis:6.2-alpine
           ports:
-            - containerPort: 6379
+            - name: redis
+              containerPort: 6379
           resources:
             requests:
               cpu: 100m
@@ -25,9 +26,6 @@ spec:
             limits:
               cpu: 200m
               memory: 200Mi
-          env:
-            - name: REDIS_ADDR
-              value: redis:6379
           volumeMounts:
             - name: redis-persistent-storage-claim
               mountPath: /data
