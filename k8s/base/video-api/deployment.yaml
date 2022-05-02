@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: video-api
-  namespace: default
   labels:
     app: video-api
 spec:
@@ -18,17 +17,19 @@ spec:
       containers:
       - name: video-api
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8081
+          name: api
         - containerPort: 2222
-        command: ["/cmd", "video", "api"]
+          name: prometheus
+        command:
+        - /cmd
+        - video
+        - api
         env:
           - name: COMMENT_SERVER_ADDR
             value: comment-api:80
-          - name: GOCACHE
-            value: /src/.cache/gocache
-          - name: GOPATH
-            value: /go
           - name: KAFKA_CONSUMER_ADDRS
             value: kafka:9092
           - name: KAFKA_CONSUMER_GROUP
@@ -66,4 +67,3 @@ spec:
           limits:
             memory: "100Mi"
             cpu: "100m"
-        imagePullPolicy: Always

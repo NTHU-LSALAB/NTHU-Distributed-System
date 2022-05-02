@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: video-gateway
-  namespace: default
   labels:
     app: video-gateway
 spec:
@@ -18,14 +17,15 @@ spec:
       containers:
       - name: video-gateway
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
-        command: ["/cmd", "video", "gateway"]
+          name: gateway
+        command:
+        - /cmd
+        - video
+        - gateway
         env:
-          - name: GOCACHE
-            value: /src/.cache/gocache
-          - name: GOPATH
-            value: /go
           - name: GRPC_SERVER_ADDR
             value: video-api:80
           - name: KAFKA_CONSUMER_ADDRS
@@ -61,4 +61,3 @@ spec:
           limits:
             memory: "100Mi"
             cpu: "100m"
-        imagePullPolicy: Always

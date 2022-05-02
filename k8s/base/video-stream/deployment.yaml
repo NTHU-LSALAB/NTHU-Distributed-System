@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: video-stream
-  namespace: default
   labels:
     app: video-stream
 spec:
@@ -18,14 +17,15 @@ spec:
       containers:
       - name: video-stream
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
-        command: ["/cmd", "video", "stream"]
+          name: stream
+        command:
+        - /cmd
+        - video
+        - stream
         env:
-          - name: GOCACHE
-            value: /src/.cache/gocache
-          - name: GOPATH
-            value: /go
           - name: KAFKA_CONSUMER_ADDRS
             value: kafka:9092
           - name: KAFKA_CONSUMER_GROUP
@@ -59,4 +59,3 @@ spec:
           limits:
             memory: "100Mi"
             cpu: "100m"
-        imagePullPolicy: Always

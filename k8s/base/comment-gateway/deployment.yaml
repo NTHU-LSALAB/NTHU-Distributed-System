@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: comment-gateway
-  namespace: default
   labels:
     app: comment-gateway
 spec:
@@ -18,14 +17,15 @@ spec:
       containers:
       - name: comment-gateway
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
-        command: ["/cmd", "comment", "gateway"]
+          name: gateway
+        command:
+        - /cmd
+        - comment
+        - gateway
         env:
-          - name: GOCACHE
-            value: /src/.cache/gocache
-          - name: GOPATH
-            value: /go
           - name: GRPC_SERVER_ADDR
             value: comment-api:80
           - name: KAFKA_CONSUMER_ADDRS
@@ -61,4 +61,3 @@ spec:
           limits:
             memory: "100Mi"
             cpu: "100m"
-        imagePullPolicy: Always
