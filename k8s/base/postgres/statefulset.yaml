@@ -42,4 +42,8 @@ spec:
         resources:
           requests:
             storage: 500Mi
+<<<<<<< HEAD
         storageClassName: nfs
+=======
+        storageClassName: nfs
+>>>>>>> 94a615d (feature: add postgres)
