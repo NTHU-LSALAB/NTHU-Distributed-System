@@ -26,8 +26,6 @@ spec:
               cpu: 200m
               memory: 200Mi
           env:
-            - name: POSTGRES_URL
-              value: postgres://postgres@postgres:5432/postgres?sslmode=disable
             - name: POSTGRES_HOST_AUTH_METHOD
               value: trust
           volumeMounts:
@@ -42,4 +40,5 @@ spec:
         resources:
           requests:
             storage: 500Mi
+
         storageClassName: nfs
