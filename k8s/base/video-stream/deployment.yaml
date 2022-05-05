@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-stream
+  labels:
+    app: video-stream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: video-stream
+  template:
+    metadata:
+      labels:
+        app: video-stream
+    spec:
+      containers:
+      - name: video-stream
+        image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: stream
+        command:
+        - /cmd
+        - video
+        - stream
+        env:
+          - name: KAFKA_CONSUMER_ADDRS
+            value: kafka:9092
+          - name: KAFKA_CONSUMER_GROUP
+            value: video-stream
+          - name: KAFKA_CONSUMER_TOPIC
+            value: video
+          - name: KAFKA_PRODUCER_ADDRS
+            value: kafka:9092
+          - name: KAFKA_PRODUCER_TOPIC
+            value: video
+          - name: MINIO_BUCKET
+            value: videos
+          - name: MINIO_ENDPOINT
+            value: play.min.io
+          - name: MINIO_PASSWORD
+            value: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+          - name: MINIO_USERNAME
+            value: Q3AM3UQ867SPQQA43P2F
+          - name: MONGO_DATABASE
+            value: nthu_distributed_system
+          - name: MONGO_URL
+            value: mongodb://mongodb:27017/
+          - name: POSTGRES_URL
+            value: postgres://postgres@postgres:5432/postgres?sslmode=disable
+          - name: REDIS_ADDR
+            value: redis:6379
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
+          limits:
+            memory: "100Mi"
+            cpu: "100m"
