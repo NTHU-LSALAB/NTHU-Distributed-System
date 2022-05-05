@@ -2,7 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: comment-gateway
-  namespace: default
 spec:
   selector:
     app: comment-gateway
