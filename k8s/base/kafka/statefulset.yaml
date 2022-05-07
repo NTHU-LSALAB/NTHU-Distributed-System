@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  serviceName: kafka
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: confluentinc/cp-kafka:7.0.1
+        ports:
+        - name: kafka
+          containerPort: 9092
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:9092
+        - name: KAFKA_BROKER_ID
+          value: 1
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: zookeeper:2181
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: INTERNAL://:29092,EXTERNAL://:9092
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: INTERNAL
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: 1
+        resources:
+          requests:
+            cpu: 300m
+            memory: 300Mi
+          limits:
+            cpu: 600m
+            memory: 600Mi
+        volumeMounts:
+        - name: postgres-persistent-storage-claim
+          mountPath: /opt/kafka/data-1
+  volumeClaimTemplates:
+  - metadata:
+      name: zookeeper-persistent-storage-claim
+    spec:
+      storageClassName: nfs
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 500Mi
