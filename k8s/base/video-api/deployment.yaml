@@ -5,7 +5,7 @@ metadata:
   labels:
     app: video-api
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: video-api
@@ -19,51 +19,43 @@ spec:
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8081
-          name: api
-        - containerPort: 2222
-          name: prometheus
+        - name: grpc
+          containerPort: 8081
+        - name: prometheus
+          containerPort: 2222
         command:
         - /cmd
         - video
         - api
         env:
-          - name: COMMENT_SERVER_ADDR
-            value: comment-api:80
-          - name: KAFKA_CONSUMER_ADDRS
-            value: kafka:9092
-          - name: KAFKA_CONSUMER_GROUP
-            value: video-stream
-          - name: KAFKA_CONSUMER_TOPIC
-            value: video
-          - name: KAFKA_PRODUCER_ADDRS
-            value: kafka:9092
-          - name: KAFKA_PRODUCER_TOPIC
-            value: video
-          - name: METER_HISTOGRAM_BOUNDARIES
-            value: 10,100,200,500,1000
-          - name: METER_NAME
-            value: video.api
-          - name: MINIO_BUCKET
-            value: videos
-          - name: MINIO_ENDPOINT
-            value: play.min.io
-          - name: MINIO_PASSWORD
-            value: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
-          - name: MINIO_USERNAME
-            value: Q3AM3UQ867SPQQA43P2F
-          - name: MONGO_DATABASE
-            value: nthu_distributed_system
-          - name: MONGO_URL
-            value: mongodb://mongodb:27017/
-          - name: POSTGRES_URL
-            value: postgres://postgres@postgres:5432/postgres?sslmode=disable
-          - name: REDIS_ADDR
-            value: redis:6379
+        - name: KAFKA_PRODUCER_ADDRS
+          value: kafka:9092
+        - name: KAFKA_PRODUCER_TOPIC
+          value: video
+        - name: METER_HISTOGRAM_BOUNDARIES
+          value: 10,100,200,500,1000
+        - name: METER_NAME
+          value: video.api
+        - name: MINIO_BUCKET
+          value: videos
+        - name: MINIO_ENDPOINT
+          value: play.min.io
+        - name: MINIO_PASSWORD
+          value: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+        - name: MINIO_USERNAME
+          value: Q3AM3UQ867SPQQA43P2F
+        - name: MONGO_DATABASE
+          value: nthu_distributed_system
+        - name: MONGO_URL
+          value: mongodb://mongodb:27017/
+        - name: REDIS_ADDR
+          value: redis:6379
+        - name: COMMENT_SERVER_ADDR
+          value: comment-api:80
         resources:
           requests:
-            memory: "50Mi"
-            cpu: "50m"
+            memory: 25Mi
+            cpu: 25m
           limits:
-            memory: "100Mi"
-            cpu: "100m"
+            memory: 50Mi
+            cpu: 50m

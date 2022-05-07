@@ -3,8 +3,8 @@ kind: StatefulSet
 metadata:
   name: postgres
 spec:
-  replicas: 1
   serviceName: postgres
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -14,32 +14,31 @@ spec:
         app: postgres
     spec:
       containers:
+      - name: postgres
+        image: postgres:14-alpine
+        ports:
         - name: postgres
-          image: postgres:14-alpine
-          ports:
-            - name: postgres
-              containerPort: 5432
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
-            limits:
-              cpu: 200m
-              memory: 200Mi
-          env:
-            - name: POSTGRES_HOST_AUTH_METHOD
-              value: trust
-          volumeMounts:
-            - name: postgres-persistent-storage-claim
-              mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-persistent-storage-claim
-      spec:
-        accessModes:
-          - ReadWriteOnce
+          containerPort: 5432
         resources:
           requests:
-            storage: 500Mi
-
-        storageClassName: nfs
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
+        volumeMounts:
+        - name: postgres-persistent-storage-claim
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-persistent-storage-claim
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 500Mi
+      storageClassName: nfs

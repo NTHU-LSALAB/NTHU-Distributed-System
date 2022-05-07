@@ -14,29 +14,28 @@ spec:
         app: redis
     spec:
       containers:
+      - name: redis
+        image: redis:6.2-alpine
+        ports:
         - name: redis
-          image: redis:6.2-alpine
-          ports:
-            - name: redis
-              containerPort: 6379
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
-            limits:
-              cpu: 200m
-              memory: 200Mi
-          volumeMounts:
-            - name: redis-persistent-storage-claim
-              mountPath: /data
-
-  volumeClaimTemplates:
-    - metadata:
-        name: redis-persistent-storage-claim
-      spec:
-        accessModes:
-          - ReadWriteOnce
+          containerPort: 6379
         resources:
           requests:
-            storage: 500Mi
-        storageClassName: nfs
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        volumeMounts:
+        - name: redis-persistent-storage-claim
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-persistent-storage-claim
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 500Mi
+      storageClassName: nfs

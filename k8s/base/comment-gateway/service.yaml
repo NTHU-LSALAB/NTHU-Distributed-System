@@ -3,9 +3,10 @@ kind: Service
 metadata:
   name: comment-gateway
 spec:
+  type: ClusterIP
   selector:
     app: comment-gateway
-  type: ClusterIP
   ports:
-  - port: 80
+  - name: gateway
+    port: 80
     targetPort: 8080

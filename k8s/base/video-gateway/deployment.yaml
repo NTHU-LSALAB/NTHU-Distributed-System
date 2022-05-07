@@ -19,45 +19,19 @@ spec:
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8080
-          name: gateway
+        - name: http
+          containerPort: 8080
         command:
         - /cmd
         - video
         - gateway
         env:
-          - name: GRPC_SERVER_ADDR
-            value: video-api:80
-          - name: KAFKA_CONSUMER_ADDRS
-            value: kafka:9092
-          - name: KAFKA_CONSUMER_GROUP
-            value: video-stream
-          - name: KAFKA_CONSUMER_TOPIC
-            value: video
-          - name: KAFKA_PRODUCER_ADDRS
-            value: kafka:9092
-          - name: KAFKA_PRODUCER_TOPIC
-            value: video
-          - name: MINIO_BUCKET
-            value: videos
-          - name: MINIO_ENDPOINT
-            value: play.min.io
-          - name: MINIO_PASSWORD
-            value: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
-          - name: MINIO_USERNAME
-            value: Q3AM3UQ867SPQQA43P2F
-          - name: MONGO_DATABASE
-            value: nthu_distributed_system
-          - name: MONGO_URL
-            value: mongodb://mongo:27017/
-          - name: POSTGRES_URL
-            value: postgres://postgres@postgres:5432/postgres?sslmode=disable
-          - name: REDIS_ADDR
-            value: redis:6379
+        - name: GRPC_SERVER_ADDR
+          value: video-api:8081
         resources:
           requests:
-            memory: "50Mi"
-            cpu: "50m"
+            memory: 25Mi
+            cpu: 25m
           limits:
-            memory: "100Mi"
-            cpu: "100m"
+            memory: 50Mi
+            cpu: 50m
