@@ -3,7 +3,6 @@ resources:
 - kafka
 - mongodb
 - postgres
-- prometheus
 - redis
 - video
 - zookeeper
