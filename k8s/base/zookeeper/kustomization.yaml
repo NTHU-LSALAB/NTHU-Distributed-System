@@ -1,0 +1,6 @@
+resources:
+- statefulset.yaml
+- service.yaml
+
+commonLabels:
+  app: zookeeper

@@ -2,17 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: video-gateway
-  labels:
-    app: video-gateway
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: video-gateway
   template:
-    metadata:
-      labels:
-        app: video-gateway
     spec:
       containers:
       - name: video-gateway

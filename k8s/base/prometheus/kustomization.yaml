@@ -1,0 +1,8 @@
+resources:
+- statefulset.yaml
+- service.yaml
+- rbac.yaml
+- configmap.yaml
+
+commonLabels:
+  app: prometheus

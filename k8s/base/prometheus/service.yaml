@@ -4,8 +4,6 @@ metadata:
   name: prometheus
 spec:
   clusterIP: None
-  selector:
-    app: prometheus
   ports:
   - name: http
     port: 80

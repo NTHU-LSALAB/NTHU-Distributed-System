@@ -2,18 +2,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
-  labels:
-    app: zookeeper
 spec:
   serviceName: zookeeper
   replicas: 1
-  selector:
-    matchLabels:
-      app: zookeeper
   template:
-    metadata:
-      labels:
-        app: zookeeper
     spec:
       containers:
         - name: zookeeper

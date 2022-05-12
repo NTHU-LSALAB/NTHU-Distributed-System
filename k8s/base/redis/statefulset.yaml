@@ -5,13 +5,7 @@ metadata:
 spec:
   serviceName: redis
   replicas: 1
-  selector:
-    matchLabels:
-      app: redis
   template:
-    metadata:
-      labels:
-        app: redis
     spec:
       containers:
       - name: redis

@@ -1,0 +1,7 @@
+resources:
+- video-api
+- video-gateway
+- video-stream
+
+commonLabels:
+  module: video

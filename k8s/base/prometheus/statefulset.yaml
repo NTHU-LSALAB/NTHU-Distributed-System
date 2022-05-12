@@ -5,13 +5,7 @@ metadata:
 spec:
   replicas: 1
   serviceName: prometheus
-  selector:
-    matchLabels:
-      app: prometheus
   template:
-    metadata:
-      labels:
-        app: prometheus
     spec:
       serviceAccountName: prometheus
       containers:

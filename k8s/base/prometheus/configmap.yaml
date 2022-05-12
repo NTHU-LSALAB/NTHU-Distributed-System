@@ -1,9 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: prometheus-config-file
-  labels:
-    name: prometheus-config-file
+  name: prometheus
 data:
   prometheus.yml: |-
     global:
@@ -22,7 +20,7 @@ data:
       - role: endpoints
       relabel_configs:
       - source_labels: [__meta_kubernetes_endpoints_name]
-        regex: 'video-api'
+        regex: video-api
         action: keep
 
     - job_name: comment-api

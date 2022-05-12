@@ -2,17 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: video-stream
-  labels:
-    app: video-stream
 spec:
   replicas: 2
-  selector:
-    matchLabels:
-      app: video-stream
   template:
-    metadata:
-      labels:
-        app: video-stream
     spec:
       containers:
       - name: video-stream

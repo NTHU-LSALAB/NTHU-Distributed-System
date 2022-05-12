@@ -1,0 +1,9 @@
+resources:
+- comment
+- kafka
+- mongodb
+- postgres
+- prometheus
+- redis
+- video
+- zookeeper

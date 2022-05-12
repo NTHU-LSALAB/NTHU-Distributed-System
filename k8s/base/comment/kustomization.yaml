@@ -1,0 +1,6 @@
+resources:
+- comment-api
+- comment-gateway
+
+commonLabels:
+  module: comment

@@ -1,21 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: comment-api
-  labels:
-    app: comment-api
+  name: video-api
 spec:
   replicas: 2
-  selector:
-    matchLabels:
-      app: comment-api
   template:
-    metadata:
-      labels:
-        app: comment-api
     spec:
       containers:
-      - name: comment-api
+      - name: video-api
         image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
         imagePullPolicy: Always
         ports:
@@ -25,13 +17,17 @@ spec:
           containerPort: 2222
         command:
         - /cmd
-        - comment
+        - video
         - api
         env:
+        - name: KAFKA_PRODUCER_ADDRS
+          value: kafka:9092
+        - name: KAFKA_PRODUCER_TOPIC
+          value: video
         - name: METER_HISTOGRAM_BOUNDARIES
           value: 10,100,200,500,1000
         - name: METER_NAME
-          value: comment.api
+          value: video.api
         - name: MINIO_BUCKET
           value: videos
         - name: MINIO_ENDPOINT
@@ -40,12 +36,14 @@ spec:
           value: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
         - name: MINIO_USERNAME
           value: Q3AM3UQ867SPQQA43P2F
-        - name: POSTGRES_URL
-          value: postgres://postgres@postgres:5432/postgres?sslmode=disable
+        - name: MONGO_DATABASE
+          value: nthu_distributed_system
+        - name: MONGO_URL
+          value: mongodb://mongodb:27017/
         - name: REDIS_ADDR
           value: redis:6379
-        - name: VIDEO_SERVER_ADDR
-          value: video-api:80
+        - name: COMMENT_SERVER_ADDR
+          value: comment-api:80
         resources:
           requests:
             memory: 25Mi
