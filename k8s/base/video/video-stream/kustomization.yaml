@@ -1,0 +1,5 @@
+resources:
+- deployment.yaml
+
+commonLabels:
+  app: video-stream

@@ -4,8 +4,6 @@ metadata:
   name: video-api
 spec:
   type: ClusterIP
-  selector:
-    app: video-api
   ports:
   - name: grpc
     port: 8081

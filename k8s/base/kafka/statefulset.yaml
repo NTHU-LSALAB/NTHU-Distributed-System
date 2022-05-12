@@ -2,18 +2,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka
-  labels:
-    app: kafka
 spec:
   serviceName: kafka
   replicas: 1
-  selector:
-    matchLabels:
-      app: kafka
   template:
-    metadata:
-      labels:
-        app: kafka
     spec:
       containers:
       - name: kafka
@@ -25,7 +17,7 @@ spec:
         - name: KAFKA_BOOTSTRAP_SERVERS
           value: kafka:9092
         - name: KAFKA_BROKER_ID
-          value: 1
+          value: "1"
         - name: KAFKA_ZOOKEEPER_CONNECT
           value: zookeeper:2181
         - name: KAFKA_ADVERTISED_LISTENERS
@@ -35,7 +27,7 @@ spec:
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: INTERNAL
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
-          value: 1
+          value: "1"
         resources:
           requests:
             cpu: 300m
@@ -44,11 +36,12 @@ spec:
             cpu: 600m
             memory: 600Mi
         volumeMounts:
-        - name: postgres-persistent-storage-claim
+        - name: kafka-persistent-volume-claim
           mountPath: /opt/kafka/data-1
+      enableServiceLinks: false
   volumeClaimTemplates:
   - metadata:
-      name: zookeeper-persistent-storage-claim
+      name: kafka-persistent-volume-claim
     spec:
       storageClassName: nfs
       accessModes:

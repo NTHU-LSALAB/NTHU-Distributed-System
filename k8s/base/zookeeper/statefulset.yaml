@@ -2,18 +2,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
-  labels:
-    app: zookeeper
 spec:
   serviceName: zookeeper
   replicas: 1
-  selector:
-    matchLabels:
-      app: zookeeper
   template:
-    metadata:
-      labels:
-        app: zookeeper
     spec:
       containers:
         - name: zookeeper
@@ -23,9 +15,9 @@ spec:
             containerPort: 2181
           env:
           - name: ZOOKEEPER_CLIENT_PORT
-            value: 2181
+            value: "2181"
           - name: ZOOKEEPER_TICK_TIME
-            value: 2000
+            value: "2000"
           resources:
             requests:
               cpu: 100m

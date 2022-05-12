@@ -5,13 +5,7 @@ metadata:
 spec:
   serviceName: postgres
   replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
   template:
-    metadata:
-      labels:
-        app: postgres
     spec:
       containers:
       - name: postgres
@@ -36,9 +30,9 @@ spec:
   - metadata:
       name: postgres-persistent-storage-claim
     spec:
+      storageClassName: nfs
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
           storage: 500Mi
-      storageClassName: nfs

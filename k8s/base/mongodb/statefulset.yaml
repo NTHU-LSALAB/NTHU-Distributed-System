@@ -5,13 +5,7 @@ metadata:
 spec:
   serviceName: mongodb
   replicas: 1
-  selector:
-    matchLabels:
-      app: mongodb
   template:
-    metadata:
-      labels:
-        app: mongodb
     spec:
       containers:
       - name: mongodb
@@ -33,9 +27,9 @@ spec:
   - metadata:
       name: mongodb-persistent-storage-claim
     spec:
+      storageClassName: nfs
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
           storage: 500Mi
-      storageClassName: nfs

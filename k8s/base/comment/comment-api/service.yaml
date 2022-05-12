@@ -4,8 +4,6 @@ metadata:
   name: comment-api
 spec:
   type: ClusterIP
-  selector:
-    app: comment-api
   ports:
   - name: grpc
     port: 8081
