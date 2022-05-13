@@ -6,3 +6,4 @@ resources:
 - redis
 - video
 - zookeeper
+- github-actions
