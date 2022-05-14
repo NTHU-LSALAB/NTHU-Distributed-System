@@ -1,0 +1,88 @@
+name: deployment workflow
+
+on:
+  workflow_run:
+    workflows:
+    - main workflow
+    types:
+    - completed
+    branches:
+    - $default-branch
+
+jobs:
+  setup:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      image-name: ${{ steps.output.outputs.image-name }}
+    steps:
+    - name: set image name
+      run:
+        echo "IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> ${{ github.env }}
+    - name: set output
+      id: output
+      run: echo "::set-output name=image-name::${{ env.IMAGE_NAME }}:${{ github.sha }}"
+
+  deployment-comment:
+    runs-on: ubuntu-20.04
+    needs:
+    - setup
+    environment: production-comment
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+
+    - name: setup kubectl
+      uses: justin0u0/setup-kubectl@v1
+      with:
+        kubectl-version: stable
+        cluster-certificate-authority-data: ${{ secrets.KUBERNETES_CLUSTER_CLIENT_CERTIFICATE_AUTHORITY_DATA }}
+        cluster-server: ${{ secrets.KUBERNETES_CLUSTER_SERVER }}
+        credentials-token: ${{ secrets.KUBERNETES_CREDENTIALS_TOKEN }}
+
+    - name: deploy comment-api
+      run: kubectl set image deploy/comment-api comment-api=${{ needs.setup.outputs.image-name }}
+
+    - name: deploy comment-gateway
+      run: kubectl set image deploy/comment-gateway comment-gateway=${{ needs.setup.outputs.image-name }}
+
+    - name: wait comment-api
+      run: kubectl rollout status -w deploy/comment-api
+
+    - name: wait comment-gateway
+      run: kubectl rollout status -w deploy/comment-gateway
+
+  deployment-video:
+    runs-on: ubuntu-20.04
+    needs:
+    - setup
+    environment: production-video
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+
+    - name: setup kubectl
+      uses: justin0u0/setup-kubectl@v1
+      with:
+        kubectl-version: stable
+        cluster-certificate-authority-data: ${{ secrets.KUBERNETES_CLUSTER_CLIENT_CERTIFICATE_AUTHORITY_DATA }}
+        cluster-server: ${{ secrets.KUBERNETES_CLUSTER_SERVER }}
+        credentials-token: ${{ secrets.KUBERNETES_CREDENTIALS_TOKEN }}
+
+    - name: deploy video-api
+      run: kubectl set image deploy/video-api video-api=${{ needs.setup.outputs.image-name }}
+
+    - name: deploy video-gateway
+      run: kubectl set image deploy/video-gateway video-gateway=${{ needs.setup.outputs.image-name }}
+
+    - name: deploy video-stream
+      run: kubectl set image deploy/video-stream video-stream=${{ needs.setup.outputs.image-name }}
+
+    - name: wait video-api
+      run: kubectl rollout status -w deploy/video-api
+
+    - name: wait video-gateway
+      run: kubectl rollout status -w deploy/video-gateway
+
+    - name: wait video-stream
+      run: kubectl rollout status -w deploy/video-stream
