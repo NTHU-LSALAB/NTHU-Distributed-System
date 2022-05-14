@@ -17,17 +17,17 @@ rule_files:
 
 # A scrape configuration containing exactly one endpoint to scrape:
 scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets:
-        - 'localhost:9090'
+- job_name: 'prometheus'
+  static_configs:
+    - targets:
+      - 'localhost:9090'
 
-  - job_name: video
-    static_configs:
-      - targets:
-        - 'video-api:2222'
+- job_name: video
+  static_configs:
+    - targets:
+      - 'video-api:2222'
 
-  - job_name: comment
-    static_configs:
-      - targets:
-        - 'comment-api:2222'
+- job_name: comment
+  static_configs:
+    - targets:
+      - 'comment-api:2222'
