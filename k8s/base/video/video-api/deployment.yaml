@@ -46,8 +46,8 @@ spec:
           value: comment-api:80
         resources:
           requests:
-            memory: 25Mi
-            cpu: 25m
+            memory: 30Mi
+            cpu: 10m
           limits:
-            memory: 50Mi
-            cpu: 50m
+            memory: 60Mi
+            cpu: 20m
