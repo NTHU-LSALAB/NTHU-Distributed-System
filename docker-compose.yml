@@ -177,3 +177,15 @@ services:
     - gateway
     ports:
     - 10081:8080
+
+  comment-migration:
+    image: nthu-distributed-system:latest
+    environment:
+      MIGRATION_SOURCE: file:///static/modules/comment/migration
+      MIGRATION_URL: postgres://postgres@postgres:5432/postgres?sslmode=disable
+    command:
+    - /cmd
+    - comment
+    - migration
+    depends_on:
+    - postgres
