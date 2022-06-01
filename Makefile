@@ -43,6 +43,7 @@ dc.generate:
 
 define make-generate-rules
 
+.PHONY: $1.generate
 $1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/protoc-gen-grpc-sarama bin/mockgen
 	protoc \
 		-I . \
@@ -59,9 +60,11 @@ $1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gatewa
 endef
 $(foreach module,$(MODULES),$(eval $(call make-generate-rules,$(module))))
 
+.PHONY: pkg.generate
 pkg.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/protoc-gen-grpc-sarama bin/mockgen
 	go generate ./pkg/...
 
+.PHONY: generate
 generate: pkg.generate $(addsuffix .generate,$(MODULES))
 
 bin/protoc-gen-go: go.mod
@@ -88,6 +91,7 @@ define make-dc-lint-rules
 .PHONY: dc.$1.lint
 dc.$1.lint:
 	$(DOCKER_COMPOSE) run --rm lint make $1.lint
+
 endef
 $(foreach module,$(MODULES),$(eval $(call make-dc-lint-rules,$(module))))
 
@@ -101,15 +105,18 @@ dc.lint:
 
 define make-lint-rules
 
+.PHONY: $1.lint
 $1.lint:
 	golangci-lint run ./modules/$1/...
 
 endef
 $(foreach module,$(MODULES),$(eval $(call make-lint-rules,$(module))))
 
+.PHONY: pkg.lint
 pkg.lint:
 	golangci-lint run ./pkg/...
 
+.PHONY: lint
 lint:
 	golangci-lint run ./...
 
@@ -120,8 +127,6 @@ lint:
 define make-dc-test-rules
 
 .PHONY: dc.$1.test
-
-# to test individual module, override the command defined in the docker-compose.yml file
 dc.$1.test:
 	$(DOCKER_COMPOSE) run --rm test make $1.test
 
@@ -138,15 +143,18 @@ dc.test:
 
 define make-test-rules
 
+.PHONY: $1.test
 $1.test:
 	go test -v -race ./modules/$1/...
 
 endef
 $(foreach module,$(MODULES),$(eval $(call make-test-rules,$(module))))
 
+.PHONY: pkg.test
 pkg.test:
 	go test -v -race ./pkg/...
 
+.PHONY: test
 test: pkg.test $(addsuffix .test,$(MODULES))
 
 ####################################################################################################
@@ -161,6 +169,7 @@ dc.image: dc.build
 dc.build:
 	$(DOCKER_COMPOSE) run --rm build
 
+.PHONY: build
 build: $(STATIC_DIRS)
 	@mkdir -p $(BUILD_DIR)
 	go build -o $(BUILD_DIR)/cmd ./cmd/main.go
