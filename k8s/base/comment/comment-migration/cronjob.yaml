@@ -8,17 +8,19 @@ spec:
   suspend: true
   jobTemplate:
     spec:
-      restartPolicy: Never
-      containers:
-      - name: comment-migration
-        image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
-        imagePullPolicy: Always
-        command:
-        - /cmd
-        - comment
-        - migration
-        env:
-        - name: MIGRATION_SOURCE
-          value: file:///static/modules/comment/migration
-        - name: MIGRATION_URL
-          value: postgres://postgres@postgres:5432/postgres?sslmode=disable
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: comment-migration
+            image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+            imagePullPolicy: Always
+            command:
+            - /cmd
+            - comment
+            - migration
+            env:
+            - name: MIGRATION_SOURCE
+              value: file:///static/modules/comment/migration
+            - name: MIGRATION_URL
+              value: postgres://postgres@postgres:5432/postgres?sslmode=disable
