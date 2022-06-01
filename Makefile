@@ -2,6 +2,11 @@ PATH := $(CURDIR)/bin:$(PATH)
 
 MODULES := video comment
 
+BUILD_DIR := bin/app
+BUILD_STATIC_DIR := $(BUILD_DIR)/static
+
+STATIC_DIRS := $(wildcard modules/*/migration)
+
 DOCKER_COMPOSE := $(or $(DOCKER_COMPOSE),$(DOCKER_COMPOSE),docker compose)
 
 ####################################################################################################
@@ -156,6 +161,12 @@ dc.image: dc.build
 dc.build:
 	$(DOCKER_COMPOSE) run --rm build
 
-build:
-	mkdir -p ./bin/app
-	go build -o ./bin/app/cmd ./cmd/main.go
+build: $(STATIC_DIRS)
+	@mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/cmd ./cmd/main.go
+
+.PHONY: $(STATIC_DIRS)
+.SECONDEXPANSION:
+$(STATIC_DIRS): %: $$(wildcard %/*)
+	@mkdir -p $(BUILD_STATIC_DIR)/$@
+	cp -R $@/. $(BUILD_STATIC_DIR)/$@
