@@ -44,5 +44,7 @@ func runMigration(_ *cobra.Command, _ []string) error {
 		logger.Fatal("failed to run migration", zap.Error(err))
 	}
 
+	logger.Info("run migration job successfully, terminating ...")
+
 	return nil
 }
