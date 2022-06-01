@@ -1,0 +1,22 @@
+name: Run Migration Job
+description: Create a migration job from an existing CronJob, wait for the job to finish.
+author: Justin Chen <mail@justin0u0.com>
+inputs:
+  migration-cronjob-name:
+    description: The migration cronjob name in the Kubernetes cluster.
+    required: true
+  migration-job-name:
+    description: The manually run migration job name.
+    required: true
+  migration-job-timeout:
+    description: The timeout duration of the migration job.
+    required: true
+    default: 3m
+runs:
+  using: composite
+  steps:
+  - name: run migration job
+    shell: bash
+    run: |
+      kubectl create job --from cronjob/${{ inputs.migration-cronjob-name }} ${{ inputs.migration-job-name }}
+      kubectl wait --for=condition=complete --timeout ${{ inputs.migration-job-timeout }} job/${{ inputs.migration-job-name }}

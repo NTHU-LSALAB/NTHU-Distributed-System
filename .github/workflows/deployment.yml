@@ -40,6 +40,12 @@ jobs:
         cluster-server: ${{ secrets.KUBERNETES_CLUSTER_SERVER }}
         credentials-token: ${{ secrets.KUBERNETES_CREDENTIALS_TOKEN }}
 
+    - name: run migration job
+      uses: ./.github/actions/run-migration
+      with:
+        migration-cronjob-name: comment-migration
+        migration-job-name: comment-migration-${{ github.run_id }}
+
     - name: deploy comment-api
       run: kubectl set image deploy/comment-api comment-api=${{ needs.setup.outputs.image-name }}
 
