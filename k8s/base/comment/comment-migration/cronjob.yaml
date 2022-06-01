@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: comment-migration
+spec:
+  schedule: 0 0 * * *
+  concurrencyPolicy: Forbid
+  suspend: true
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: comment-migration
+            image: ghcr.io/nthu-lsalab/nthu-distributed-system:latest
+            imagePullPolicy: Always
+            command:
+            - /cmd
+            - comment
+            - migration
+            env:
+            - name: MIGRATION_SOURCE
+              value: file:///static/modules/comment/migration
+            - name: MIGRATION_URL
+              value: postgres://postgres@postgres:5432/postgres?sslmode=disable

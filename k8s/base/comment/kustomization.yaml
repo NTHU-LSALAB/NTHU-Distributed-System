@@ -1,6 +1,7 @@
 resources:
 - comment-api
 - comment-gateway
+- comment-migration
 
 commonLabels:
   module: comment
