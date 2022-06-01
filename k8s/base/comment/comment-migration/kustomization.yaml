@@ -1,0 +1,5 @@
+resources:
+- cronjob.yaml
+
+commonLabels:
+  app: comment-migration
