@@ -72,8 +72,13 @@ storageClass:
   ## StorageClass parameters
   parameters: {}
 
+  # https://www.mongodb.com/docs/manual/administration/production-notes/#remote-filesystems--nfs-
   mountOptions:
-    - vers=3
+  - bg
+  - hard
+  - nolock
+  - noatime
+  - nointr
 
   ## ReclaimPolicy field of the class, which can be either Delete or Retain
   reclaimPolicy: Retain
