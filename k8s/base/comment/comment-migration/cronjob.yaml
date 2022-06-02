@@ -24,3 +24,10 @@ spec:
               value: file:///static/modules/comment/migration
             - name: MIGRATION_URL
               value: postgres://postgres@postgres:5432/postgres?sslmode=disable
+            resources:
+              requests:
+                memory: 30Mi
+                cpu: 10m
+              limits:
+                memory: 60Mi
+                cpu: 20m
