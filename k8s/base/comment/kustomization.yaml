@@ -1,5 +1,5 @@
 resources:
-- comment-api
+# TODO: - comment-api
 - comment-gateway
 - comment-migration
 

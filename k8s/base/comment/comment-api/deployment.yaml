@@ -1,9 +1,9 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: # TODO:
+kind: # TODO:
 metadata:
   name: comment-api
 spec:
-  replicas: 2
+  replicas: # TODO:
   template:
     spec:
       containers:
@@ -16,9 +16,7 @@ spec:
         - name: prometheus
           containerPort: 2222
         command:
-        - /cmd
-        - comment
-        - api
+        # TODO:
         env:
         - name: METER_HISTOGRAM_BOUNDARIES
           value: 10,100,200,500,1000
