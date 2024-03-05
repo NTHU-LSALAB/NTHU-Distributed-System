@@ -18,7 +18,7 @@ x-common-env: &common-env
   MINIO_PASSWORD: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
 
 x-common-build: &common-build
-  image: justin0u0/golang-protoc:protoc-3.19.3-golang-1.17
+  image: justin0u0/golang-protoc:protoc-25.3-golang-1.21.7
   working_dir: /src
   environment:
     <<: *common-env
