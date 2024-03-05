@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/gateway"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/video/pb"
@@ -80,7 +81,8 @@ func serveHTTP(lis net.Listener, conn *grpc.ClientConn, logger *logkit.Logger) r
 	}
 
 	httpServer := &http.Server{
-		Handler: mux,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	return func(ctx context.Context) error {

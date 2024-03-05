@@ -77,6 +77,7 @@ func listVideoKey(limit, skip int64) string {
 // id that is useful for testing
 func NewFakeVideo() *Video {
 	id := primitive.NewObjectID()
+	baseURL := "https://storage.example.com/videos/" + id.Hex()
 
 	// Note that timestamp is hard to test equally,
 	// so ignore the `createdAt` and `updatedAt` field
@@ -87,11 +88,11 @@ func NewFakeVideo() *Video {
 		Height:   600,
 		Size:     144000,
 		Duration: 10.234,
-		URL:      "https://storage.example.com/videos/" + id.Hex() + ".mp4",
+		URL:      baseURL + ".mp4",
 		Status:   VideoStatusSuccess,
 		Variants: map[string]string{
-			"1080p": "https://storage.example.com/videos/" + id.Hex() + "-1080p.mp4",
-			"720p":  "https://storage.example.com/videos/" + id.Hex() + "-720p.mp4",
+			"1080p": baseURL + "-1080p.mp4",
+			"720p":  baseURL + "-720p.mp4",
 		},
 	}
 }

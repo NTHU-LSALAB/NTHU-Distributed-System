@@ -139,6 +139,7 @@ func newPrometheusServer(exporter *prometheus.Exporter, conf *PrometheusServiceM
 				http.NotFound(w, r)
 			}
 		}),
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	go func() {

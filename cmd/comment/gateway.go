@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/modules/comment/pb"
 	"github.com/NTHU-LSALAB/NTHU-Distributed-System/pkg/grpckit"
@@ -72,7 +73,8 @@ func serveHTTP(lis net.Listener, conn *grpc.ClientConn, logger *logkit.Logger) r
 	mux := runtime.NewServeMux()
 
 	httpServer := &http.Server{
-		Handler: mux,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	return func(ctx context.Context) error {
